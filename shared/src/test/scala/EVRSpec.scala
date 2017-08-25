@@ -5,27 +5,31 @@ import rpm4s.data.{EVR, Epoch, Release, Version}
 class EVRSpec extends FlatSpec with Matchers with PropertyChecks {
 
   "version" should "not allow empty string" in {
-    Version.fromString("") should be(None)
+    Version.parse("") should be(None)
   }
 
-  "evr" should "parse v correctly" in {
-    EVR.fromString("1.2.3") should equal(Some(EVR(Version("1.2.3"))))
-  }
-
-  it should "parse e:v correctly" in {
-    EVR.fromString("12:1.2.3") should equal(
-      Some(EVR(Version("1.2.3"), None, Some(Epoch(12)))))
-  }
-
-  it should "parse v-r correctly" in {
-    EVR.fromString("1.2.3-4.5") should equal(
-      Some(EVR(Version("1.2.3"), Some(Release("4.5"))))
+  "EVR.parse" should "handle v correctly" in {
+    EVR.parse("1.2.3") should equal(
+      Some(EVR(Version.parse("1.2.3").get))
     )
   }
 
-  it should "parse e:v-r correctly" in {
-    EVR.fromString("12:1.2.3-4.5") should equal(
-      Some(EVR(Version("1.2.3"), Some(Release("4.5")), Some(Epoch(12)))))
+  it should "handle e:v correctly" in {
+    EVR.parse("12:1.2.3") should equal(
+      Some(EVR(Version.parse("1.2.3").get, None, Some(Epoch(12))))
+    )
+  }
+
+  it should "handle v-r correctly" in {
+    EVR.parse("1.2.3-4.5") should equal(
+      Some(EVR(Version.parse("1.2.3").get, Some(Release("4.5"))))
+    )
+  }
+
+  it should "handle e:v-r correctly" in {
+    EVR.parse("12:1.2.3-4.5") should equal(
+      Some(EVR(Version.parse("1.2.3").get, Some(Release("4.5")), Some(Epoch(12))))
+    )
   }
 
 }

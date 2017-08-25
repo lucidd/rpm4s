@@ -7,7 +7,7 @@ case class EVR(
 object EVR {
   //TODO: more validation for individual parts
   //TODO: Document format
-  def fromString(evr: String): Option[EVR] = {
+  def parse(evr: String): Option[EVR] = {
     val relIdx = evr.lastIndexOf("-")
 
     val (release, ev) = if (relIdx == -1) {

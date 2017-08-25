@@ -104,7 +104,7 @@ object Extractor {
           .zip(flags.values)
           .map {
             case ((name, version), flags) =>
-              construct(Name(name), EVR.fromString(version), SenseFlags(flags))
+              construct(Name(name), EVR.parse(version), SenseFlags(flags))
           }
       }
       Right(a.getOrElse(Vector.empty))
@@ -298,7 +298,7 @@ object Extractor {
     def extract(data: Data): Result[Version] =
       data(HeaderTag.Version).flatMap { x =>
         Version
-          .fromString(x.value)
+          .parse(x.value)
           .toRight(ConvertingError(s"invalid version ${x.value}"))
       }
   }
