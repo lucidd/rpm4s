@@ -82,6 +82,10 @@ lazy val rpm4s = crossProject
   .configs(DebugTest)
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
   .settings(
+    coverageEnabled := true,
+    coverageMinimum := 42, // TODO: increase this once we have more
+    coverageFailOnMinimum := true,
+    buildInfoPackage := "rpm4s",
     resolvers += Resolver.sonatypeRepo("snapshots"),
     fork in DebugTest := true,
     javaOptions in DebugTest ++= Seq(
@@ -113,9 +117,8 @@ lazy val rpm4s = crossProject
         "-Xfatal-warnings"
       )))
   )
-  .enablePlugins(BuildInfoPlugin)
+  .enablePlugins(BuildInfoPlugin, ScoverageSbtPlugin)
     .settings(
-      buildInfoPackage := "rpm4s"
     )
 
 lazy val rpm4sJVM = rpm4s.jvm
