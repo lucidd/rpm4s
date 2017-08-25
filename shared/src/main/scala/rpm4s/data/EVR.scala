@@ -23,7 +23,7 @@ object EVR {
       (Some(ev.substring(0, epochIdx)), ev.substring(epochIdx + 1))
     }
 
-    Version.fromString(version).map { ver =>
+    Version.parse(version).map { ver =>
       EVR(
         ver,
         release.map(Release(_)),

@@ -13,6 +13,7 @@ case class Or(a: License, b: License) extends License
 // TODO find out if "license with ..." should be modeled as modifiers on existing licenses
 // TODO find out if "... with exceptions" is a concrete license or a set of licenses
 // TODO find duplicate (equivalent but differently named licenses) and normalize them
+// TODO implement normalize for licences to make different format strings comparable
 object License {
 
   implicit class LicenseOps(val license: License) extends AnyVal {
@@ -281,11 +282,7 @@ object License {
   case object `BitTorrent-1.1` extends KnownLicense
   case object `SUSE-Sun-Laboratories` extends KnownLicense
 
-
-
-
-
-  val allLicenses = List(
+  val allKnownLicenses: List[KnownLicense] = List(
     `GPL-2.0`,
     `GPL-2.0+`,
     `LGPL-3.0+`,
@@ -479,7 +476,7 @@ object License {
     `SUSE-Sun-Laboratories`
   )
 
-  val name2license: Map[String, License] = allLicenses.map(
+  val name2license: Map[String, KnownLicense] = allKnownLicenses.map(
     license => license.toString -> license
   ).toMap
 

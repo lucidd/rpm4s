@@ -1,11 +1,27 @@
 package rpm4s.data
 
+import rpm4s.data.Version.Segment
+
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 
-case class Version(value: String) extends AnyVal {
+case class Version(segments: List[Segment]) extends AnyVal {
   import Version._
-  def segments: List[Segment] = {
+  def string: String = {
+    segments.foldLeft(new StringBuilder) { case (sb, s) =>
+      s match {
+        case Alpha(v) => sb.append(v)
+        case Numeric(v) => sb.append(v)
+        case Separator(v) => sb.append(v)
+        case Tilde => sb.append('~')
+      }
+    }.toString
+  }
+}
+
+object Version {
+
+  def parse(value: String): Option[Version] = {
     def seg(rest: String, acc: ListBuffer[Segment]): List[Segment] = {
       rest.headOption match {
         case None => acc.toList
@@ -22,18 +38,19 @@ case class Version(value: String) extends AnyVal {
           seg(rest.drop(separator.length), acc :+ Separator(separator))
       }
     }
-    seg(value, new ListBuffer)
-  }
-}
-
-object Version {
-
-  implicit val ordering: Ordering[Version] = new Ordering[Version] {
-    def compare(x: Version, y: Version): Int = Version.compare(x, y)
+    val segments = seg(value, new ListBuffer)
+    if (segments.isEmpty) None
+    else Some(Version(segments))
   }
 
-  def rpmvercmp(v1: String, v2: String): Int = {
-    compare(Version(v1), Version(v2))
+  implicit val ordering: Ordering[Version] =
+    (x: Version, y: Version) => Version.compare(x, y)
+
+  def rpmvercmp(v1: String, v2: String): Option[Int] = {
+    for {
+      a <- parse(v1)
+      b <- parse(v2)
+    } yield compare(a, b)
   }
   def compare(v1: Version, v2: Version): Int = {
     @tailrec
@@ -70,10 +87,6 @@ object Version {
     segment(v1.segments, v2.segments)
   }
 
-  def fromString(value: String): Option[Version] = {
-    if (value.isEmpty) None
-    else Some(Version(value))
-  }
   sealed trait Segment extends Product with Serializable
   case class Separator(value: String) extends Segment
   case object Tilde extends Segment
