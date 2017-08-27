@@ -9,7 +9,7 @@ node_js:
   - "6"
 
 script:
-  - sbt clean coverage test coverageReport
-
-after_success:
+  - SBT_PROFILE=coverage sbt clean coverage test coverageReport coverageAggregate
   - bash <(curl -s https://codecov.io/bash)
+  - sbt clean test
+

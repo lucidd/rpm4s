@@ -1,6 +1,14 @@
 import Dependencies._
 import org.scalajs.jsenv.nodejs.NodeJSEnv
+import org.scalajs.sbtplugin.cross.CrossProject
 
+lazy val cmdlineProfile =
+  sys.env.getOrElse("SBT_PROFILE", "")
+
+def profile: CrossProject ⇒ CrossProject = pr => cmdlineProfile match {
+  case "coverage" => pr.enablePlugins(ScoverageSbtPlugin)
+  case _ => pr.disablePlugins(ScoverageSbtPlugin)
+}
 
 scalafmtVersion in ThisBuild := "1.0.0-RC2"
 
@@ -74,13 +82,18 @@ lazy val root = project
 
 lazy val benchmarks = project
   .in(file("benchmarks"))
+  .settings(
+    coverageEnabled := false
+  )
   .dependsOn(rpm4sJVM)
   .enablePlugins(JmhPlugin)
 
 lazy val rpm4s = crossProject
   .in(file("."))
+  .enablePlugins(BuildInfoPlugin)
   .configs(DebugTest)
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
+  .configureCross(profile)
   .settings(
     coverageEnabled := true,
     coverageMinimum := 42, // TODO: increase this once we have more
@@ -117,9 +130,6 @@ lazy val rpm4s = crossProject
         "-Xfatal-warnings"
       )))
   )
-  .enablePlugins(BuildInfoPlugin, ScoverageSbtPlugin)
-    .settings(
-    )
 
 lazy val rpm4sJVM = rpm4s.jvm
   .settings(
