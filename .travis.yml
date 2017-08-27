@@ -13,3 +13,12 @@ script:
   - bash <(curl -s https://codecov.io/bash)
   - sbt clean test
 
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.coursier/cache
+    - $HOME/.sbt
+
+before_cache:
+  - find $HOME/.sbt -name "*.lock" -type f -delete
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
