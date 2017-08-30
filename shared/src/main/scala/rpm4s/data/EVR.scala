@@ -1,5 +1,7 @@
 package rpm4s.data
 
+import rpm4s.codecs.ConvertingError
+
 case class EVR(
     version: Version,
     release: Option[Release] = None,
@@ -7,7 +9,7 @@ case class EVR(
 object EVR {
   //TODO: more validation for individual parts
   //TODO: Document format
-  def parse(evr: String): Option[EVR] = {
+  def parse(evr: String): Either[ConvertingError, EVR] = {
     val relIdx = evr.lastIndexOf("-")
 
     val (release, ev) = if (relIdx == -1) {
@@ -22,13 +24,16 @@ object EVR {
     } else {
       (Some(ev.substring(0, epochIdx)), ev.substring(epochIdx + 1))
     }
-
-    Version.parse(version).map { ver =>
-      EVR(
-        ver,
-        release.map(Release(_)),
-        epoch.map(x => Epoch(x.toInt))
-      )
-    }
+    for {
+      ver <- Version.parse(version)
+      rel <- release match {
+        case Some(r) => Release.fromString(r).map(Some(_))
+        case None => Right(None)
+      }
+      ep <- epoch match {
+        case Some(e) =>  Epoch.fromString(e).map(Some(_))
+        case None => Right(None)
+      }
+    } yield EVR(ver, rel, ep)
   }
 }

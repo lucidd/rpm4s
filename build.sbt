@@ -17,8 +17,7 @@ val DebugTest = config("dtest") extend Test
 def scalacOptionsVersion(scalaVersion: String) = {
   Seq(
     "-deprecation", // Emit warning and location for usages of deprecated APIs.
-    "-encoding",
-    "utf-8", // Specify character encoding used by source files.
+    "-encoding", "utf-8", // Specify character encoding used by source files.
     "-explaintypes", // Explain type errors in more detail.
     "-feature", // Emit warning and location for usages of features that should be imported explicitly.
     "-language:existentials", // Existential types (besides wildcard types) can be written and inferred
@@ -37,7 +36,8 @@ def scalacOptionsVersion(scalaVersion: String) = {
     "-Ywarn-nullary-override", // Warn when non-nullary `def f()' overrides nullary `def f'.
     "-Ywarn-nullary-unit", // Warn when nullary methods return Unit.
     "-Ywarn-numeric-widen", // Warn when numerics are widened.
-    "-Ywarn-value-discard" // Warn when non-Unit expression results are unused.
+    "-Ywarn-value-discard", // Warn when non-Unit expression results are unused.
+    "-Ypatmat-exhaust-depth", "40"
   ) ++ (CrossVersion.partialVersion(scalaVersion) match {
     case Some((2, 11)) => Nil
     case Some((2, 12)) => Seq(
@@ -75,6 +75,7 @@ lazy val root = project
   .aggregate(rpm4sJS, rpm4sJVM)
   .settings(
     coverageEnabled := false,
+    coverageMinimum := 54, // TODO: increase this once we have more
     publishArtifact := false,
     publish := {},
     publishLocal := {}
@@ -96,7 +97,6 @@ lazy val rpm4s = crossProject
   .configureCross(profile)
   .settings(
     coverageEnabled := true,
-    coverageMinimum := 42, // TODO: increase this once we have more
     coverageFailOnMinimum := true,
     buildInfoPackage := "rpm4s",
     resolvers += Resolver.sonatypeRepo("snapshots"),
@@ -133,12 +133,14 @@ lazy val rpm4s = crossProject
 
 lazy val rpm4sJVM = rpm4s.jvm
   .settings(
+    coverageMinimum := 64, // TODO: increase this once we have more
     libraryDependencies ++= Seq(
     )
   )
 
 lazy val rpm4sJS = rpm4s.js
   .settings(
+    coverageMinimum := 37, // TODO: increase this once we have more
     parallelExecution := false,
     requiresDOM := false,
     jsEnv := new NodeJSEnv()

@@ -1,10 +1,8 @@
 package rpm4s
 
-import java.nio.channels.FileChannel
 import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
-import rpm4s.{Lead, RpmFile}
 import scodec.Codec
 import scodec.bits.BitVector
 import rpm4s.codecs._

@@ -3,10 +3,11 @@ package rpm4s
 import org.scalacheck.Arbitrary
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
-import rpm4s.IndexData.StringData
+import rpm4s.codecs.IndexData.StringData
 import scodec.{Attempt, Codec}
 import scodec.bits.BitVector
 import rpm4s.codecs._
+import rpm4s.data.{Architecture, Name, RpmPrimaryEntry, Version}
 
 class RpmParseSpec
     extends FlatSpec
@@ -16,7 +17,7 @@ class RpmParseSpec
   implicit val stringDataArb = Arbitrary(
     Arbitrary.arbString.arbitrary.map(StringData))
 
-  "RPM" should "be parseable" in {
+  "Codec[RpmFile]" should "be parseable" in {
     val bits = BitVector.fromInputStream(
       getClass.getResourceAsStream("/kernel-default-4.11.8-1.2.x86_64.rpm"))
     val rpmFile = Codec[RpmFile].decode(bits)
@@ -30,6 +31,15 @@ class RpmParseSpec
     rpmFile.require.remainder shouldBe BitVector.empty
     val encoded = Codec[RpmFile].encode(rpmFile.require.value)
     encoded shouldEqual Attempt.successful(bits)
+  }
+
+  "rpm.decode" should "correctly decode RpmPrimaryEntry" in {
+    val bits = BitVector.fromInputStream(
+      getClass.getResourceAsStream("/kernel-default-4.11.8-1.2.x86_64.rpm"))
+    val rpe = rpm4s.decode[RpmPrimaryEntry](bits).require
+    rpe.architecture shouldBe Architecture.x86_64
+    rpe.name shouldBe Name.fromString("kernel-default").toOption.get
+    rpe.version shouldBe Version.parse("4.11.8").toOption.get
   }
 
 }

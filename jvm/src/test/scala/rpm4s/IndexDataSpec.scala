@@ -3,7 +3,7 @@ package rpm4s
 import org.scalacheck.Arbitrary
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
-import rpm4s.IndexData.StringData
+import rpm4s.codecs.IndexData.StringData
 import rpm4s.codecs._
 import rpm4s.data.HeaderType
 import scodec.bits.BitVector

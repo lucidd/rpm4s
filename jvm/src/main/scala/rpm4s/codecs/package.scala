@@ -1,6 +1,6 @@
 package rpm4s
 
-import rpm4s.IndexData._
+import rpm4s.codecs._
 import scodec._
 import scodec.codecs._
 import scodec.bits._
@@ -10,6 +10,7 @@ import rpm4s.data.HeaderType._
 import rpm4s.data.OS._
 import rpm4s.data.Architecture._
 import SignatureTag._
+import rpm4s.codecs.IndexData._
 import rpm4s.data.{Architecture, HeaderRange, HeaderType, RPMType}
 
 import scala.annotation.tailrec
@@ -635,7 +636,7 @@ package object codecs {
               def apply[A <: IndexData](tag: HeaderTag[A]): Extractor.Result[A] =
                 map.get(tag).map(_.asInstanceOf[A]) match {
                   case Some(x) => Right(x)
-                  case None    => Left(Extractor.MissingHeader(tag))
+                  case None    => Left(MissingHeader(tag))
                 }
            }
           )

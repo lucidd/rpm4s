@@ -1,4 +1,4 @@
-package rpm4s
+package rpm4s.codecs
 
 import rpm4s.data.HeaderType
 

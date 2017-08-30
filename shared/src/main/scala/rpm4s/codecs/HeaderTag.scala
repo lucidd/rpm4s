@@ -1,6 +1,6 @@
-package rpm4s
+package rpm4s.codecs
 
-import rpm4s.IndexData._
+import rpm4s.codecs.IndexData._
 
 sealed trait RPMTag extends Product with Serializable
 sealed trait HeaderTag[+T <: IndexData] extends RPMTag

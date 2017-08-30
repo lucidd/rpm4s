@@ -1,5 +1,6 @@
 package rpm4s
 
+import rpm4s.codecs.{Header, HeaderTag, IndexData, IndexEntry, SignatureTag}
 import scodec.bits.BitVector
 
 case class RpmFile(

@@ -12,7 +12,7 @@ import rpm4s.data.{OS, RPMType}
  * @param archnum
  * @param name
  * @param osnum  just testing
- * @param signatureType  type of [[rpm4s.HeaderTag.HeaderSignatures]]
+ * @param signatureType  type of [[rpm4s.codecs.HeaderTag.HeaderSignatures]]
  */
 case class Lead(
   major: Int,

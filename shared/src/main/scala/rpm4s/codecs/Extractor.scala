@@ -2,11 +2,10 @@ package rpm4s.codecs
 
 import java.time.{Instant, ZoneOffset}
 
-import rpm4s.IndexData.{Int32Data, StringArrayData}
 import rpm4s.codecs.Extractor.Data
+import rpm4s.codecs.IndexData.{Int32Data, StringArrayData}
 import rpm4s.data.Checksum.Sha1
 import rpm4s.data._
-import rpm4s.{HeaderTag, IndexData, RPMTag, SignatureTag}
 import scodec.bits.BitVector
 import shapeless.{::, Generic, HList, HNil, Lazy}
 
@@ -36,9 +35,6 @@ trait Extractor[T] {
 }
 
 object Extractor {
-  sealed trait Error
-  case class MissingHeader(tag: RPMTag) extends Error
-  case class ConvertingError(msg: String) extends Error
 
   /**
     * Holds the data for an [[Extractor]]
@@ -93,20 +89,23 @@ object Extractor {
     )
     val sigTags: Set[SignatureTag] = Set.empty
     def extract(data: Data): Result[Vector[T]] = {
+      import cats.implicits._
       //TODO: needs more validation
       val a = for {
         names <- data(namesTag)
         versions <- data(versionTag)
         flags <- data(flagsTag)
-      } yield {
-        names.values
+        result <- names.values
           .zip(versions.values)
           .zip(flags.values)
-          .map {
-            case ((name, version), flags) =>
-              construct(Name(name), EVR.parse(version), SenseFlags(flags))
+          .traverse { case ((name, evr), flags) =>
+            for {
+              name <- Name.fromString(name)
+              evr <- if (evr.nonEmpty) Right(None)
+              else EVR.parse(evr).map(Some(_))
+            } yield construct(name, evr, SenseFlags(flags))
           }
-      }
+      } yield result
       Right(a.getOrElse(Vector.empty))
     }
   }
@@ -178,21 +177,23 @@ object Extractor {
       )
       val sigTags: Set[SignatureTag] = Set.empty
       def extract(data: Data): Result[Vector[FileEntry]] = {
-        val a = for {
+        import cats.implicits._
+        for {
           dirNames <- data(HeaderTag.DirNames)
           dirIndexes <- data(HeaderTag.DirIndexes)
           baseNames <- data(HeaderTag.BaseNames)
           flags <- data(HeaderTag.FileFlags)
           modes <- data(HeaderTag.FileModes)
-        } yield {
-          baseNames.values.zip(dirIndexes.values).zipWithIndex.map {
+          result <- baseNames.values.zip(dirIndexes.values).zipWithIndex.traverse {
             case ((base, idx), index) =>
-              val mode = Stat(modes.values(index))
+              val rawMode = modes.values(index)
+              val mode = Stat.fromShort(rawMode)
               val flag = FileFlags(flags.values(index))
-              FileEntry(dirNames.values(idx) + base, mode, flag)
+              mode.toRight(
+                ConvertingError(s"$rawMode is not a valid mode value")
+              ).map(m => FileEntry(dirNames.values(idx) + base, m, flag))
           }
-        }
-        Right(a.getOrElse(Vector.empty))
+        } yield result
       }
     }
 
@@ -225,7 +226,9 @@ object Extractor {
     val tags: Set[HeaderTag[_ <: IndexData]] = Set(HeaderTag.Name)
     val sigTags: Set[SignatureTag] = Set.empty
     def extract(data: Data): Result[Name] =
-      data(HeaderTag.Name).map(d => Name(d.value))
+      data(HeaderTag.Name).flatMap { d =>
+        Name.fromString(d.value)
+      }
   }
 
   implicit val buildTimeExtractor: Extractor[BuildTime] =
@@ -262,14 +265,18 @@ object Extractor {
     val tags: Set[HeaderTag[_ <: IndexData]] = Set(HeaderTag.Epoch)
     val sigTags: Set[SignatureTag] = Set.empty
     def extract(data: Data): Result[Epoch] =
-      data(HeaderTag.Epoch).map(x => Epoch(x.values.head))
+      data(HeaderTag.Epoch).flatMap { x =>
+        Epoch.fromInt(x.values.head)
+      }
   }
 
   implicit val releaseExtractor: Extractor[Release] = new Extractor[Release] {
     val tags: Set[HeaderTag[_ <: IndexData]] = Set(HeaderTag.Release)
     val sigTags: Set[SignatureTag] = Set.empty
     def extract(data: Data): Result[Release] =
-      data(HeaderTag.Release).map(x => Release(x.value))
+      data(HeaderTag.Release).flatMap(
+        x => Release.fromString(x.value)
+      )
   }
 
   implicit val vendorExtractor: Extractor[Vendor] = new Extractor[Vendor] {
@@ -297,9 +304,7 @@ object Extractor {
     val sigTags: Set[SignatureTag] = Set.empty
     def extract(data: Data): Result[Version] =
       data(HeaderTag.Version).flatMap { x =>
-        Version
-          .parse(x.value)
-          .toRight(ConvertingError(s"invalid version ${x.value}"))
+        Version.parse(x.value)
       }
   }
 

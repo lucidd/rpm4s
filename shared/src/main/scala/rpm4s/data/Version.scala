@@ -1,95 +1,185 @@
 package rpm4s.data
 
-import rpm4s.data.Version.Segment
+import cats.kernel.Comparison
+import rpm4s.codecs.ConvertingError
+import rpm4s.data.Version.{Alpha, Numeric, Segment, Separator, Tilde}
+import rpm4s.utils.{isAlpha, isNum}
 
 import scala.annotation.tailrec
-import scala.collection.mutable.ListBuffer
+import scala.collection.immutable.HashSet
 
-case class Version(segments: List[Segment]) extends AnyVal {
-  import Version._
+case class Version (segment: Segment) {
   def string: String = {
-    segments.foldLeft(new StringBuilder) { case (sb, s) =>
-      s match {
-        case Alpha(v) => sb.append(v)
-        case Numeric(v) => sb.append(v)
-        case Separator(v) => sb.append(v)
-        case Tilde => sb.append('~')
-      }
-    }.toString
+    @tailrec
+    def str(seg: Option[Segment], acc: StringBuilder): String = seg match {
+      case None => acc.toString()
+      case Some(Tilde(next)) => str(next, acc.append('~'))
+      case Some(Alpha(value, next)) => str(next, acc.append(value))
+      case Some(Separator(value, next)) => str(next, acc.append(value))
+      case Some(Numeric(value, next)) => str(next, acc.append(value))
+    }
+    str(Some(segment), new StringBuilder)
   }
 }
 
 object Version {
+  sealed trait Segment {
+    def next: Option[Segment]
+  }
+  sealed trait NotAlpha extends Segment
+  sealed trait NotNumeric extends Segment
+  sealed trait NotSeparator extends Segment
 
-  def parse(value: String): Option[Version] = {
-    def seg(rest: String, acc: ListBuffer[Segment]): List[Segment] = {
-      rest.headOption match {
-        case None => acc.toList
-        case Some(c) if c.isLetter =>
-          val alpha = rest.takeWhile(_.isLetter)
-          seg(rest.drop(alpha.length), acc :+ Alpha(alpha))
-        case Some(c) if c.isDigit =>
-          val digits = rest.takeWhile(_.isDigit)
-          seg(rest.drop(digits.length), acc :+ Numeric(BigInt(digits)))
-        case Some('~') =>
-          seg(rest.tail, acc :+ Tilde)
-        case Some(_) =>
-          val separator = rest.takeWhile(c => !(c.isLetterOrDigit || c == '~'))
-          seg(rest.drop(separator.length), acc :+ Separator(separator))
+  def parse(value: String): Either[ConvertingError, Version] = {
+    def alpha(rest: String): Either[ConvertingError, Option[Alpha]] = {
+      val a = rest.takeWhile(isAlpha)
+      notAlpha(rest.drop(a.length)).map { next =>
+        Some(new Alpha(a, next))
       }
     }
-    val segments = seg(value, new ListBuffer)
-    if (segments.isEmpty) None
-    else Some(Version(segments))
+    def numeric(rest: String): Either[ConvertingError, Option[Numeric]] = {
+      val a = rest.takeWhile(isNum)
+      notNum(rest.drop(a.length)).map { next =>
+        Some(new Numeric(a, next))
+      }
+    }
+    def separator(rest: String): Either[ConvertingError, Option[Separator]] = {
+      val a = rest.takeWhile(Separator.validSeparatorChars.contains)
+      notSep(rest.drop(a.length)).map { next =>
+        Some(new Separator(a, next))
+      }
+    }
+    def tilde(rest: String): Either[ConvertingError, Option[Tilde]] =
+      segment(rest.drop(1)).map(x => Some(Tilde(x)))
+
+    def notSep(rest: String): Either[ConvertingError, Option[NotSeparator]] = {
+      rest.headOption match {
+        case None => Right(None)
+        case Some(c) if isAlpha(c) => alpha(rest)
+        case Some(c) if isNum(c) => numeric(rest)
+        case Some('~') => tilde(rest)
+        case Some(c) => Left(ConvertingError(s"expected non sep segment got: '$c'"))
+      }
+    }
+    def notNum(rest: String): Either[ConvertingError, Option[NotNumeric]] = {
+      rest.headOption match {
+        case None => Right(None)
+        case Some(c) if isAlpha(c) => alpha(rest)
+        case Some('~') => tilde(rest)
+        case Some(c) if Separator.validSeparatorChars.contains(c) => separator(rest)
+        case Some(c) => Left(ConvertingError(s"expected non num segment got: '$c'"))
+      }
+    }
+    def notAlpha(rest: String): Either[ConvertingError, Option[NotAlpha]] = {
+      rest.headOption match {
+        case None => Right(None)
+        case Some(c) if isNum(c) => numeric(rest)
+        case Some('~') => tilde(rest)
+        case Some(c) if Separator.validSeparatorChars.contains(c) => separator(rest)
+        case Some(c) => Left(ConvertingError(s"expected non alpha segment got: '$c'"))
+      }
+    }
+    def segment(rest: String): Either[ConvertingError, Option[Segment]] = {
+      rest.headOption match {
+        case None => Right(None)
+        case Some(c) if isAlpha(c) => alpha(rest)
+        case Some(c) if isNum(c) => numeric(rest)
+        case Some('~') => tilde(rest)
+        case Some(c) if Separator.validSeparatorChars.contains(c) => separator(rest)
+        case Some(c) => Left(ConvertingError(s"'$c' is not a valid version char"))
+      }
+    }
+    segment(value).flatMap {
+      case Some(seg) => Right(new Version(seg))
+      case None => Left(ConvertingError(s"version can not be empty"))
+    }
   }
 
-  implicit val ordering: Ordering[Version] =
-    (x: Version, y: Version) => Version.compare(x, y)
 
-  def rpmvercmp(v1: String, v2: String): Option[Int] = {
+  implicit val ordering: Ordering[Version] =
+    (x: Version, y: Version) => Version.compare(x, y).toInt
+
+  def rpmvercmp(v1: String, v2: String): Either[ConvertingError, Comparison] = {
     for {
       a <- parse(v1)
       b <- parse(v2)
     } yield compare(a, b)
   }
-  def compare(v1: Version, v2: Version): Int = {
+  def compare(v1: Version, v2: Version): Comparison = {
     @tailrec
-    def segment(s1: List[Segment], s2: List[Segment]): Int = {
-      (s1.headOption, s2.headOption) match {
-        case (None, None) => 0
-        case (Some(Alpha(_)), None) | (Some(Numeric(_)), None) => 1
-        case (None, Some(Alpha(_))) | (None, Some(Numeric(_))) => -1
+    def segment(s1: Option[Segment], s2: Option[Segment]): Comparison = {
+      (s1, s2) match {
+        case (None, None) => Comparison.EqualTo
+        case (Some(Alpha(_, _)), None) | (Some(Numeric(_, _)), None) => Comparison.GreaterThan
+        case (None, Some(Alpha(_, _))) | (None, Some(Numeric(_, _))) => Comparison.LessThan
 
-        case (Some(Separator(_)), Some(Separator(_))) =>
-          segment(s1.tail, s2.tail)
-        case (_, Some(Separator(_))) => segment(s1, s2.tail)
-        case (Some(Separator(_)), _) => segment(s1.tail, s2)
+        case (Some(Tilde(r1)), Some(Tilde(r2))) =>
+          segment(r1, r2)
+        case (Some(Tilde(_)), _) => Comparison.LessThan
+        case (_, Some(Tilde(_))) => Comparison.GreaterThan
 
-        case (Some(Tilde), Some(Tilde)) => segment(s1.tail, s2.tail)
-        case (Some(Tilde), _) => -1
-        case (_, Some(Tilde)) => 1
+        case (Some(Separator(_, r1)), Some(Separator(_, r2))) =>
+          segment(r1, r2)
+        case (None, Some(Separator(_, r2))) =>
+          segment(None, r2)
+        case (Some(Separator(_, r1)), None) =>
+          segment(r1, None)
+        case (Some(seg), Some(Separator(_, r2))) =>
+          segment(seg.next, r2)
+        case (Some(Separator(_, r1)), Some(seg)) =>
+          segment(r1, seg.next)
 
-        case (Some(Alpha(_)), Some(Numeric(_))) => -1
-        case (Some(Numeric(_)), Some(Alpha(_))) => 1
 
-        case (Some(Numeric(num1)), Some(Numeric(num2))) =>
-          num1.compareTo(num2) match {
-            case 0 => segment(s1.tail, s2.tail)
-            case x => Integer.signum(x)
+        case (Some(Alpha(_, _)), Some(Numeric(_, _))) => Comparison.LessThan
+        case (Some(Numeric(_, _)), Some(Alpha(_, _))) => Comparison.GreaterThan
+
+        case (Some(lhs@Numeric(_, r1)), Some(rhs@Numeric(_, r2))) =>
+          lhs.toBigInt.compareTo(rhs.toBigInt) match {
+            case 0 => segment(r1, r2)
+            case x => Comparison.fromInt(x)
           }
-        case (Some(Alpha(alpha1)), Some(Alpha(alpha2))) =>
+        case (Some(Alpha(alpha1, r1)), Some(Alpha(alpha2, r2))) =>
           alpha1.compareTo(alpha2) match {
-            case 0 => segment(s1.tail, s2.tail)
-            case x => Integer.signum(x)
+            case 0 => segment(r1, r2)
+            case x => Comparison.fromInt(x)
           }
       }
     }
-    segment(v1.segments, v2.segments)
+    segment(Some(v1.segment), Some(v2.segment))
   }
 
-  sealed trait Segment extends Product with Serializable
-  case class Separator(value: String) extends Segment
-  case object Tilde extends Segment
-  case class Alpha(value: String) extends Segment
-  case class Numeric(value: BigInt) extends Segment
+
+  case class Separator private[Version] (value: String, next: Option[NotSeparator]) extends Segment with NotAlpha with NotNumeric {
+    def copy(value: String = value, next: Option[NotSeparator] = next): Nothing = ???
+  }
+  object Separator {
+    // found in librpm source build/parsePreamble.c
+    val validSeparatorChars = HashSet("{}%+_.": _*)
+  }
+
+  case class Tilde(next: Option[Segment]) extends Segment with NotAlpha with NotNumeric with NotSeparator
+
+  /**
+    * A version segment with one or more letters
+    * @param value non empty string containing only letters
+    */
+  case class Alpha private[Version] (value: String, next: Option[NotAlpha]) extends Segment with NotNumeric with NotSeparator {
+    def copy(value: String = value, next: Option[NotAlpha] = next): Nothing = ???
+  }
+  object Alpha {
+  }
+
+  /**
+    * A version segment with one or more digits
+    * @param value non empty string containing only digits
+    *
+    * Note: value is string to preserve leading zeros
+    */
+  case class Numeric private[Version] (value: String, next: Option[NotNumeric]) extends Segment with NotAlpha with NotSeparator {
+    def toBigInt: BigInt = BigInt(value)
+    def copy(value: String = value, next: Option[NotNumeric] = next): Nothing = ???
+  }
+  object Numeric {
+  }
+
 }
