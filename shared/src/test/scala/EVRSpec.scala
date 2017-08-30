@@ -1,13 +1,8 @@
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
-import rpm4s.codecs.ConvertingError
 import rpm4s.data.{EVR, Epoch, Release, Version}
 
 class EVRSpec extends FlatSpec with Matchers with PropertyChecks {
-
-  "version" should "not allow empty string" in {
-    Version.parse("") shouldBe Left(ConvertingError(s"version can not be empty"))
-  }
 
   "EVR.parse" should "handle v correctly" in {
     val expected = for {
