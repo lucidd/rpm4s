@@ -26,6 +26,8 @@ object Version {
   sealed trait Segment {
     def next: Option[Segment]
   }
+
+  //These traits ensure alpha, numeric and separator can not follow after themselves
   sealed trait NotAlpha extends Segment
   sealed trait NotNumeric extends Segment
   sealed trait NotSeparator extends Segment
@@ -150,9 +152,16 @@ object Version {
 
 
   case class Separator private[Version] (value: String, next: Option[NotSeparator]) extends Segment with NotAlpha with NotNumeric {
-    def copy(value: String = value, next: Option[NotSeparator] = next): Nothing = ???
+    def copy(value: String = value, next: Option[NotSeparator] = next): Either[ConvertingError, Separator] = {
+      Separator(value, next)
+    }
   }
   object Separator {
+    def apply(value: String, next: Option[NotSeparator]): Either[ConvertingError, Separator] = {
+      if (value.nonEmpty && value.forall(validSeparatorChars.contains))
+        Right(new Separator(value, next))
+      else Left(ConvertingError(s"$value does contain invalid chars for a separator segment"))
+    }
     // found in librpm source build/parsePreamble.c
     val validSeparatorChars = HashSet("{}%+_.": _*)
   }
@@ -164,9 +173,16 @@ object Version {
     * @param value non empty string containing only letters
     */
   case class Alpha private[Version] (value: String, next: Option[NotAlpha]) extends Segment with NotNumeric with NotSeparator {
-    def copy(value: String = value, next: Option[NotAlpha] = next): Nothing = ???
+    def copy(value: String = value, next: Option[NotAlpha] = next): Either[ConvertingError, Alpha] = {
+      Alpha(value, next)
+    }
   }
   object Alpha {
+    def apply(value: String, next: Option[NotAlpha]): Either[ConvertingError, Alpha] = {
+      if (value.nonEmpty && value.forall(isAlpha))
+        Right(new Alpha(value, next))
+      else Left(ConvertingError(s"$value does contain invalid chars for a alpha segment"))
+    }
   }
 
   /**
@@ -177,9 +193,16 @@ object Version {
     */
   case class Numeric private[Version] (value: String, next: Option[NotNumeric]) extends Segment with NotAlpha with NotSeparator {
     def toBigInt: BigInt = BigInt(value)
-    def copy(value: String = value, next: Option[NotNumeric] = next): Nothing = ???
+    def copy(value: String = value, next: Option[NotNumeric] = next): Either[ConvertingError, Numeric] = {
+      Numeric(value, next)
+    }
   }
   object Numeric {
+    def apply(value: String, next: Option[NotNumeric]): Either[ConvertingError, Numeric] = {
+      if (value.nonEmpty && value.forall(_.isDigit))
+        Right(new Numeric(value, next))
+      else Left(ConvertingError(s"$value does contain invalid chars for a numeric segment"))
+    }
   }
 
 }

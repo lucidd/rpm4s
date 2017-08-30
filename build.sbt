@@ -75,7 +75,7 @@ lazy val root = project
   .aggregate(rpm4sJS, rpm4sJVM)
   .settings(
     coverageEnabled := false,
-    coverageMinimum := 54, // TODO: increase this once we have more
+    coverageMinimum := 55, // TODO: increase this once we have more
     publishArtifact := false,
     publish := {},
     publishLocal := {}
@@ -133,14 +133,14 @@ lazy val rpm4s = crossProject
 
 lazy val rpm4sJVM = rpm4s.jvm
   .settings(
-    coverageMinimum := 64, // TODO: increase this once we have more
+    coverageMinimum := 65, // TODO: increase this once we have more
     libraryDependencies ++= Seq(
     )
   )
 
 lazy val rpm4sJS = rpm4s.js
   .settings(
-    coverageMinimum := 37, // TODO: increase this once we have more
+    coverageMinimum := 38, // TODO: increase this once we have more
     parallelExecution := false,
     requiresDOM := false,
     jsEnv := new NodeJSEnv()

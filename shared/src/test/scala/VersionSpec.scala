@@ -135,4 +135,65 @@ class VersionSpec extends FlatSpec with Matchers with PropertyChecks {
     }
   }
 
+  "Alpha" should "should allow a-zA-Z" in {
+    forAll(Gen.alphaStr.filter(_.nonEmpty)) { str: String =>
+      val a = Alpha(str ,None)
+      a.isRight shouldBe true
+      a.toOption.get.value shouldBe str
+    }
+  }
+
+  it should "not allow chars other then a-zA-Z" in {
+    forAll { str: String =>
+      whenever(!str.forall(rpm4s.utils.isAlpha)) {
+        Alpha(str, None).isLeft shouldBe true
+      }
+    }
+  }
+
+  it should "not allow empty string" in {
+    Alpha("", None).isLeft shouldBe true
+  }
+
+
+  "Numeric" should "allow 0-9" in {
+    forAll(Gen.numStr.filter(_.nonEmpty)) { str: String =>
+      val a = Numeric(str ,None)
+      a.isRight shouldBe true
+      a.toOption.get.value shouldBe str
+    }
+  }
+
+  it should "not allow chars other then 0-9" in {
+    forAll { str: String =>
+      whenever(!str.forall(rpm4s.utils.isNum)) {
+        Numeric(str, None).isLeft shouldBe true
+      }
+    }
+  }
+
+  it should "not allow empty string" in {
+    Numeric("", None).isLeft shouldBe true
+  }
+
+  "Separator" should "not only allow {}%+_." in {
+    forAll(Gen.nonEmptyListOf(Gen.oneOf("{}%+_.")).map(_.mkString)) { str: String =>
+      val a = Separator(str ,None)
+      a.isRight shouldBe true
+      a.toOption.get.value shouldBe str
+    }
+  }
+
+  it should "not allow chars other then {}%+_." in {
+    forAll { str: String =>
+      whenever(!str.forall(c => "{}%+_.".contains(c))) {
+        Separator(str, None).isLeft shouldBe true
+      }
+    }
+  }
+
+  it should "not allow empty string" in {
+    Separator("", None).isLeft shouldBe true
+  }
+
 }
