@@ -117,9 +117,6 @@ lazy val rpm4s = crossProject
       "org.scalatest" %%% "scalatest" % scalatest,
       "org.scalacheck" %%% "scalacheck" % scalacheck,
       "org.typelevel" %%% "cats-core" % cats,
-      "co.fs2" %% "fs2-io" % fs2,
-      "co.fs2" %%% "fs2-core" % fs2,
-      "co.fs2" %% "fs2-cats" % fs2Cats,
       "org.scodec" %% "scodec-core" % "1.10.3",
       "org.scodec" %% "scodec-cats" % "0.2.0"
     ),
