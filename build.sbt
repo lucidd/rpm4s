@@ -117,8 +117,7 @@ lazy val rpm4s = crossProject
       "org.scalatest" %%% "scalatest" % scalatest,
       "org.scalacheck" %%% "scalacheck" % scalacheck,
       "org.typelevel" %%% "cats-core" % cats,
-      "org.scodec" %% "scodec-core" % "1.10.3",
-      "org.scodec" %% "scodec-cats" % "0.2.0"
+      "org.scodec" %% "scodec-core" % "1.10.3"
     ),
     scalacOptions ++= scalacOptionsVersion(scalaVersion.value),
     scalacOptions in (Compile, console) ~= (_.filterNot(
@@ -139,7 +138,6 @@ lazy val rpm4sJS = rpm4s.js
   .settings(
     coverageMinimum := 38, // TODO: increase this once we have more
     parallelExecution := false,
-    requiresDOM := false,
     jsEnv := new NodeJSEnv()
   )
 
