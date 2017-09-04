@@ -19,7 +19,6 @@ object HeaderTag {
   case object DSAHeader extends HeaderTag[BinaryData] with SignatureTag
   case object RSAHeader extends HeaderTag[BinaryData] with SignatureTag
   case object SHA1Header extends HeaderTag[StringData] with SignatureTag
-  val HDRId = SHA1Header
 
   case object Name extends HeaderTag[StringData]
   case object Version extends HeaderTag[StringData]
