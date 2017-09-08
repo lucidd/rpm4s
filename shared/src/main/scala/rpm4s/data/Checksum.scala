@@ -19,7 +19,7 @@ object Checksum {
   }
   case class Sha1(bytes: ByteVector) extends Checksum {
     def toSelfDescribingHex: String = s"sha1-$toHex"
-    override def toString: String = toHex
+    override def toString: String = toSelfDescribingHex
   }
   object Sha1 {
     def fromBytes(bytes: ByteVector): Option[Sha1] = {
@@ -39,7 +39,7 @@ object Checksum {
 
   case class Sha256(bytes: ByteVector) extends Checksum {
     def toSelfDescribingHex: String = s"sha256-$toHex"
-    override def toString: String = toHex
+    override def toString: String = toSelfDescribingHex
   }
   object Sha256 {
     def bytesFromHex(value: String): Option[Array[Byte]] = {
