@@ -24,13 +24,17 @@ case class VirtualRef(name: String, version: Option[String], flags: SenseFlags) 
 object PkgRef {
   sealed trait RpmLib extends Product with Serializable
   object RpmLib {
+    //TODO: find the remaining possible values
     case object CompressedFileNames extends RpmLib
     case object PayloadFilesHavePrefix extends RpmLib
     case object PayloadIsLzma extends RpmLib
     case object TildeInVersions extends RpmLib
+    case object PartialHardlinkSets extends RpmLib
+
     def fromString(value: String): Option[RpmLib] = value match {
       case "CompressedFileNames" => Some(CompressedFileNames)
       case "PayloadFilesHavePrefix" => Some(PayloadFilesHavePrefix)
+      case "PartialHardlinkSets" => Some(PartialHardlinkSets)
       case "PayloadIsLzma" => Some(PayloadIsLzma)
       case "TildeInVersions" => Some(TildeInVersions)
       case _ => None

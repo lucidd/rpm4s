@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<repomd xmlns="http://linux.duke.edu/metadata/repo" xmlns:rpm="http://linux.duke.edu/metadata/rpm">
+  <revision>1504283245</revision>
+  <tags>
+    <repo>obsproduct://build.opensuse.org/openSUSE:Factory/openSUSE/20170831/ftp/i586-x86_64</repo>
+  </tags>
+  <data type="filelists">
+    <location href="repodata/80610a11481d44079fe6d246d21bbc8c696af0c5d020d0758c08680721f89049-filelists.xml.gz" />
+    <checksum type="sha256">80610a11481d44079fe6d246d21bbc8c696af0c5d020d0758c08680721f89049</checksum>
+    <timestamp>1504285261</timestamp>
+    <size>36305202</size>
+    <open-size>523218425</open-size>
+    <open-checksum type="sha256">c07940568a03f6a70b26c59cd7fe906ee7151e55e09eb429fde2505c3f5554bb</open-checksum>
+  </data>
+  <data type="other">
+    <location href="repodata/6561edfdd361818575afe19999ca0daf5be617d9d7e9027d1286b798e49d7064-other.xml.gz" />
+    <checksum type="sha256">6561edfdd361818575afe19999ca0daf5be617d9d7e9027d1286b798e49d7064</checksum>
+    <timestamp>1504285261</timestamp>
+    <size>182111641</size>
+    <open-size>842317798</open-size>
+    <open-checksum type="sha256">aba25a059c1cadc131c1c01275f15ee033264df46420beb0071ea93daed289b3</open-checksum>
+  </data>
+  <data type="primary">
+    <location href="repodata/03b53138f32575f30326c7028857cb013b709570614b7bb6190ff3ec2eac3ea7-primary.xml.gz" />
+    <checksum type="sha256">03b53138f32575f30326c7028857cb013b709570614b7bb6190ff3ec2eac3ea7</checksum>
+    <timestamp>1504285261</timestamp>
+    <size>17781467</size>
+    <open-size>139577942</open-size>
+    <open-checksum type="sha256">baea56d3261c44c07b609658b09fa56bd4c8ce939f74d1ae08deff152b7ca010</open-checksum>
+  </data>
+</repomd>

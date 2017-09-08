@@ -1,6 +1,4 @@
 target
 .idea
 TODO.md
-tools.sbt
-tools
 *.class

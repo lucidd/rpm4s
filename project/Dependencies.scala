@@ -1,8 +1,6 @@
-import sbt._
-
 object Dependencies {
   val cats = "1.0.0-MF"
-  val fs2 = "0.9.5"
+  val fs2 = "0.10.0-M6"
   val fs2Cats = "0.3.0"
   val scalatest = "3.0.0"
   val scalacheck = "1.13.5"

@@ -1,6 +1,7 @@
 import Dependencies._
 import org.scalajs.jsenv.nodejs.NodeJSEnv
 import org.scalajs.sbtplugin.cross.CrossProject
+import sbtassembly.AssemblyPlugin.defaultShellScript
 
 lazy val cmdlineProfile =
   sys.env.getOrElse("SBT_PROFILE", "")
@@ -72,7 +73,7 @@ def scalacOptionsVersion(scalaVersion: String) = {
 
 lazy val root = project
   .in(file("."))
-  .aggregate(rpm4sJS, rpm4sJVM)
+  .aggregate(rpm4sJS, rpm4sJVM, repoUtils, cli)
   .settings(
     coverageEnabled := false,
     coverageMinimum := 55, // TODO: increase this once we have more
@@ -141,3 +142,109 @@ lazy val rpm4sJS = rpm4s.js
     jsEnv := new NodeJSEnv()
   )
 
+lazy val cli = project.in(file("cli"))
+  .dependsOn(rpm4sJVM, repoUtils)
+  .enablePlugins(BuildInfoPlugin)
+  .settings(
+    coverageMinimum := 0,
+    coverageFailOnMinimum := true,
+    buildInfoKeys := Seq[BuildInfoKey](
+      name,
+      version,
+      scalaVersion,
+      sbtVersion
+    ),
+    buildInfoPackage := "rpm4s.cli",
+    mainClass in assembly := Some("rpm4s.cli.Main"),
+    fork in run := true,
+    //javaOptions in run ++= Seq(
+    //  //"-Xmx2000m",
+    //  "-Xdebug",
+    //  "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
+    //),
+    //fork in Test := true,
+    //javaOptions in Test ++= Seq(
+    //  "-Xdebug",
+    //  "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=127.0.0.1:5005"
+    //),
+    assemblyOption in assembly := (assemblyOption in assembly).value
+      .copy(prependShellScript = Some(defaultShellScript)),
+    assemblyJarName in assembly := "rpm4s",
+    assemblyOption in assembly :=
+      (assemblyOption in assembly).value
+        .copy(
+          prependShellScript = Some(
+            Seq("#!/usr/bin/env sh", """exec java -jar "$0" "$@"""" + "\n")
+          )),
+    libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % scalatest,
+      "org.scalacheck" %%% "scalacheck" % scalacheck,
+      "org.typelevel" %%% "cats-core" % cats,
+      "org.typelevel" %%% "cats-free" % cats,
+      "co.fs2" %% "fs2-io" % fs2,
+      "co.fs2" %%% "fs2-core" % fs2,
+      //"co.fs2" %% "fs2-cats" % fs2Cats,
+      "org.apache.commons" % "commons-compress" % "1.12",
+      "org.tukaani" % "xz" % "1.5",
+      "com.github.pathikrit" %% "better-files-akka" % "3.0.0",
+      "com.github.scopt" %% "scopt" % "3.6.0",
+      "org.http4s" %% "http4s-core" % http4s,
+      "org.http4s" %% "http4s-dsl" % http4s,
+      "org.http4s" %% "http4s-jawn" % http4s,
+      "org.http4s" %% "http4s-blaze-server" % http4s,
+      "org.http4s" %% "http4s-blaze-client" % http4s,
+      "io.circe" %% "circe-core" % circe,
+      "io.circe" %% "circe-generic" % circe,
+      "io.circe" %% "circe-parser" % circe,
+      "org.bouncycastle" % "bcprov-jdk15on" % "1.57",
+      "org.bouncycastle" % "bcpg-jdk15on" % "1.57"
+    )
+  )
+
+lazy val repoUtils = project.in(file("repo-utils"))
+  .dependsOn(rpm4sJVM)
+  .enablePlugins(BuildInfoPlugin)
+  .settings(
+    coverageMinimum := 42,
+    coverageFailOnMinimum := true,
+    buildInfoKeys := Seq[BuildInfoKey](
+      name,
+      version,
+      scalaVersion,
+      sbtVersion
+    ),
+    buildInfoPackage := "rpm4s.repo",
+    fork in run := true,
+    //javaOptions in run ++= Seq(
+    //  //"-Xmx2000m",
+    //  "-Xdebug",
+    //  "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
+    //),
+    //fork in Test := true,
+    //javaOptions in Test ++= Seq(
+    //  "-Xdebug",
+    //  "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=127.0.0.1:5005"
+    //),
+    libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % scalatest,
+      "org.scalacheck" %%% "scalacheck" % scalacheck,
+      "org.typelevel" %%% "cats-core" % cats,
+      "org.typelevel" %%% "cats-free" % cats,
+      "co.fs2" %% "fs2-io" % fs2,
+      "co.fs2" %%% "fs2-core" % fs2,
+      "org.apache.commons" % "commons-compress" % "1.12",
+      "org.tukaani" % "xz" % "1.5",
+      "com.github.pathikrit" %% "better-files-akka" % "3.0.0",
+      "com.github.scopt" %% "scopt" % "3.6.0",
+      "org.http4s" %% "http4s-core" % http4s,
+      "org.http4s" %% "http4s-dsl" % http4s,
+      "org.http4s" %% "http4s-jawn" % http4s,
+      "org.http4s" %% "http4s-blaze-server" % http4s,
+      "org.http4s" %% "http4s-blaze-client" % http4s,
+      "io.circe" %% "circe-core" % circe,
+      "io.circe" %% "circe-generic" % circe,
+      "io.circe" %% "circe-parser" % circe,
+      "org.bouncycastle" % "bcprov-jdk15on" % "1.57",
+      "org.bouncycastle" % "bcpg-jdk15on" % "1.57"
+    )
+  )
