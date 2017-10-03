@@ -1,29 +1,13 @@
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.{Gen}
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 import rpm4s.data.Version._
 import rpm4s.data.Version
 import cats.kernel.Comparison._
 import rpm4s.codecs.ConvertingError
+import Utils._
 
 class VersionSpec extends FlatSpec with Matchers with PropertyChecks {
-
-  val numeric = Gen.numStr.filter(_.nonEmpty)
-  val alpha = Gen.alphaStr.filter(_.nonEmpty)
-  val tilde = Gen.const("~")
-  val sep = Gen.nonEmptyListOf(Gen.oneOf(Separator.validSeparatorChars.toSeq)).map(_.mkString)
-
-  val segment = Gen.oneOf(numeric, alpha, tilde, sep)
-  val version = Gen.nonEmptyListOf(segment).map(_.mkString)
-      .map { verStr =>
-        Version.parse(verStr) match {
-          case Right(v) => v
-          case Left(err) => throw new RuntimeException(err.msg)
-        }
-      }
-
-  implicit val arbVersion: Arbitrary[Version] = Arbitrary(version)
-
 
   "rpmvercmp" should "be symmetric" in {
     forAll { (v1: Version, v2: Version) =>
@@ -176,7 +160,7 @@ class VersionSpec extends FlatSpec with Matchers with PropertyChecks {
     Numeric("", None).isLeft shouldBe true
   }
 
-  "Separator" should "not only allow {}%+_." in {
+  "Separator" should " allow {}%+_." in {
     forAll(Gen.nonEmptyListOf(Gen.oneOf("{}%+_.")).map(_.mkString)) { str: String =>
       val a = Separator(str ,None)
       a.isRight shouldBe true
