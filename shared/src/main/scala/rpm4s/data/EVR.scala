@@ -10,7 +10,7 @@ object EVR {
   //TODO: more validation for individual parts
   //TODO: Document format
   def parse(evr: String): Either[ConvertingError, EVR] = {
-    val relIdx = evr.lastIndexOf("-")
+    val relIdx = evr.indexOf("-")
 
     val (release, ev) = if (relIdx == -1) {
       (None, evr)
