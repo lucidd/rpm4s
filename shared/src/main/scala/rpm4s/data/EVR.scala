@@ -5,7 +5,13 @@ import rpm4s.codecs.ConvertingError
 case class EVR(
     version: Version,
     release: Option[Release] = None,
-    epoch: Option[Epoch] = None)
+    epoch: Option[Epoch] = None) {
+  def string: String = {
+    val e = epoch.map(e => s"${e.value}:").getOrElse("")
+    val r = release.map(r => s"-${r.value}").getOrElse("")
+    s"$e${version.string}$r"
+  }
+}
 object EVR {
   //TODO: more validation for individual parts
   //TODO: Document format

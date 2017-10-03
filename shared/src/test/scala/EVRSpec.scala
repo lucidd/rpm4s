@@ -1,6 +1,7 @@
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 import rpm4s.data.{EVR, Epoch, Release, Version}
+import Utils._
 
 class EVRSpec extends FlatSpec with Matchers with PropertyChecks {
 
@@ -34,6 +35,12 @@ class EVRSpec extends FlatSpec with Matchers with PropertyChecks {
       r <- Release.fromString("4.5")
     } yield EVR(v, Some(r), Some(e))
     EVR.parse("12:1.2.3-4.5") shouldEqual expected
+  }
+
+  it should "roundtrip" in {
+    forAll { evr: EVR =>
+      EVR.parse(evr.string) shouldEqual Right(evr)
+    }
   }
 
 }
