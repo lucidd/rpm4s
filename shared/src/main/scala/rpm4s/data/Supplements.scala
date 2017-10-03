@@ -1,4 +1,4 @@
 package rpm4s.data
 
-case class Supplements(name: Name, evr: Option[EVR], flags: SenseFlags)
+case class Supplements(name: String, evr: Option[EVR], flags: SenseFlags)
     extends PkgRef

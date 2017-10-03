@@ -1,4 +1,4 @@
 package rpm4s.data
 
-case class Obsoletes(name: Name, evr: Option[EVR], flags: SenseFlags)
+case class Obsoletes(name: String, evr: Option[EVR], flags: SenseFlags)
     extends PkgRef

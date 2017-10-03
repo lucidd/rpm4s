@@ -80,7 +80,7 @@ object Extractor {
     namesTag: HeaderTag[StringArrayData],
     versionTag: HeaderTag[StringArrayData],
     flagsTag: HeaderTag[Int32Data],
-    construct: (Name, Option[EVR], SenseFlags) => T
+    construct: (String, Option[EVR], SenseFlags) => T
   ): Extractor[Vector[T]] = new Extractor[Vector[T]] {
     val tags: Set[HeaderTag[_ <: IndexData]] = Set(
       namesTag,
@@ -99,10 +99,11 @@ object Extractor {
           .zip(versions.values)
           .zip(flags.values)
           .traverse { case ((name, evr), flags) =>
+            println(s"name: $name evr: $evr flags: $flags")
             for {
-              name <- Name.fromString(name)
-              evr <- if (evr.nonEmpty) Right(None)
-              else EVR.parse(evr).map(Some(_))
+              name <- Right(name)
+              evr <- if (evr.isEmpty) Right(None)
+                     else EVR.parse(evr).map(Some(_))
             } yield construct(name, evr, SenseFlags(flags))
           }
       } yield result

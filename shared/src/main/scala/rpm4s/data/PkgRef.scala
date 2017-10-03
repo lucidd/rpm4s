@@ -1,12 +1,17 @@
 package rpm4s.data
 
 trait PkgRef {
-  def name: Name
+  /**
+    * Note: name does not seem to always be a valid rpm name see kernel-default provides
+    * firmware(4.11.8-1-default/3com/typhoon.bin)
+    * @return
+    */
+  def name: String
   def evr: Option[EVR]
   def flags: SenseFlags
   def rpmLib: Option[PkgRef.RpmLib] = {
     val prefix = "rpmlib("
-    val (p, r) = name.value.splitAt(prefix.length)
+    val (p, r) = name.splitAt(prefix.length)
     if (p == prefix && r.endsWith(")")) {
       val v = r.take(r.length - 1)
       PkgRef.RpmLib.fromString(v)
