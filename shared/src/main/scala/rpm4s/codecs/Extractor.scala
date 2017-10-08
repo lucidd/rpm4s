@@ -5,6 +5,7 @@ import java.time.{Instant, ZoneOffset}
 import rpm4s.codecs.Extractor.Data
 import rpm4s.codecs.IndexData.{Int32Data, StringArrayData}
 import rpm4s.data.Checksum.Sha1
+import rpm4s.data.Dependency._
 import rpm4s.data._
 import scodec.bits.BitVector
 import shapeless.{::, Generic, HList, HNil, Lazy}
@@ -80,7 +81,7 @@ object Extractor {
     namesTag: HeaderTag[StringArrayData],
     versionTag: HeaderTag[StringArrayData],
     flagsTag: HeaderTag[Int32Data],
-    construct: (String, Option[EVR], SenseFlags) => T
+    construct: PkgRef => T
   ): Extractor[Vector[T]] = new Extractor[Vector[T]] {
     val tags: Set[HeaderTag[_ <: IndexData]] = Set(
       namesTag,
@@ -99,12 +100,16 @@ object Extractor {
           .zip(versions.values)
           .zip(flags.values)
           .traverse { case ((name, evr), flags) =>
-            println(s"name: $name evr: $evr flags: $flags")
-            for {
-              name <- Right(name)
+
+
+            val a = for {
+              name <- Name(name)
               evr <- if (evr.isEmpty) Right(None)
                      else EVR.parse(evr).map(Some(_))
-            } yield construct(name, evr, SenseFlags(flags))
+            } yield RpmRef(name, evr, SenseFlags(flags))
+
+            val b = a.getOrElse(VirtualRef(name, if (evr.isEmpty) None else Some(evr), SenseFlags(flags)))
+            Either.right(construct(b))
           }
       } yield result
       Right(a.getOrElse(Vector.empty))

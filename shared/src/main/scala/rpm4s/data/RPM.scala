@@ -1,5 +1,7 @@
 package rpm4s.data
 
+import rpm4s.data.Dependency._
+
 case class RPM(
     name: Name,
     version: Version,

@@ -1,22 +1,25 @@
 package rpm4s.data
 
-trait PkgRef {
-  /**
-    * Note: name does not seem to always be a valid rpm name see kernel-default provides
-    * firmware(4.11.8-1-default/3com/typhoon.bin)
-    * @return
-    */
-  def name: String
-  def evr: Option[EVR]
+sealed trait PkgRef extends Product with Serializable {
+  def nameString: String
+  def versionString: Option[String]
   def flags: SenseFlags
   def rpmLib: Option[PkgRef.RpmLib] = {
     val prefix = "rpmlib("
-    val (p, r) = name.splitAt(prefix.length)
+    val (p, r) = nameString.splitAt(prefix.length)
     if (p == prefix && r.endsWith(")")) {
       val v = r.take(r.length - 1)
       PkgRef.RpmLib.fromString(v)
     } else None
   }
+}
+case class RpmRef(name: Name, evr: Option[EVR], flags: SenseFlags) extends PkgRef {
+  override def nameString: String = name.value
+  override def versionString: Option[String] = evr.map(_.string)
+}
+case class VirtualRef(name: String, version: Option[String], flags: SenseFlags) extends PkgRef {
+  override def nameString: String = name
+  override def versionString: Option[String] = version
 }
 object PkgRef {
   sealed trait RpmLib extends Product with Serializable
