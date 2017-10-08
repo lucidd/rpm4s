@@ -2,7 +2,7 @@ package rpm4s.data
 
 import rpm4s.data.Stat.FileType
 
-class Stat private (raw: Short) {
+class Stat private (private val raw: Short) {
 
   def sticky: Boolean = (raw & Stat.STICKY_BIT) != 0
   def sgid: Boolean = (raw & Stat.SET_GROUP_ID_BIT) != 0
@@ -16,6 +16,8 @@ class Stat private (raw: Short) {
     s"$owner$group$other"
   }
 
+  def toShort: Short = raw
+
   override def toString: String = {
     val other = Stat.perm2string((raw & 7).toByte)
     val group = Stat.perm2string(((raw >> 3) & 7).toByte)
@@ -26,6 +28,13 @@ class Stat private (raw: Short) {
     val flags = (f1 ++ f2 ++ f3).mkString("|")
     s"Stat(Owner($owner), Group($group), Other($other), Type(${Stat.raw2fileType(raw).getOrElse("Unknown")}), Flags($flags))"
   }
+
+  override def equals(obj: scala.Any): Boolean = obj match {
+    case other: Stat => raw == other.raw
+    case _ => false
+  }
+
+  override def hashCode(): Int = raw.hashCode()
 }
 
 object Stat {
