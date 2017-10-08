@@ -7,7 +7,8 @@ import rpm4s.codecs.IndexData.StringData
 import scodec.{Attempt, Codec}
 import scodec.bits.BitVector
 import rpm4s.codecs._
-import rpm4s.data.{Architecture, Name, RpmPrimaryEntry, Version}
+import rpm4s.data.Dependency.{Conflicts, Obsoletes, Provides, Requires}
+import rpm4s.data._
 
 class RpmParseSpec
     extends FlatSpec
@@ -40,6 +41,69 @@ class RpmParseSpec
     rpe.architecture shouldBe Architecture.x86_64
     rpe.name shouldBe Name.fromString("kernel-default").toOption.get
     rpe.version shouldBe Version.parse("4.11.8").toOption.get
+
+    rpe.vendor shouldBe Vendor("openSUSE")
+    rpe.license shouldBe License.`GPL-2.0`
+
+    rpe.description shouldBe Description(
+      Map(
+        "C" ->
+          """The standard kernel for both uniprocessor and multiprocessor systems.
+
+
+Source Timestamp: 2017-06-29 16:37:33 +0200
+GIT Revision: 42bd7a027035420d318d4cb5a3db7233aff32b44
+GIT Branch: stable"""
+      )
+    )
+
+    rpe.summery shouldBe Summery(
+      Map(
+        "C" -> """The Standard Kernel"""
+      )
+    )
+
+    rpe.group shouldBe Group(
+      Map(
+        "C" -> """System/Kernel"""
+      )
+    )
+
+    rpe.headerRange shouldBe HeaderRange(5016, 1736491)
+
+    rpe.provides.size shouldBe 202
+    rpe.provides(0) shouldBe Provides(RpmRef(Name("ath3k-firmware").toOption.get, Some(EVR.parse("1.0").toOption.get), SenseFlags(8)))
+    rpe.provides(23) shouldBe Provides(VirtualRef("firmware(4.11.8-1-default/3com/typhoon.bin)", None, SenseFlags(0)))
+    rpe.provides(160) shouldBe Provides(VirtualRef("kernel-default(x86-64)", Some("4.11.8-1.2"), SenseFlags(8)))
+
+    rpe.fileEntries.size shouldBe 4976
+    rpe.fileEntries(0) shouldBe FileEntry("/boot/.vmlinuz-4.11.8-1-default.hmac", Stat.fromShort(-32348).get, FileFlags(0))
+    rpe.fileEntries(2488) shouldBe FileEntry("/lib/modules/4.11.8-1-default/kernel/drivers/net/ethernet/chelsio/cxgb4vf", Stat.fromShort(16877).get, FileFlags(0))
+    rpe.fileEntries(4975) shouldBe FileEntry("/lib/modules/4.11.8-1-default/vdso/vdsox32.so", Stat.fromShort(-32275).get, FileFlags(0))
+
+    rpe.requires.size shouldBe 20
+    rpe.requires(0) shouldBe Requires(VirtualRef("/bin/sh", None, SenseFlags(512)))
+    rpe.requires(8) shouldBe Requires(RpmRef(Name("awk").toOption.get, None, SenseFlags(512)))
+    rpe.requires(18) shouldBe Requires(VirtualRef("rpmlib(PayloadIsLzma)", Some("4.4.6-1"), SenseFlags(16777226)))
+
+    rpe.enhances.size shouldBe 0
+
+    rpe.conflicts.size shouldBe 6
+    rpe.conflicts(0) shouldBe Conflicts(RpmRef(Name("apparmor-parser").toOption.get, Some(EVR.parse("2.3").toOption.get), SenseFlags(2)))
+    rpe.conflicts(3) shouldBe Conflicts(RpmRef(Name("lvm2").toOption.get, Some(EVR.parse("2.02.33").toOption.get), SenseFlags(2)))
+    rpe.conflicts(5) shouldBe Conflicts(RpmRef(Name("udev").toOption.get, Some(EVR.parse("118").toOption.get), SenseFlags(2)))
+
+    rpe.obsoletes.size shouldBe 49
+    rpe.obsoletes(0) shouldBe Obsoletes(RpmRef(Name("ath3k-firmware").toOption.get, Some(EVR.parse("1.0").toOption.get), SenseFlags(10)))
+    rpe.obsoletes(24) shouldBe Obsoletes(RpmRef(Name("kernel-default-base").toOption.get, Some(EVR.parse("3.1").toOption.get), SenseFlags(2)))
+    rpe.obsoletes(48) shouldBe Obsoletes(RpmRef(Name("xen-kmp-default").toOption.get, Some(EVR.parse("4.6.1").toOption.get), SenseFlags(10)))
+
+    rpe.recommends.size shouldBe 0
+
+    rpe.supplements.size shouldBe 0
+
+    rpe.suggests.size shouldBe 0
+
   }
 
 }
