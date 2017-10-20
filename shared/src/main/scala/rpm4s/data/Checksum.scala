@@ -1,11 +1,18 @@
 package rpm4s.data
 
-import scodec.bits.ByteVector
+import scala.annotation.tailrec
+
 
 sealed trait Checksum extends Product with Serializable {
-  def toHex: String = bytes.toHex
+  def toHex: String = bytes.foldLeft(new StringBuilder) {
+    case (sb, b) =>
+      val h = Integer.toHexString(b & 0xFF)
+      if (h.size == 1) sb.append("0" + h)
+      else sb.append(h)
+  }.toString
   def toSelfDescribingHex: String
-  def bytes: ByteVector
+  def bytes: Vector[Byte]
+
 }
 //TODO: cleanup and implement more checksum types
 object Checksum {
@@ -17,56 +24,53 @@ object Checksum {
     }
 
   }
-  case class Sha1(bytes: ByteVector) extends Checksum {
+
+  def fromHex(value: String): Option[Vector[Byte]] = {
+    val data = new Array[Byte](value.length / 2)
+    @tailrec
+    def loop(idx: Int): Option[Array[Byte]] = {
+      if (idx < value.length) {
+        val msb = Character.digit(value.charAt(idx), 16) << 4
+        val lsb = Character.digit(value.charAt(idx + 1), 16)
+        if (msb == -1 || lsb == -1) None
+        else {
+          data(idx / 2) = (msb | lsb).toByte
+          loop(idx + 2)
+        }
+      } else Some(data)
+    }
+    loop(0).map(_.toVector)
+  }
+
+  case class Sha1(bytes: Vector[Byte]) extends Checksum {
     def toSelfDescribingHex: String = s"sha1-$toHex"
     override def toString: String = toSelfDescribingHex
   }
   object Sha1 {
-    def fromBytes(bytes: ByteVector): Option[Sha1] = {
+    def fromBytes(bytes: Vector[Byte]): Option[Sha1] = {
       if (bytes.length != 20) None
       else Some(Sha1(bytes))
     }
-    def fromBytes(bytes: Array[Byte]): Option[Sha1] = {
-      if (bytes.length != 20) None
-      else Some(Sha1(ByteVector(bytes)))
-    }
     def fromHex(value: String): Option[Sha1] = {
       if (value.length == 40)
-        ByteVector.fromHex(value).map(Sha1(_))
+        Checksum.fromHex(value).map(Sha1(_))
       else None
     }
   }
 
-  case class Sha256(bytes: ByteVector) extends Checksum {
+  case class Sha256(bytes: Vector[Byte]) extends Checksum {
     def toSelfDescribingHex: String = s"sha256-$toHex"
     override def toString: String = toSelfDescribingHex
   }
   object Sha256 {
-    def bytesFromHex(value: String): Option[Array[Byte]] = {
-      def hexCharToByte(char: Char): Byte = char match {
-        case c if c >= '0' && c <= '9' => (c - '0').toByte
-        case c if c >= 'a' && c <= 'f' => (10 + (c - 'a')).toByte
-        case c if c >= 'A' && c <= 'F' => (10 + (c - 'A')).toByte
-        //TODO: dont crash on invalid input
-      }
-      if (value.length % 2 == 0) Some {
-        value
-          .sliding(2, 2)
-          .map { pair =>
-            (hexCharToByte(pair(0)) << 8 | hexCharToByte(pair(1))).toByte
-          }
-          .toArray
-      } else None
-    }
-
-    def fromBytes(bytes: Array[Byte]): Option[Sha256] = {
+    def fromBytes(bytes: Vector[Byte]): Option[Sha256] = {
       if (bytes.length != 32) None
-      else Some(Sha256(ByteVector(bytes)))
+      else Some(Sha256(bytes))
     }
 
     def fromHex(value: String): Option[Sha256] = {
       if (value.length == 64)
-        ByteVector.fromHex(value).map(Sha256(_))
+        Checksum.fromHex(value).map(Sha256(_))
       else None
     }
   }

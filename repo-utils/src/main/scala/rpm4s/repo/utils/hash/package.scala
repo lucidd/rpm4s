@@ -13,7 +13,7 @@ package object hash {
     in: Stream[F, Byte],
     pipe: Pipe[F, Byte, Byte],
     digest: => MessageDigest,
-    fromBytes: Array[Byte] => Option[Checksum],
+    fromBytes: Vector[Byte] => Option[Checksum],
     sink: Sink[F, Byte]
   ): F[(Checksum, Long, Checksum, Long)] = {
     Sync[F].suspend {
@@ -38,9 +38,9 @@ package object hash {
         .run
         .map(_ => {
           (
-            fromBytes(before.digest()).get,
+            fromBytes(before.digest().toVector).get,
             sizeBefore,
-            fromBytes(after.digest()).get,
+            fromBytes(after.digest().toVector).get,
             sizeAfter
           )
         })

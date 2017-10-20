@@ -27,7 +27,7 @@ package object hash {
 
   def sha256(bytes: BitVector): Sha256 = {
     val sha256bytes = digest(bytes, MessageDigest.getInstance("SHA-256"))
-    Sha256.fromBytes(sha256bytes.toArray).get
+    Sha256.fromBytes(sha256bytes.toArray.toVector).get
   }
 
 }
