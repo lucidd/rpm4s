@@ -146,6 +146,7 @@ lazy val cli = project.in(file("cli"))
   .dependsOn(rpm4sJVM, repoUtils)
   .enablePlugins(BuildInfoPlugin)
   .settings(
+    organization := "io.lullabyte",
     coverageMinimum := 0,
     coverageFailOnMinimum := true,
     buildInfoKeys := Seq[BuildInfoKey](
@@ -205,6 +206,7 @@ lazy val repoUtils = project.in(file("repo-utils"))
   .dependsOn(rpm4sJVM)
   .enablePlugins(BuildInfoPlugin)
   .settings(
+    organization := "io.lullabyte",
     coverageMinimum := 42,
     coverageFailOnMinimum := true,
     buildInfoKeys := Seq[BuildInfoKey](
