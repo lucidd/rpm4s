@@ -149,7 +149,12 @@ package object primary {
       val (glibc, rest) =
         requires.partition(_.ref.nameString.startsWith("libc.so.6"))
       //TODO: quick and dirty solution used by createrepo refactor later
-      val x = glibc.sortBy(r => Version.parse(r.ref.nameString).toOption.get)(
+      val x = glibc.sortBy { r =>
+        val start = r.ref.nameString.indexOf("(")
+        val end = r.ref.nameString.indexOf("(", start)
+        val version = r.ref.nameString.slice(start + 1, end)
+        Version.parse(version).toOption.get
+      }(
         implicitly[Ordering[Version]].reverse
       )
 
@@ -169,7 +174,7 @@ package object primary {
     val provideRefs = rpm.provides.map(_.ref)
     pkgRefs(provideRefs, "provides")
     pkgRefs(
-      collapseGLIBC(rpm.requires)
+      rpm.requires
         // filter out requires that are also present in provides
         //TODO: this should probably include all self provided dependencies
         .filterNot(r => provideRefs.contains(r.ref))
