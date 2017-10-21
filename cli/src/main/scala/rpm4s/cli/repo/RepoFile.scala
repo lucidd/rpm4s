@@ -11,13 +11,12 @@ case class RepoFile(
 )
 object RepoFile {
   def toFile(repoFile: RepoFile): String = {
-    s"""
-      |[${repoFile.name}]
-      |baseurl=${repoFile.baseurl}
-      |type=rpm-md
-      |enabled=${if (repoFile.enabled) "1" else "0"}
-      |autorefresh=${if (repoFile.autorefresh) "1" else "0"}
-      |gpgcheck=${if (repoFile.gpgcheck) "1" else "0"}
+    s"""|[${repoFile.name}]
+        |type=rpm-md
+        |baseurl=${repoFile.baseurl}
+        |enabled=${if (repoFile.enabled) "1" else "0"}
+        |autorefresh=${if (repoFile.autorefresh) "1" else "0"}
+        |gpgcheck=${if (repoFile.gpgcheck) "1" else "0"}
     """.stripMargin
   }
 }
