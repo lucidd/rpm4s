@@ -110,8 +110,8 @@ lazy val rpm4s = crossProject
   )
   .settings(
     organization := "io.lullabyte",
-    scalaVersion := "2.12.3",
-    crossScalaVersions := Seq("2.12.3"),
+    scalaVersion := "2.12.4",
+    crossScalaVersions := Seq("2.12.4"),
     name := "rpm4s",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",

@@ -26,7 +26,7 @@ package object codecs {
     case RPMType.Source => 1
   }
 
-  implicit def indexEntryCodec[T <: RPMTag](implicit t: Codec[T]): Codec[IndexEntry[T]] =
+  implicit def indexEntryCodec[T <: RPMTag: Codec]: Codec[IndexEntry[T]] =
     (
       ("tag" | Codec[T]) ::
         ("type" | Codec[HeaderType]) ::
@@ -497,7 +497,7 @@ package object codecs {
       case PayloadDigestAlgo => 5093
     }
 
-  implicit def headerCodec[T <: RPMTag](implicit t: Codec[T]): Codec[Header[T]] =
+  implicit def headerCodec[T <: RPMTag: Codec]: Codec[Header[T]] =
     (
       ("magic" | constant(hex"8E AD E8")) ::
         ("version" | uint8) ::
