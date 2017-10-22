@@ -89,7 +89,7 @@ package object primary {
     location: String
   )(sb: StringBuilder): StringBuilder = {
     val name = rpm.name.value
-    val arch = rpm.architecture.toString
+    val arch = Architecture.toRpmString(rpm.architecture)
     val epoch = rpm.epoch.map(_.value).getOrElse(0).toString
     val version = rpm.version.string
     val release = rpm.release.value
