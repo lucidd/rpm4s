@@ -2,14 +2,14 @@ package rpm4s.repo.utils
 
 import java.security.MessageDigest
 
-import cats.effect.Sync
+import cats.effect.{Effect, Sync}
 import fs2.{Pipe, Sink, Stream}
 import rpm4s.data.Checksum
 import cats.implicits._
 
 package object hash {
 
-  def checksumsBeforeAndAfter[F[_]: Sync](
+  def checksumsBeforeAndAfter[F[_]: Effect](
     in: Stream[F, Byte],
     pipe: Pipe[F, Byte, Byte],
     digest: => MessageDigest,

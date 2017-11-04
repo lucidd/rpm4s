@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file._
 import java.security.MessageDigest
 
-import cats.effect.{Sync}
+import cats.effect.{Effect, Sync}
 import cats.implicits._
 import fs2.{Chunk, Sink, Stream}
 import rpm4s.data.Checksum.Sha256
@@ -14,7 +14,7 @@ import cats.implicits._
 
 package object repo {
 
-  def create[F[_]: Sync](
+  def create[F[_]: Effect](
     reporoot: Path,
     rpms: Stream[F, (RpmPrimaryEntry, Checksum)],
     nameFn: (RpmPrimaryEntry, Checksum) => String,
@@ -35,7 +35,7 @@ package object repo {
     )
   }
 
-  def create[F[_]: Sync](
+  def create[F[_]: Effect](
     repomdSink: Sink[F, Byte],
     primarySink: Sink[F, Byte],
     nameFn: (RpmPrimaryEntry, Checksum) => String,

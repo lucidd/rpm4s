@@ -303,7 +303,7 @@ package object primary {
                   //val n = se.getAttributeByName(typeAttr).getValue
                   pack(h1, PackageBuilder()).flatMap {
                     case (p, h) =>
-                      Pull.output1(p) >> go(h)
+                      Pull.output1(p) *> go(h)
                   }
                 case _ => go(h1)
               }

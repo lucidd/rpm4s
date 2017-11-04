@@ -141,7 +141,7 @@ package object repomd {
                 case "repomd" =>
                   rmd(h1, RepoMdBuilder.empty).flatMap {
                     case (p, h) =>
-                      Pull.output1(p) >> go(h)
+                      Pull.output1(p) *> go(h)
                   }
                 case _ => go(h1)
               }

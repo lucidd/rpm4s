@@ -141,7 +141,7 @@ object Yast2 {
               pack(h1, PackageBuilder(name = Some(name), arch = Some(arch)))
                 .flatMap {
                   case Some((p, h)) =>
-                    Pull.output1(p) >> go(h)
+                    Pull.output1(p) *> go(h)
                   case None => Pull.pure(None)
                 }
             } else go(h1)

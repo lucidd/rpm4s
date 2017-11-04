@@ -258,7 +258,7 @@ package object updateinfo {
                   val builder = UpdateBuilder(from, status, tpe, version)
                   update(h, builder).flatMap {
                     case (u, h) =>
-                      Pull.output1(u) >> go(h)
+                      Pull.output1(u) *> go(h)
                   }
                 case _ => go(h1)
               }
