@@ -11,8 +11,6 @@ def profile: CrossProject ⇒ CrossProject = pr => cmdlineProfile match {
   case _ => pr.disablePlugins(ScoverageSbtPlugin)
 }
 
-scalafmtVersion in ThisBuild := "1.0.0-RC2"
-
 val DebugTest = config("dtest") extend Test
 
 def scalacOptionsVersion(scalaVersion: String) = {
