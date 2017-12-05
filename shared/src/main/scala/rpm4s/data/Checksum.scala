@@ -74,4 +74,38 @@ object Checksum {
       else None
     }
   }
+
+  case class Md5(bytes: Vector[Byte]) extends Checksum {
+    def toSelfDescribingHex: String = s"md5-$toHex"
+    override def toString: String = toSelfDescribingHex
+  }
+  object Md5 {
+    def fromBytes(bytes: Vector[Byte]): Option[Md5] = {
+      if (bytes.length != 16) None
+      else Some(Md5(bytes))
+    }
+
+    def fromHex(value: String): Option[Md5] = {
+      if (value.length == 32)
+        Checksum.fromHex(value).map(Md5(_))
+      else None
+    }
+  }
+
+  case class Sha512(bytes: Vector[Byte]) extends Checksum {
+    def toSelfDescribingHex: String = s"sha512-$toHex"
+    override def toString: String = toSelfDescribingHex
+  }
+  object Sha512 {
+    def fromBytes(bytes: Vector[Byte]): Option[Sha512] = {
+      if (bytes.length != 64) None
+      else Some(Sha512(bytes))
+    }
+
+    def fromHex(value: String): Option[Sha512] = {
+      if (value.length == 128)
+        Checksum.fromHex(value).map(Sha512(_))
+      else None
+    }
+  }
 }
