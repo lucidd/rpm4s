@@ -104,17 +104,17 @@ object Yast2 {
                     case "Cks:" =>
                       cks(line) match {
                         case Right(v) => pack(h1, acc.copy(checksum = Some(v)))
-                        case Left(e)  => Pull.fail(new RuntimeException(e))
+                        case Left(e)  => Pull.raiseError(new RuntimeException(e))
                       }
                     case "Loc:" =>
                       loc(line) match {
                         case Right(v) => pack(h1, acc.copy(loc = Some(v)))
-                        case Left(e)  => Pull.fail(new RuntimeException(e))
+                        case Left(e)  => Pull.raiseError(new RuntimeException(e))
                       }
                     case "Siz:" =>
                       siz(line) match {
                         case Right(v) => pack(h1, acc.copy(size = Some(v)))
-                        case Left(e)  => Pull.fail(new RuntimeException(e))
+                        case Left(e)  => Pull.raiseError(new RuntimeException(e))
                       }
                     case "Pkg:" =>
                       Pull.pure(
@@ -141,7 +141,7 @@ object Yast2 {
               pack(h1, PackageBuilder(name = Some(name), arch = Some(arch)))
                 .flatMap {
                   case Some((p, h)) =>
-                    Pull.output1(p) *> go(h)
+                    Pull.output1(p) >> go(h)
                   case None => Pull.pure(None)
                 }
             } else go(h1)

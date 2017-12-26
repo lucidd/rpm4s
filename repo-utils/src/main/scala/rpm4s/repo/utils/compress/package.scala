@@ -83,7 +83,7 @@ package object compress {
         awaitShort(s).flatMap {
           case Some((size, h)) =>
             h.pull.drop(size)
-          case None => Pull.fail(new RuntimeException("premature end of stream"))
+          case None => Pull.raiseError(new RuntimeException("premature end of stream"))
         }
       } else Pull.pure(Some(s))
       s <- optRest match {
@@ -91,7 +91,7 @@ package object compress {
           if ((flags & FNAME) == FNAME) {
             Pull.pure(s.dropWhile(_ != 0).drop(1))
           } else Pull.pure(s)
-        case None => Pull.fail(new RuntimeException("premature end of stream"))
+        case None => Pull.raiseError(new RuntimeException("premature end of stream"))
       }
       s <- if ((flags & FCOMMENT) == FCOMMENT) {
             Pull.pure(s.dropWhile(_ != 0).drop(1))
@@ -109,24 +109,24 @@ package object compress {
         val a = for {
           idOpt <- awaitShort(h)
           cmOpt <- idOpt match {
-            case None => Pull.fail(new RuntimeException("premature end of stream"))
+            case None => Pull.raiseError(new RuntimeException("premature end of stream"))
             case Some((id, h)) =>
               if (id == 0x1f8b)
                 h.pull.uncons1
-              else Pull.fail(
+              else Pull.raiseError(
                 new RuntimeException(
                   s"invalid gzip header ${Integer.toHexString(id)} =! 0x1f8b"))
           }
           flagsOpt <- cmOpt match {
-            case None => Pull.fail(new RuntimeException("premature end of stream"))
+            case None => Pull.raiseError(new RuntimeException("premature end of stream"))
             case Some((cm, h)) =>
               if (cm == 8)
                 h.pull.uncons1.flatMap {
                   case Some((flags, h)) =>
                     skipFlags(flags, h.drop(6))
-                  case None => Pull.fail(new RuntimeException("premature end of stream"))
+                  case None => Pull.raiseError(new RuntimeException("premature end of stream"))
                 }
-              else Pull.fail(new RuntimeException(s"unsupported compression method $cm"))
+              else Pull.raiseError(new RuntimeException(s"unsupported compression method $cm"))
           }
         } yield ()
         a

@@ -260,7 +260,7 @@ package object primary {
                   checksum(se, h1).flatMap {
                     case Some((cs, h2)) =>
                       pack(h2, acc.copy[Option](checksum = Some(cs)))
-                    case None => Pull.fail(new RuntimeException("expected checksum"))
+                    case None => Pull.raiseError(new RuntimeException("expected checksum"))
                   }
                 case "size" => {
                   pack(h1, acc.copy(size = Some(size(se))))
@@ -269,7 +269,7 @@ package object primary {
                   text(h1).flatMap {
                     case Some((text, h2)) =>
                       pack(h2, acc.copy(name = Name(text).toOption))
-                    case None => Pull.fail(new RuntimeException("expected name"))
+                    case None => Pull.raiseError(new RuntimeException("expected name"))
                   }
                 }
                 case "location" => {
@@ -303,7 +303,7 @@ package object primary {
                   //val n = se.getAttributeByName(typeAttr).getValue
                   pack(h1, PackageBuilder()).flatMap {
                     case (p, h) =>
-                      Pull.output1(p) *> go(h)
+                      Pull.output1(p) >> go(h)
                   }
                 case _ => go(h1)
               }

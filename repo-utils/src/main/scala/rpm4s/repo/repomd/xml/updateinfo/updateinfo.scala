@@ -51,7 +51,7 @@ package object updateinfo {
               case "False" => false
             }
             Pull.pure((v, h2))
-          case None => Pull.fail(new RuntimeException("expected boolean"))
+          case None => Pull.raiseError(new RuntimeException("expected boolean"))
         }
 
 
@@ -80,7 +80,7 @@ package object updateinfo {
                 pack(h1, acc2)
               case "filename" => text(h1).flatMap {
                 case Some((text, h2)) => pack(h2, acc.copy(filename = Some(text)))
-                case None => Pull.fail(new RuntimeException("expected text"))
+                case None => Pull.raiseError(new RuntimeException("expected text"))
               }
               case "relogin_suggested" =>
                 boolean(h1).flatMap {
@@ -131,7 +131,7 @@ package object updateinfo {
                 case Some(h2) => collection(h2, acc)
               }
           }
-          case None => Pull.fail(new RuntimeException("premature end of stream"))
+          case None => Pull.raiseError(new RuntimeException("premature end of stream"))
         }
       }
 
@@ -182,42 +182,42 @@ package object updateinfo {
                   references(h1, Vector.empty).flatMap {
                     case Some((refs, h2)) =>
                       update(h2, acc.copy(references = Some(refs.toList)))
-                    case None => Pull.fail(new RuntimeException("expected release"))
+                    case None => Pull.raiseError(new RuntimeException("expected release"))
                   }
                 }
                 case "release" => {
                   text(h1).flatMap {
                     case Some((text, h2)) =>
                       update(h2, acc.copy(release = Some(text)))
-                    case None => Pull.fail(new RuntimeException("expected release"))
+                    case None => Pull.raiseError(new RuntimeException("expected release"))
                   }
                 }
                 case "title" => {
                   text(h1).flatMap {
                     case Some((text, h2)) =>
                       update(h2, acc.copy(title = Some(text)))
-                    case None => Pull.fail(new RuntimeException("expected title"))
+                    case None => Pull.raiseError(new RuntimeException("expected title"))
                   }
                 }
                 case "id" => {
                   text(h1).flatMap {
                     case Some((text, h2)) =>
                       update(h2, acc.copy(id = Some(text)))
-                    case None => Pull.fail(new RuntimeException("expected id"))
+                    case None => Pull.raiseError(new RuntimeException("expected id"))
                   }
                 }
                 case "description" => {
                   text(h1).flatMap {
                     case Some((text, h2)) =>
                       update(h2, acc.copy(description = Some(text)))
-                    case None => Pull.fail(new RuntimeException("expected description"))
+                    case None => Pull.raiseError(new RuntimeException("expected description"))
                   }
                 }
                 case "severity" => {
                   text(h1).flatMap {
                     case Some((text, h2)) =>
                       update(h2, acc.copy(severity = Severity.fromString(text)))
-                    case None => Pull.fail(new RuntimeException("expected severity"))
+                    case None => Pull.raiseError(new RuntimeException("expected severity"))
                   }
                 }
                 case "issued" => {
@@ -258,7 +258,7 @@ package object updateinfo {
                   val builder = UpdateBuilder(from, status, tpe, version)
                   update(h, builder).flatMap {
                     case (u, h) =>
-                      Pull.output1(u) *> go(h)
+                      Pull.output1(u) >> go(h)
                   }
                 case _ => go(h1)
               }

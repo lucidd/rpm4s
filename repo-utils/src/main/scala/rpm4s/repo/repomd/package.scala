@@ -44,31 +44,31 @@ package object repomd {
                 checksum(se, h1).flatMap {
                   case Some((cs, h2)) =>
                     data(h2, acc.copy[Option](checksum = Some(cs)))
-                  case None => Pull.fail(new RuntimeException("expected checksum"))
+                  case None => Pull.raiseError(new RuntimeException("expected checksum"))
                 }
               case "timestamp" =>
                 instant(h1).flatMap {
                   case Some((long, h2)) =>
                     data(h2, acc.copy(timestamp = long))
-                  case None => Pull.fail(new RuntimeException("expected timestamp"))
+                  case None => Pull.raiseError(new RuntimeException("expected timestamp"))
                 }
               case "size" =>
                 bytes(h1).flatMap {
                   case Some((long, h2)) =>
                     data(h2, acc.copy(size = long))
-                  case None => Pull.fail(new RuntimeException("expected size"))
+                  case None => Pull.raiseError(new RuntimeException("expected size"))
                 }
               case "open-size" =>
                 bytes(h1).flatMap {
                   case Some((long, h2)) =>
                     data(h2, acc.copy(openSize = long))
-                  case None => Pull.fail(new RuntimeException("expected open-size"))
+                  case None => Pull.raiseError(new RuntimeException("expected open-size"))
                 }
               case "open-checksum" =>
                 checksum(se, h1).flatMap {
                   case Some((cs, h2)) =>
                     data(h2, acc.copy[Option](openChecksum = Some(cs)))
-                  case None => Pull.fail(new RuntimeException("expected open-size"))
+                  case None => Pull.raiseError(new RuntimeException("expected open-size"))
                 }
               case _ => data(h1, acc)
             }
@@ -141,7 +141,7 @@ package object repomd {
                 case "repomd" =>
                   rmd(h1, RepoMdBuilder.empty).flatMap {
                     case (p, h) =>
-                      Pull.output1(p) *> go(h)
+                      Pull.output1(p) >> go(h)
                   }
                 case _ => go(h1)
               }
