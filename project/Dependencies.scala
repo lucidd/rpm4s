@@ -5,4 +5,6 @@ object Dependencies {
   val scalacheck = "1.13.5"
   val http4s = "0.18.0-M8"
   val circe = "0.9.0"
+  val shapeless = "2.3.3"
+  val scodecCore = "1.10.3"
 }

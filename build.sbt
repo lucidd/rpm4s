@@ -112,11 +112,11 @@ lazy val rpm4s = crossProject
     crossScalaVersions := Seq("2.12.4"),
     name := "rpm4s",
     libraryDependencies ++= Seq(
-      "com.chuusai" %% "shapeless" % "2.3.2",
+      "com.chuusai" %% "shapeless" % shapeless,
       "org.scalatest" %%% "scalatest" % scalatest,
       "org.scalacheck" %%% "scalacheck" % scalacheck,
       "org.typelevel" %%% "cats-core" % cats,
-      "org.scodec" %% "scodec-core" % "1.10.3"
+      "org.scodec" %% "scodec-core" % scodecCore
     ),
     scalacOptions ++= scalacOptionsVersion(scalaVersion.value),
     scalacOptions in (Compile, console) ~= (_.filterNot(
@@ -234,18 +234,9 @@ lazy val repoUtils = project.in(file("repo-utils"))
       "co.fs2" %% "fs2-io" % fs2,
       "co.fs2" %%% "fs2-core" % fs2,
       "org.apache.commons" % "commons-compress" % "1.12",
-      "org.tukaani" % "xz" % "1.5",
-      "com.github.pathikrit" %% "better-files-akka" % "3.0.0",
-      "com.github.scopt" %% "scopt" % "3.6.0",
       "org.http4s" %% "http4s-core" % http4s,
-      "org.http4s" %% "http4s-dsl" % http4s,
-      "org.http4s" %% "http4s-jawn" % http4s,
-      "org.http4s" %% "http4s-blaze-server" % http4s,
-      "org.http4s" %% "http4s-blaze-client" % http4s,
       "io.circe" %% "circe-core" % circe,
       "io.circe" %% "circe-generic" % circe,
-      "io.circe" %% "circe-parser" % circe,
-      "org.bouncycastle" % "bcprov-jdk15on" % "1.57",
-      "org.bouncycastle" % "bcpg-jdk15on" % "1.57"
+      "io.circe" %% "circe-parser" % circe
     )
   )
