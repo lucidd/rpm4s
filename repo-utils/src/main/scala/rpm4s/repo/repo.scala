@@ -54,7 +54,7 @@ package object repo {
         val repomdBytes =
           repomd.create(gzSize, openSize, gzChecksum, openChecksum, revision)(
             new StringBuilder).toString.getBytes(StandardCharsets.UTF_8)
-        Stream.chunk(Chunk.bytes(repomdBytes)).covary[F].to(repomdSink).run
+        Stream.chunk(Chunk.bytes(repomdBytes)).covary[F].to(repomdSink).compile.drain
     }
   }
 
