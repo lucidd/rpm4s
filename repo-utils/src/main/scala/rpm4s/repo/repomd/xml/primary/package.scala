@@ -188,13 +188,14 @@ package object primary {
     pkgRefs(rpm.suggests.map(_.ref), "suggests")
     pkgRefs(rpm.recommends.map(_.ref), "recommends")
 
-    rpm.fileEntries
+    rpm.fileEntries.getOrElse(Vector.empty)
       .filter { e =>
+        //TODO: the reason for those filters is that some files like binaries are used for requires. Find out exact files / directories here
         e.path.startsWith("/bin/") ||
-          e.path.startsWith("/sbin/") ||
-          e.path.startsWith("/etc/") ||
-          e.path.startsWith("/usr/bin/") ||
-          e.path.startsWith("/usr/sbin/")
+        e.path.startsWith("/sbin/") ||
+        e.path.startsWith("/etc/") ||
+        e.path.startsWith("/usr/bin/") ||
+        e.path.startsWith("/usr/sbin/")
       }
       .foreach { fe =>
         val tpe = if (fe.mode.tpe == FileType.Directory) {

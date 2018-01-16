@@ -76,10 +76,10 @@ GIT Branch: stable"""
     rpe.provides(23) shouldBe Provides(VirtualRef("firmware(4.11.8-1-default/3com/typhoon.bin)", None, SenseFlags(0)))
     rpe.provides(160) shouldBe Provides(VirtualRef("kernel-default(x86-64)", Some("4.11.8-1.2"), SenseFlags(8)))
 
-    rpe.fileEntries.size shouldBe 4976
-    rpe.fileEntries(0) shouldBe FileEntry("/boot/.vmlinuz-4.11.8-1-default.hmac", Stat.fromShort(-32348).get, FileFlags(0))
-    rpe.fileEntries(2488) shouldBe FileEntry("/lib/modules/4.11.8-1-default/kernel/drivers/net/ethernet/chelsio/cxgb4vf", Stat.fromShort(16877).get, FileFlags(0))
-    rpe.fileEntries(4975) shouldBe FileEntry("/lib/modules/4.11.8-1-default/vdso/vdsox32.so", Stat.fromShort(-32275).get, FileFlags(0))
+    rpe.fileEntries.map(_.size) shouldBe Some(4976)
+    rpe.fileEntries.map(_(0)) shouldBe Some(FileEntry("/boot/.vmlinuz-4.11.8-1-default.hmac", Stat.fromShort(-32348).get, FileFlags(0)))
+    rpe.fileEntries.map(_(2488)) shouldBe Some(FileEntry("/lib/modules/4.11.8-1-default/kernel/drivers/net/ethernet/chelsio/cxgb4vf", Stat.fromShort(16877).get, FileFlags(0)))
+    rpe.fileEntries.map(_(4975)) shouldBe Some(FileEntry("/lib/modules/4.11.8-1-default/vdso/vdsox32.so", Stat.fromShort(-32275).get, FileFlags(0)))
 
     rpe.requires.size shouldBe 20
     rpe.requires(0) shouldBe Requires(VirtualRef("/bin/sh", None, SenseFlags(512)))
