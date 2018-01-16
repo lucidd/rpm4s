@@ -303,6 +303,7 @@ package object codecs {
       case 1153 => Attempt.successful(PreTransProg)
       case 1154 => Attempt.successful(PostTransProg)
 
+      case 5010 => Attempt.successful(FileCaps)
       case 5011 => Attempt.successful(FileDigestAlgo)
 
       case 5046 => Attempt.successful(RecommendName)
@@ -458,6 +459,7 @@ package object codecs {
       case PreTransProg  => 1153
       case PostTransProg => 1154
 
+      case FileCaps => 5010
       case FileDigestAlgo => 5011
 
       case RecommendName    => 5046
