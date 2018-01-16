@@ -35,7 +35,7 @@ package object hash {
           Stream.chunk(chunk)
         })
         .to(sink)
-        .compile.drain
+        .run
         .map(_ => {
           (
             fromBytes(before.digest().toVector).get,

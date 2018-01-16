@@ -32,11 +32,11 @@ object Yast2 {
     ): PackageBuilder = PackageF(name, arch, loc, checksum, size)
   }
   def build(packageBuilder: PackageBuilder): Option[Package] = {
-    (packageBuilder.name,
-     packageBuilder.arch,
-     packageBuilder.loc,
-     packageBuilder.checksum,
-     packageBuilder.size).mapN(PackageF[Id])
+    (packageBuilder.name |@|
+      packageBuilder.arch |@|
+      packageBuilder.loc |@|
+      packageBuilder.checksum |@|
+      packageBuilder.size).map(PackageF[Id])
   }
 
   case class Meta(checksum: Checksum, path: String)

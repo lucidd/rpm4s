@@ -207,7 +207,6 @@ lazy val repoUtils = project.in(file("repo-utils"))
     organization := "io.lullabyte",
     coverageMinimum := 42,
     coverageFailOnMinimum := true,
-    scalacOptions ++= Seq("-deprecation"),
     buildInfoKeys := Seq[BuildInfoKey](
       name,
       version,
