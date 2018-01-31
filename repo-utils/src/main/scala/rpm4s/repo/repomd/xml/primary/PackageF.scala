@@ -3,10 +3,14 @@ package rpm4s.repo.repomd.xml.primary
 import cats.Id
 import cats.implicits._
 import org.http4s.Uri
-import rpm4s.data.{Checksum, Name}
+import rpm4s.data._
 
 case class PackageF[F[_]](
   name: F[Name],
+  version: F[Version],
+  epoch: F[Option[Epoch]],
+  release: F[Release],
+  arch: F[Architecture],
   loc: F[Uri],
   checksum: F[Checksum],
   size: F[SizeInfo]
@@ -18,6 +22,10 @@ object PackageF {
   object PackageBuilder {
     def build(packageBuilder: PackageBuilder): Option[Package] = {
       (packageBuilder.name,
+        packageBuilder.version,
+        packageBuilder.epoch,
+        packageBuilder.release,
+        packageBuilder.arch,
         packageBuilder.loc,
         packageBuilder.checksum,
         packageBuilder.size).mapN(PackageF[Id])
@@ -25,9 +33,13 @@ object PackageF {
     val empty: PackageBuilder = apply()
     def apply(
       name: Option[Name] = None,
+      version: Option[Version] = None,
+      epoch: Option[Option[Epoch]] = None,
+      release: Option[Release] = None,
+      arch: Option[Architecture] = None,
       loc: Option[Uri] = None,
       checksum: Option[Checksum] = None,
       size: Option[SizeInfo] = None
-    ): PackageBuilder = PackageF(name, loc, checksum, size)
+    ): PackageBuilder = PackageF(name, version, epoch, release, arch, loc, checksum, size)
   }
 }
