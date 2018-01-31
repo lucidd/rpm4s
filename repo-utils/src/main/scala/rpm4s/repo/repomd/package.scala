@@ -7,7 +7,7 @@ import javax.xml.stream.events.XMLEvent
 import cats.effect.Effect
 import fs2.{Pipe, Pull, Stream}
 import rpm4s.data.Checksum
-import rpm4s.data.Checksum.{Sha1, Sha256}
+import rpm4s.data.Checksum.{Md5, Sha1, Sha256, Sha512}
 import rpm4s.repo.repomd.Data.Primary
 import rpm4s.repo.repomd.RMDataF.{RMData, RMDataBuilder}
 import rpm4s.repo.repomd.RepoMdF.RepoMdBuilder
@@ -26,8 +26,10 @@ package object repomd {
   private val hrefAttr = new QName("href")
 
   private[repomd] def checksum2type(checksum: Checksum): String = checksum match {
-    case Sha256(_) => "sha256"
+    case Md5(_)   => "md5"
     case Sha1(_)   => "sha1"
+    case Sha256(_) => "sha256"
+    case Sha512(_) => "sha512"
   }
 
   private def data[F[_]](h: Stream[F, XMLEvent], acc: RMDataBuilder)
