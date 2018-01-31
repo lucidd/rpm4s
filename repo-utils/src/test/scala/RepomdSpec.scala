@@ -51,6 +51,10 @@ class RepomdSpec
     val expected = Vector(
       PackageF[cats.Id](
         name = Name("0ad").toOption.get,
+        arch = Architecture.i586,
+        version = Version.parse("0.0.22").toOption.get,
+        epoch = None,
+        release = Release.fromString("1.2").toOption.get,
         checksum = Sha256.fromHex("526e7af8c90ef5a41a7fb17d7a42277e06727f3bbb443cc795819e0feb1e5021").get,
         size = SizeInfo(
           pack = Bytes(5640346),
@@ -61,6 +65,10 @@ class RepomdSpec
       ),
       PackageF[cats.Id](
         name = Name("389-ds").toOption.get,
+        arch = Architecture.i586,
+        version = Version.parse("1.3.6.6").toOption.get,
+        epoch = None,
+        release = Release.fromString("2.1").toOption.get,
         checksum = Sha256.fromHex("bc7b674119d3c37c2b595567a583cf41dc3296f944871f076e184db5525955e1").get,
         size = SizeInfo(
           pack = Bytes(2152714),
@@ -71,6 +79,10 @@ class RepomdSpec
       ),
       PackageF[cats.Id](
         name = Name("389-ds-devel").toOption.get,
+        arch = Architecture.i586,
+        version = Version.parse("1.3.6.6").toOption.get,
+        epoch = None,
+        release = Release.fromString("2.1").toOption.get,
         checksum = Sha256.fromHex("9e231c26fd27defa79da040c0249091b6f44fd32b1b3d34e97d423e14a83643e").get,
         size = SizeInfo(
           pack = Bytes(115302),

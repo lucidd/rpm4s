@@ -14,6 +14,9 @@ import rpm4s.repo.data.Bytes
 import rpm4s.repo.repomd.checksum2type
 import rpm4s.repo.repomd.xml.primary.PackageF.PackageBuilder
 import rpm4s.repo.utils.xml.{EndEvent, StartEvent, xmlevents}
+import cats._
+import cats.implicits._
+import cats.syntax._
 
 import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext
@@ -25,6 +28,9 @@ package object primary {
   private val sizeInstalled = new QName("installed")
   private val sizeArchive = new QName("archive")
   private val hrefAttr = new QName("href")
+  private val epochAttr = new QName("epoch")
+  private val verAttr = new QName("ver")
+  private val relAttr = new QName("rel")
 
   private def sense2xml(sense: Sense): String = sense match {
     case Sense.Any => ""
@@ -265,6 +271,30 @@ package object primary {
                   }
                 case "size" => {
                   pack(h1, acc.copy(size = Some(size(se))))
+                }
+                case "version" => {
+                  val version = Version.parse(se.getAttributeByName(verAttr).getValue)
+                  val epochString = se.getAttributeByName(epochAttr).getValue
+                  val epoch =
+                    if (epochString == "0") Either.right(None)
+                    else Epoch.fromString(epochString).map(Some(_))
+                  val release = Release.fromString(se.getAttributeByName(relAttr).getValue)
+                  (version, epoch, release) match {
+                    case (Right(v), Right(e), Right(r)) =>
+                      pack(h1, acc.copy(
+                        version = Some(v),
+                        epoch = Some(e),
+                        release = Some(r)
+                      ))
+                    case _ => Pull.raiseError(new RuntimeException("expected arch"))
+                  }
+                }
+                case "arch" => {
+                  text(h1).flatMap {
+                    case Some((text, h2)) =>
+                      pack(h2, acc.copy(arch = Architecture.fromString(text)))
+                    case None => Pull.raiseError(new RuntimeException("expected arch"))
+                  }
                 }
                 case "name" => {
                   text(h1).flatMap {
