@@ -48,10 +48,11 @@ class RepomdSpec
     ).through(xml2packages)
      .runLog.unsafeRunSync()
 
+    //TODO: this is missing source rpm test case
     val expected = Vector(
       PackageF[cats.Id](
         name = Name("0ad").toOption.get,
-        arch = Architecture.i586,
+        arch = Some(Architecture.i586),
         version = Version.parse("0.0.22").toOption.get,
         epoch = None,
         release = Release.fromString("1.2").toOption.get,
@@ -65,7 +66,7 @@ class RepomdSpec
       ),
       PackageF[cats.Id](
         name = Name("389-ds").toOption.get,
-        arch = Architecture.i586,
+        arch = Some(Architecture.i586),
         version = Version.parse("1.3.6.6").toOption.get,
         epoch = None,
         release = Release.fromString("2.1").toOption.get,
@@ -79,7 +80,7 @@ class RepomdSpec
       ),
       PackageF[cats.Id](
         name = Name("389-ds-devel").toOption.get,
-        arch = Architecture.i586,
+        arch = Some(Architecture.i586),
         version = Version.parse("1.3.6.6").toOption.get,
         epoch = None,
         release = Release.fromString("2.1").toOption.get,
