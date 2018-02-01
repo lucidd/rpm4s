@@ -292,7 +292,9 @@ package object primary {
                 case "arch" => {
                   text(h1).flatMap {
                     case Some((text, h2)) =>
-                      pack(h2, acc.copy(arch = Architecture.fromString(text)))
+                      val arch = if (text == "src") None
+                                 else Some(Architecture.fromString(text).get)
+                      pack(h2, acc.copy(arch = Some(arch)))
                     case None => Pull.raiseError(new RuntimeException("expected arch"))
                   }
                 }
