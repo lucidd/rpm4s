@@ -156,6 +156,10 @@ class VersionSpec extends FlatSpec with Matchers with PropertyChecks {
     }
   }
 
+  it should "not allow ໘" in {
+    Numeric("໘", None).isLeft shouldBe true
+  }
+
   it should "not allow empty string" in {
     Numeric("", None).isLeft shouldBe true
   }

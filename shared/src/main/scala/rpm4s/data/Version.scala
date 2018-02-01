@@ -199,7 +199,7 @@ object Version {
   }
   object Numeric {
     def apply(value: String, next: Option[NotNumeric]): Either[ConvertingError, Numeric] = {
-      if (value.nonEmpty && value.forall(_.isDigit))
+      if (value.nonEmpty && value.forall(isNum))
         Right(new Numeric(value, next))
       else Left(ConvertingError(s"$value does contain invalid chars for a numeric segment"))
     }
