@@ -88,6 +88,7 @@ object HeaderTag {
   case object Prefixes extends HeaderTag[StringArrayData]
   case object InstPrefixes extends HeaderTag[StringArrayData]
   case object ProvideFlags extends HeaderTag[Int32Data]
+  case object SourcePackage extends HeaderTag[Int32Data]
   case object ProvideVersion extends HeaderTag[StringArrayData]
   case object ObsoleteFlags extends HeaderTag[Int32Data]
   case object ObsoleteVersion extends HeaderTag[StringArrayData]

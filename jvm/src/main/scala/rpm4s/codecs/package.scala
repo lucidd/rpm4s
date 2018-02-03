@@ -277,6 +277,8 @@ package object codecs {
       case 1098 => Attempt.successful(Prefixes)
       case 1099 => Attempt.successful(InstPrefixes)
 
+      case 1106 => Attempt.successful(SourcePackage)
+
       case 1112 => Attempt.successful(ProvideFlags)
       case 1113 => Attempt.successful(ProvideVersion)
       case 1114 => Attempt.successful(ObsoleteFlags)
@@ -433,6 +435,7 @@ package object codecs {
       case FileLangs         => 1097
       case Prefixes          => 1098
       case InstPrefixes      => 1099
+      case SourcePackage     => 1106
       case ProvideFlags      => 1112
       case ProvideVersion    => 1113
       case ObsoleteFlags     => 1114
