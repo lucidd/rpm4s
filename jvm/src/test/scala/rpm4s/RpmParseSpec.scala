@@ -34,6 +34,15 @@ class RpmParseSpec
     encoded shouldEqual Attempt.successful(bits)
   }
 
+  "payload extractor" should "extract rpm payload correctly" in {
+    import scodec.bits._
+    val bits = BitVector.fromInputStream(
+      getClass.getResourceAsStream("/kernel-default-4.11.8-1.2.x86_64.rpm"))
+    val rpe = rpm4s.decode[Payload](bits).require
+    val sha256 = hex"a6c622dcbfc90c84332966370b73ce54cbd5388bf8561e28338b23529627572b".bits
+    rpe.bitVector.digest("SHA-256") shouldBe sha256
+  }
+
   "rpm.decode" should "correctly decode RpmPrimaryEntry" in {
     val bits = BitVector.fromInputStream(
       getClass.getResourceAsStream("/kernel-default-4.11.8-1.2.x86_64.rpm"))

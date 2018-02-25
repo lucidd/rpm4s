@@ -384,6 +384,15 @@ object Extractor {
       } yield Group(i18n.values.zip(group.values).toMap)
   }
 
+  implicit val payloadExtractor: Extractor[Payload] =
+    new Extractor[Payload] {
+      val tags: Set[HeaderTag[_ <: IndexData]] = Set.empty
+      val sigTags: Set[SignatureTag] = Set.empty
+      override val payload: Boolean = true
+      def extract(data: Data): Result[Payload] =
+        data.payload.map(Payload).toRight(ConvertingError("missing payload."))
+    }
+
   implicit def optionExtractor[T](implicit t: Extractor[T]): Extractor[Option[T]] =
     new Extractor[Option[T]] {
       val tags: Set[HeaderTag[_ <: IndexData]] = t.tags
