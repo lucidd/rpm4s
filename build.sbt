@@ -151,7 +151,8 @@ lazy val cli = project.in(file("cli"))
       name,
       version,
       scalaVersion,
-      sbtVersion
+      sbtVersion,
+      "commit" -> git.gitHeadCommit.value.get
     ),
     buildInfoPackage := "rpm4s.cli",
     mainClass in assembly := Some("rpm4s.cli.Main"),
