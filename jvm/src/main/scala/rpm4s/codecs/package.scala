@@ -78,8 +78,8 @@ package object codecs {
       case _       => ???
     }
 
-  implicit val lead: Codec[Lead] = (
-    ("magic" | constant(hex"ED AB EE DB")) ::
+  implicit val leadCodec: Codec[Lead] = (
+      ("magic" | constant(hex"ED AB EE DB")) ::
       ("major" | uint8) ::
       ("minor" | uint8) ::
       ("type" | Codec[RPMType]) ::
