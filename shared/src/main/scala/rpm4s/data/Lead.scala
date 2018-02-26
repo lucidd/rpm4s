@@ -1,6 +1,4 @@
-package rpm4s
-
-import rpm4s.data.{OS, RPMType}
+package rpm4s.data
 
 /**
  * This header is deprecated (except for signatureType) and not really
@@ -11,7 +9,7 @@ import rpm4s.data.{OS, RPMType}
  * @param tpe
  * @param archnum
  * @param name
- * @param osnum  just testing
+ * @param osnum
  * @param signatureType  type of [[rpm4s.codecs.HeaderTag.HeaderSignatures]]
  */
 case class Lead(

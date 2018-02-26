@@ -20,6 +20,7 @@ import shapeless.{::, Generic, HList, HNil, Lazy}
   * @tparam T the type of the extracted value
   */
 trait Extractor[T] {
+  val lead: Boolean = false
   val headerRange: Boolean = false
   val payload: Boolean = false
   val tags: Set[HeaderTag[_ <: IndexData]]
@@ -41,6 +42,7 @@ object Extractor {
     * Holds the data for an [[Extractor]]
     */
   trait Data {
+    val lead: Option[Lead] = None
     val headerRange: Option[HeaderRange] = None
     val payload: Option[BitVector] = None
     def apply[A <: IndexData](tag: HeaderTag[A]): Extractor.Result[A]
@@ -384,6 +386,14 @@ object Extractor {
       } yield Group(i18n.values.zip(group.values).toMap)
   }
 
+
+  implicit val leadExtractor: Extractor[Lead] = new Extractor[Lead] {
+    override val lead: Boolean = true
+    val tags: Set[HeaderTag[_ <: IndexData]] = Set.empty
+    val sigTags: Set[SignatureTag] = Set.empty
+    def extract(data: Data): Result[Lead] =
+      data.lead.toRight(ConvertingError("missing lead."))
+  }
   implicit val payloadExtractor: Extractor[Payload] =
     new Extractor[Payload] {
       val tags: Set[HeaderTag[_ <: IndexData]] = Set.empty

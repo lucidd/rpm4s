@@ -43,6 +43,14 @@ class RpmParseSpec
     rpe.bitVector.digest("SHA-256") shouldBe sha256
   }
 
+  "lead extractor" should "extract rpm lead correctly" in {
+    import scodec.bits._
+    val bits = BitVector.fromInputStream(
+      getClass.getResourceAsStream("/kernel-default-4.11.8-1.2.x86_64.rpm"))
+    val lead = rpm4s.decode[Lead](bits).require
+    lead shouldBe Lead(3, 0, RPMType.Binary, 1, "kernel-default-4.11.8-1.2", OS.Linux, 5)
+  }
+
   "rpm.decode" should "correctly decode RpmPrimaryEntry" in {
     val bits = BitVector.fromInputStream(
       getClass.getResourceAsStream("/kernel-default-4.11.8-1.2.x86_64.rpm"))

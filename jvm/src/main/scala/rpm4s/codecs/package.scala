@@ -11,7 +11,7 @@ import rpm4s.data.OS._
 import rpm4s.data.Architecture._
 import SignatureTag._
 import rpm4s.codecs.IndexData._
-import rpm4s.data.{Architecture, HeaderRange, HeaderType, RPMType}
+import rpm4s.data.{Architecture, HeaderRange, HeaderType, Lead, RPMType}
 
 import scala.annotation.tailrec
 
@@ -610,9 +610,22 @@ package object codecs {
     */
   def decoder[T](implicit extractor: Extractor[T]): Decoder[T] =
     Decoder { bits =>
-      val leadSkipped = bits.drop((96 + 4 + 4) * 8L)
       val attempt = for {
-        indexCount <- uint32.decode(leadSkipped)
+        optLead <- {
+          val leadSize = 96
+          val headerMagicSize = 3
+          val versionSize = 1
+          val reservedSize = 4
+          if (extractor.lead) {
+            leadCodec.dropRight(ignore((headerMagicSize + versionSize + reservedSize) * 8L))
+              .decode(bits).map(_.map(lead => Some(lead)))
+          } else {
+            ignore((leadSize + headerMagicSize + versionSize + reservedSize) * 8L)
+              .withContext("skipping to indexCount")
+              .decode(bits).map(_.map(_ => None))
+          }
+        }
+        indexCount <- uint32.decode(optLead.remainder)
         dataSize <- uint32.decode(indexCount.remainder)
         padding = {
           val mod = (dataSize.value * 8) % 64
@@ -636,6 +649,8 @@ package object codecs {
         result <- extractor
           .extract(
             new Extractor.Data {
+              override val lead: Option[Lead] = optLead.value
+
               override val headerRange = Some(
                 HeaderRange.startSize(
                   (bits.size - rest.size) / 8,

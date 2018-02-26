@@ -2,7 +2,7 @@ package rpm4s
 
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
-import rpm4s.data.{OS, RPMType}
+import rpm4s.data.{Lead, OS, RPMType}
 import rpm4s.codecs._
 
 class LeadSpec
