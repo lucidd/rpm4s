@@ -386,6 +386,14 @@ object Extractor {
       } yield Group(i18n.values.zip(group.values).toMap)
   }
 
+  implicit val packagerExtractor: Extractor[Packager] = new Extractor[Packager] {
+    val tags: Set[HeaderTag[_ <: IndexData]] = Set(
+      HeaderTag.Packager
+    )
+    val sigTags: Set[SignatureTag] = Set.empty
+    def extract(data: Data): Result[Packager] =
+        data(HeaderTag.Packager).map(str => Packager(str.value))
+  }
 
   implicit val leadExtractor: Extractor[Lead] = new Extractor[Lead] {
     override val lead: Boolean = true
@@ -394,6 +402,19 @@ object Extractor {
     def extract(data: Data): Result[Lead] =
       data.lead.toRight(ConvertingError("missing lead."))
   }
+
+  implicit val payloadCompressionExtractor: Extractor[Compression] = new Extractor[Compression] {
+    val tags: Set[HeaderTag[_ <: IndexData]] = Set(
+      HeaderTag.PayloadCompressor
+    )
+    val sigTags: Set[SignatureTag] = Set.empty
+    def extract(data: Data): Result[Compression] =
+      for {
+        str <- data(HeaderTag.PayloadCompressor)
+        x <- Compression.fromString(str.value).toRight(ConvertingError(s"${str.value} unknown compression."))
+      } yield x
+  }
+
   implicit val payloadExtractor: Extractor[Payload] =
     new Extractor[Payload] {
       val tags: Set[HeaderTag[_ <: IndexData]] = Set.empty
