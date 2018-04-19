@@ -30,6 +30,9 @@ object PkgRef {
     case object PayloadIsLzma extends RpmLib
     case object TildeInVersions extends RpmLib
     case object PartialHardlinkSets extends RpmLib
+    case object FileDigests extends RpmLib
+    case object PayloadIsXz extends RpmLib
+
 
     def fromString(value: String): Option[RpmLib] = value match {
       case "CompressedFileNames" => Some(CompressedFileNames)
@@ -37,6 +40,8 @@ object PkgRef {
       case "PartialHardlinkSets" => Some(PartialHardlinkSets)
       case "PayloadIsLzma" => Some(PayloadIsLzma)
       case "TildeInVersions" => Some(TildeInVersions)
+      case "FileDigests" =>  Some(FileDigests)
+      case "PayloadIsXz" => Some(PayloadIsXz)
       case _ => None
     }
   }
