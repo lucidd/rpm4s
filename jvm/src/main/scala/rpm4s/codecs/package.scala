@@ -127,30 +127,45 @@ package object codecs {
       case _                 => ???
     }
 
+  /**
+    * Encodes the list of index data entries into a BitVector in the
+    * same order they appear in the entires list. In addition it returns
+    * a list of byte offsets of each entry in the encoded BitVector.
+    *
+    * @param entries list of rpm index data entries.
+    * @return a BitVector containing the encoded list and a list of byte offsets
+    *          of where the individual entries are in the BitVector
+    */
+  //TODO: write test especially for bit alignment
+  def encodeIndexEntry(entries: List[IndexData]): Attempt[(BitVector, List[Long])] = {
+    @tailrec
+    def loop(
+      acc: BitVector,
+      entries: List[IndexData],
+      offsets: List[Long]
+    ): Attempt[(BitVector, List[Long])] =
+      entries match {
+        case Nil => Attempt.successful((acc, offsets))
+        case data :: nextEntries =>
+          indexDataEncoder.encode(data) match {
+            case r @ Attempt.Failure(_) => r
+            case Attempt.Successful(bits) =>
+              val bitAlignment = data.headerType.bitAlignment
+              val padding = (bitAlignment - (acc.size % bitAlignment)) % bitAlignment
+              val paddingBits = BitVector.low(padding)
+              val result = paddingBits ++ bits
+              loop(acc ++ result, nextEntries, offsets :+ ((acc.size + paddingBits.size) / 8))
+          }
+
+      }
+    loop(BitVector.empty, entries, List.empty)
+  }
+
   def indexData[T <: RPMTag](header: Header[T]): Codec[List[(IndexEntry[T], IndexData)]] = {
     val codecs = header.index.sortBy(_.offset)
     new Codec[List[(IndexEntry[T], IndexData)]] {
       override def encode(value: List[(IndexEntry[T], IndexData)]): Attempt[BitVector] = {
-        @tailrec
-        def encodeEntry(
-          acc: BitVector,
-          entries: List[(IndexEntry[T], IndexData)]
-        ): Attempt[BitVector] =
-          entries match {
-            case Nil => Attempt.successful(acc)
-            case (index, data) :: nextEntries =>
-              indexDataEncoder.encode(data) match {
-                case r @ Attempt.Failure(_) => r
-                case Attempt.Successful(bits) =>
-                  val bitAlignment = index.tpe.bitAlignment
-                  val padding = (bitAlignment - (acc.size % bitAlignment)) % bitAlignment
-                  val paddingBits = BitVector.low(padding)
-                  val result = paddingBits ++ bits
-                  encodeEntry(acc ++ result, nextEntries)
-              }
-
-          }
-        encodeEntry(BitVector.empty, value)
+        encodeIndexEntry(value.map(_._2)).map(_._1)
       }
 
       override def sizeBound: SizeBound = SizeBound.unknown
@@ -617,7 +632,7 @@ package object codecs {
           val versionSize = 1
           val reservedSize = 4
           if (extractor.lead) {
-            leadCodec.dropRight(ignore((headerMagicSize + versionSize + reservedSize) * 8L))
+            leadCodec.withContext("lead").dropRight(ignore((headerMagicSize + versionSize + reservedSize) * 8L))
               .decode(bits).map(_.map(lead => Some(lead)))
           } else {
             ignore((leadSize + headerMagicSize + versionSize + reservedSize) * 8L)
@@ -625,8 +640,8 @@ package object codecs {
               .decode(bits).map(_.map(_ => None))
           }
         }
-        indexCount <- uint32.decode(optLead.remainder)
-        dataSize <- uint32.decode(indexCount.remainder)
+        indexCount <- uint32.withContext("indexCount").decode(optLead.remainder)
+        dataSize <- uint32.withContext("dataSize").decode(indexCount.remainder)
         padding = {
           val mod = (dataSize.value * 8) % 64
           if (mod == 0) 0 else 64 - mod
@@ -677,7 +692,7 @@ package object codecs {
       attempt
     }
 
-  implicit val codec: Codec[RpmFile] = (
+  implicit val rpmFileCodec: Codec[RpmFile] = (
     ("lead" | Codec[Lead]) ::
       (("signature" | Codec[Header[SignatureTag]]) >>:~ { sigHeader =>
       ("data" | alignTo(indexData(sigHeader), 64)) ::
