@@ -24,7 +24,7 @@ class RepomdSpec
   "repomd.xml" should "get parsed correctly" in {
     val r  = xmlevents[IO](getClass.getResourceAsStream("/repomd/repomd.xml"))
         .through(rpm4s.repo.repomd.xml2repomd)
-        .runLast.unsafeRunSync()
+        .compile.last.unsafeRunSync()
 
     r shouldEqual Some(
       RepoMdF[cats.Id](
@@ -46,7 +46,7 @@ class RepomdSpec
     val r  = xmlevents[IO](
       getClass.getResourceAsStream("/repomd/primary.xml")
     ).through(xml2packages)
-     .runLog.unsafeRunSync()
+     .compile.toVector.unsafeRunSync()
 
     //TODO: this is missing source rpm test case
     val expected = Vector(
@@ -102,13 +102,13 @@ class RepomdSpec
     val rpm = rpm4s.decode[RpmPrimaryEntry](BitVector.fromInputStream(getClass.getResourceAsStream("/kernel-default-4.11.8-1.2.x86_64.rpm"))).require
     val expected = fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/cc_primary.xml")),4096)
       .through(fs2.text.utf8Decode)
-      .runLog
+      .compile.toVector
       .map(_.mkString)
       .unsafeRunSync()
     val checksum = Sha256.fromHex("65f2c93d2bd4178590ac46531668108389729df9f7f0a527af4f1566e0ee94e8").get
     val generated = rpm4s.repo.repomd.xml.primary.create[IO](Some(1), Stream.emit(rpm -> checksum),
       (rpe, cksum) => "kernel-default-4.11.8-1.2.x86_64.rpm"
-    ).runLog.map(_.mkString).unsafeRunSync()
+    ).compile.toVector.map(_.mkString).unsafeRunSync()
     generated shouldBe expected
   }
 

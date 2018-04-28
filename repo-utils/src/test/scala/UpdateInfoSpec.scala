@@ -19,7 +19,7 @@ class UpdateInfoSpec
     val r  = xmlevents[IO](
       getClass.getResourceAsStream("/repomd/updateinfo.xml")
     ).through(xml2updates)
-     .runLog.unsafeRunSync()
+     .compile.toVector.unsafeRunSync()
 
     val expected = Vector(
       UpdateF[cats.Id](

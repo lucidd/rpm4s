@@ -23,10 +23,12 @@ class HashSpec
         s => s.map(_ => ())
       ).unsafeRunSync
 
-      val beforeHash = in.through(fs2.hash.sha256).runLog.map(x => Sha256.fromBytes(x).get).unsafeRunSync
-      val beforeSize = in.runLog.map(_.size).unsafeRunSync
-      val afterHash = in.through(pipe).through(fs2.hash.sha256).runLog.map(x => Sha256.fromBytes(x).get).unsafeRunSync
-      val afterSize = in.through(pipe).runLog.map(_.size).unsafeRunSync
+      val beforeHash = in.through(fs2.hash.sha256).compile
+        .toVector.map(x => Sha256.fromBytes(x).get).unsafeRunSync
+      val beforeSize = in.compile.toVector.map(_.size).unsafeRunSync
+      val afterHash = in.through(pipe).through(fs2.hash.sha256).compile.toVector
+        .map(x => Sha256.fromBytes(x).get).unsafeRunSync
+      val afterSize = in.through(pipe).compile.toVector.map(_.size).unsafeRunSync
 
 
       result shouldEqual (beforeHash, beforeSize, afterHash, afterSize)

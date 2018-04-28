@@ -22,7 +22,7 @@ class GzipSpec
     val text = bits
       .through(gunzip())
       .through(fs2.text.utf8Decode)
-      .runLog.map(_.mkString)
+      .compile.toVector.map(_.mkString)
       .unsafeRunSync()
 
 

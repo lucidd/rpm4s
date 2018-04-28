@@ -17,7 +17,7 @@ class Yast2Spec
     val r  =
       fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/yast2/content")), 4096)
         .through(fs2.text.utf8Decode)
-        .through(fs2.text.lines).runLog.map { lines =>
+        .through(fs2.text.lines).compile.toVector.map { lines =>
         Content.fromLines(lines.toList)
       }.unsafeRunSync()
 
@@ -37,7 +37,7 @@ class Yast2Spec
      .through(fs2.text.utf8Decode)
      .through(fs2.text.lines)
      .through(Yast2.pipe)
-     .runLog.unsafeRunSync()
+     .compile.toVector.unsafeRunSync()
 
     val expected = Vector(
       PackageF[cats.Id](
