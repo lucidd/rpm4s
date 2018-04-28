@@ -2,9 +2,9 @@ language: scala
 dist: trusty
 group: edge
 scala:
-  - 2.12.3
+  - 2.12.4
 jdk:
-  - oraclejdk8
+  - openjdk8
 node_js:
   - "6"
 
