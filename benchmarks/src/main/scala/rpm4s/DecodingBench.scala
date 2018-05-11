@@ -6,6 +6,7 @@ import org.openjdk.jmh.annotations._
 import scodec.Codec
 import scodec.bits.BitVector
 import rpm4s.codecs._
+import rpm4s.data.Dependency._
 import rpm4s.data._
 import shapeless.{::, HNil}
 
