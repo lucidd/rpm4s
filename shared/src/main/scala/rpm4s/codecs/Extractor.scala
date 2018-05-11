@@ -48,7 +48,7 @@ object Extractor {
     def apply[A <: IndexData](tag: HeaderTag[A]): Extractor.Result[A]
   }
   type Result[T] = Either[Error, T]
-  def apply[T: Extractor] = implicitly[Extractor[T]]
+  def apply[T: Extractor]: Extractor[T] = implicitly[Extractor[T]]
 
   implicit def genericExtractor[T, H <: HList](
     implicit gen: Generic.Aux[T, H],
