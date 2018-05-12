@@ -18,8 +18,10 @@ sealed trait Checksum extends Product with Serializable {
 object Checksum {
   def fromString(value: String): Option[Checksum] = {
     value.split("-", 2) match {
-      case Array("sha256", hex) => Sha256.fromHex(hex)
+      case Array("md5", hex) => Md5.fromHex(hex)
       case Array("sha1", hex) => Sha1.fromHex(hex)
+      case Array("sha256", hex) => Sha256.fromHex(hex)
+      case Array("sha512", hex) => Sha512.fromHex(hex)
       case _ => None
     }
 
