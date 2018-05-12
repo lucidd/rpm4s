@@ -4,8 +4,9 @@ import java.time.{Instant, ZoneOffset}
 
 import rpm4s.codecs.Extractor.Data
 import rpm4s.codecs.IndexData.{Int32Data, StringArrayData}
-import rpm4s.data.Checksum.Sha1
+import rpm4s.data.Checksum.{Md5, Sha1, Sha256, Sha512}
 import rpm4s.data.Dependency._
+import rpm4s.data.Stat.FileType
 import rpm4s.data._
 import scodec.bits.BitVector
 import shapeless.{::, Generic, HList, HNil, Lazy}
@@ -181,7 +182,9 @@ object Extractor {
         HeaderTag.DirIndexes,
         HeaderTag.BaseNames,
         HeaderTag.FileFlags,
-        HeaderTag.FileModes
+        HeaderTag.FileModes,
+        HeaderTag.FileDigests,
+        HeaderTag.FileDigestAlgo
       )
       val sigTags: Set[SignatureTag] = Set.empty
       def extract(data: Data): Result[Vector[FileEntry]] = {
@@ -192,17 +195,35 @@ object Extractor {
           baseNames <- data(HeaderTag.BaseNames)
           flags <- data(HeaderTag.FileFlags)
           modes <- data(HeaderTag.FileModes)
+          digests <- data(HeaderTag.FileDigests)
           result <- baseNames.values.zip(dirIndexes.values).zipWithIndex.traverse {
             case ((base, idx), index) =>
               val rawMode = modes.values(index)
-              val mode = Stat.fromShort(rawMode)
               val flag = FileFlags(flags.values(index))
-              mode.toRight(
-                ConvertingError(s"$rawMode is not a valid mode value")
-              ).map(m => FileEntry(dirNames.values(idx) + base, m, flag))
+              Stat.fromShort(rawMode).toRight(ConvertingError(s"$rawMode is not a valid mode value")).flatMap { mode =>
+                  if (mode.tpe == FileType.RegularFile && !flag.containsAll(FileFlags.Ghost)) {
+                    val hasher = data(HeaderTag.FileDigestAlgo).toOption.flatMap(_.values.headOption).map {
+                      case 1 =>  Md5.fromHex _
+                      case 2 =>  Sha1.fromHex _
+                      //case 3 =>   /*!< RIPEMD160 */
+                      //case 5 =>   /*!< MD2 */
+                      //case 6 =>   /*!< TIGER192 */
+                      //case 7 =>   /*!< HAVAL-5-160 */
+                      case 8 =>   Sha256.fromHex _
+                      //case 9 =>   /*!< SHA384 */
+                      case 10 =>   Sha512.fromHex _
+                    }.getOrElse(Md5.fromHex _)
+                    hasher(digests.values(index)).toRight(ConvertingError(s"'${digests.values(index)}' ${dirNames.values(idx) + base} ${flag} is not a valid checksum")).map {
+                      d => FileEntry(dirNames.values(idx) + base, mode, flag, Some(d))
+                    }
+                  } else {
+                    Either.right(FileEntry(dirNames.values(idx) + base, mode, flag, None))
+                  }
+
+              }
           }
         } yield result
-      }
+    }
     }
 
   implicit val changelogExtractor: Extractor[Vector[ChangeLogEntry]] =

@@ -1,5 +1,7 @@
 package rpm4s
 
+import java.time.{Instant, ZoneOffset}
+
 import org.scalacheck.Arbitrary
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
@@ -7,7 +9,8 @@ import rpm4s.codecs.IndexData.StringData
 import scodec.{Attempt, Codec}
 import scodec.bits.BitVector
 import rpm4s.codecs._
-import rpm4s.data.Dependency.{Conflicts, Obsoletes, Provides, Requires}
+import rpm4s.data.Checksum.Md5
+import rpm4s.data.Dependency._
 import rpm4s.data._
 
 class RpmParseSpec
@@ -15,6 +18,34 @@ class RpmParseSpec
     with Matchers
     with PropertyChecks
     with CustomMatchers {
+
+
+  case class TestSet(
+      name: Name,
+      version: Version,
+      release: Release,
+      architecture: Architecture,
+      vendor: Vendor,
+      license: License,
+      summery: Summery,
+      description: Description,
+      group: rpm4s.data.Group,
+      headerRange: HeaderRange,
+      epoch: Option[Epoch] = None,
+      buildhost: Option[BuildHost] = None,
+      buildtime: Option[BuildTime] = None,
+      fileEntries: Option[Vector[FileEntry]] = None,
+      requires: Vector[Requires] = Vector.empty,
+      provides: Vector[Provides] = Vector.empty,
+      obsoletes: Vector[Obsoletes] = Vector.empty,
+      enhances: Vector[Enhances] = Vector.empty,
+      conflicts: Vector[Conflicts] = Vector.empty,
+      supplements: Vector[Supplements] = Vector.empty,
+      recommends: Vector[Recommends] = Vector.empty,
+      suggests: Vector[Suggests] = Vector.empty,
+      changeLog: Vector[ChangeLogEntry] = Vector.empty
+  )
+
   implicit val stringDataArb = Arbitrary(
     Arbitrary.arbString.arbitrary.map(StringData))
 
@@ -54,7 +85,7 @@ class RpmParseSpec
   "rpm.decode" should "correctly decode RpmPrimaryEntry" in {
     val bits = BitVector.fromInputStream(
       getClass.getResourceAsStream("/kernel-default-4.11.8-1.2.x86_64.rpm"))
-    val rpe = rpm4s.decode[RpmPrimaryEntry](bits).require
+    val rpe = rpm4s.decode[TestSet](bits).require
     rpe.architecture shouldBe Architecture.x86_64
     rpe.name shouldBe Name.fromString("kernel-default").toOption.get
     rpe.version shouldBe Version.parse("4.11.8").toOption.get
@@ -94,9 +125,24 @@ GIT Branch: stable"""
     rpe.provides(160) shouldBe Provides(VirtualRef("kernel-default(x86-64)", Some("4.11.8-1.2"), SenseFlags(8)))
 
     rpe.fileEntries.map(_.size) shouldBe Some(4976)
-    rpe.fileEntries.map(_(0)) shouldBe Some(FileEntry("/boot/.vmlinuz-4.11.8-1-default.hmac", Stat.fromShort(-32348).get, FileFlags(0)))
-    rpe.fileEntries.map(_(2488)) shouldBe Some(FileEntry("/lib/modules/4.11.8-1-default/kernel/drivers/net/ethernet/chelsio/cxgb4vf", Stat.fromShort(16877).get, FileFlags(0)))
-    rpe.fileEntries.map(_(4975)) shouldBe Some(FileEntry("/lib/modules/4.11.8-1-default/vdso/vdsox32.so", Stat.fromShort(-32275).get, FileFlags(0)))
+    rpe.fileEntries.map(_(0)) shouldBe Some(FileEntry(
+        "/boot/.vmlinuz-4.11.8-1-default.hmac",
+        Stat.fromShort(-32348).get,
+        FileFlags(0),
+        Md5.fromHex("3ecf21a0f63338dd4636415d314d81de")
+     ))
+    rpe.fileEntries.map(_(2488)) shouldBe Some(FileEntry(
+      "/lib/modules/4.11.8-1-default/kernel/drivers/net/ethernet/chelsio/cxgb4vf",
+      Stat.fromShort(16877).get,
+      FileFlags(0),
+      None
+    ))
+    rpe.fileEntries.map(_(4975)) shouldBe Some(FileEntry(
+      "/lib/modules/4.11.8-1-default/vdso/vdsox32.so",
+      Stat.fromShort(-32275).get,
+      FileFlags(0),
+      Md5.fromHex("2b7ca31a7346fa3e7d7838e32f7270c1")
+    ))
 
     rpe.requires.size shouldBe 20
     rpe.requires(0) shouldBe Requires(VirtualRef("/bin/sh", None, SenseFlags(512)))
@@ -120,6 +166,23 @@ GIT Branch: stable"""
     rpe.supplements.size shouldBe 0
 
     rpe.suggests.size shouldBe 0
+
+    rpe.changeLog.size shouldBe 4007
+    rpe.changeLog(0) shouldBe ChangeLogEntry(
+      "jslaby@suse.cz",
+      "- Linux 4.11.8 (bnc#1012628).\n- commit 42bd7a0",
+      Instant.ofEpochSecond(1498737600).atOffset(ZoneOffset.UTC)
+    )
+    rpe.changeLog(2000) shouldBe ChangeLogEntry(
+      "agraf@suse.de",
+      "- Refresh patches.arch/arm-exynos-nosparse.patch.\n- commit 55fbf60",
+      Instant.ofEpochSecond(1350907200).atOffset(ZoneOffset.UTC)
+    )
+    rpe.changeLog(4006) shouldBe ChangeLogEntry(
+      "jeffm@suse.com",
+      "- patches.suse/export-security_inode_permission: Export\n  security_inode_permission for aufs.",
+      Instant.ofEpochSecond(1236168000).atOffset(ZoneOffset.UTC)
+    )
 
   }
 
