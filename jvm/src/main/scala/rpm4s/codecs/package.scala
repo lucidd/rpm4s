@@ -320,6 +320,8 @@ package object codecs {
       case 1153 => Attempt.successful(PreTransProg)
       case 1154 => Attempt.successful(PostTransProg)
 
+      case 5008 => Attempt.successful(LongFileSizes)
+      case 5009 => Attempt.successful(LongSize)
       case 5010 => Attempt.successful(FileCaps)
       case 5011 => Attempt.successful(FileDigestAlgo)
 
@@ -477,6 +479,8 @@ package object codecs {
       case PreTransProg  => 1153
       case PostTransProg => 1154
 
+      case LongFileSizes => 5008
+      case LongSize => 5009
       case FileCaps => 5010
       case FileDigestAlgo => 5011
 

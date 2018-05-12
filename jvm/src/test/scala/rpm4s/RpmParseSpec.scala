@@ -127,21 +127,45 @@ GIT Branch: stable"""
     rpe.fileEntries.map(_.size) shouldBe Some(4976)
     rpe.fileEntries.map(_(0)) shouldBe Some(FileEntry(
         "/boot/.vmlinuz-4.11.8-1-default.hmac",
+        "root",
+        "root",
+        65,
+        0,
+        Instant.ofEpochSecond(1499540469),
+        1,
+        1,
         Stat.fromShort(-32348).get,
         FileFlags(0),
-        Md5.fromHex("3ecf21a0f63338dd4636415d314d81de")
+        Md5.fromHex("3ecf21a0f63338dd4636415d314d81de"),
+        None
      ))
     rpe.fileEntries.map(_(2488)) shouldBe Some(FileEntry(
       "/lib/modules/4.11.8-1-default/kernel/drivers/net/ethernet/chelsio/cxgb4vf",
+      "root",
+      "root",
+      4096,
+      0,
+      Instant.ofEpochSecond(1499537070),
+      2489,
+      1,
       Stat.fromShort(16877).get,
       FileFlags(0),
+      None,
       None
     ))
     rpe.fileEntries.map(_(4975)) shouldBe Some(FileEntry(
       "/lib/modules/4.11.8-1-default/vdso/vdsox32.so",
+      "root",
+      "root",
+      3720,
+      0,
+      Instant.ofEpochSecond(1499537535),
+      4976,
+      1,
       Stat.fromShort(-32275).get,
       FileFlags(0),
-      Md5.fromHex("2b7ca31a7346fa3e7d7838e32f7270c1")
+      Md5.fromHex("2b7ca31a7346fa3e7d7838e32f7270c1"),
+      None
     ))
 
     rpe.requires.size shouldBe 20

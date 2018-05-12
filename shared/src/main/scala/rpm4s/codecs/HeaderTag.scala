@@ -30,6 +30,7 @@ object HeaderTag {
   case object BuildHost extends HeaderTag[StringData]
   case object InstallTime extends HeaderTag[Int32Data]
   case object Size extends HeaderTag[Int32Data]
+  case object LongSize extends HeaderTag[Int64Data]
   case object Distribution extends HeaderTag[StringData]
   case object Vendor extends HeaderTag[StringData]
 
@@ -44,6 +45,7 @@ object HeaderTag {
   case object Arch extends HeaderTag[StringData]
   case object OldFileNames extends HeaderTag[StringArrayData]
   case object FileSizes extends HeaderTag[Int32Data]
+  case object LongFileSizes extends HeaderTag[Int64Data]
   case object FileModes extends HeaderTag[Int16Data]
   case object FileRDevs extends HeaderTag[Int16Data]
   case object FileMTimes extends HeaderTag[Int32Data]
@@ -83,6 +85,10 @@ object HeaderTag {
 
   case object Cookie extends HeaderTag[StringData]
   case object FileDevices extends HeaderTag[Int32Data]
+  /*
+   https://www.redhat.com/archives/rhl-list/2008-December/msg03025.html
+   Hysterical as it is, the inode numbers in packages are from the host used to build the package so they'll never match what you have installed. The inode numbers in packages are only used for rpm internal hardlink handling. 
+  **/
   case object FileINodes extends HeaderTag[Int32Data]
   case object FileLangs extends HeaderTag[StringArrayData]
   case object Prefixes extends HeaderTag[StringArrayData]

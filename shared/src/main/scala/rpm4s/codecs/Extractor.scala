@@ -184,7 +184,16 @@ object Extractor {
         HeaderTag.FileFlags,
         HeaderTag.FileModes,
         HeaderTag.FileDigests,
-        HeaderTag.FileDigestAlgo
+        HeaderTag.FileDigestAlgo,
+        HeaderTag.FileUserName,
+        HeaderTag.FileGroupName,
+        HeaderTag.FileMTimes,
+        HeaderTag.FileSizes,
+        HeaderTag.LongFileSizes,
+        HeaderTag.FileLinkTOS,
+        HeaderTag.FileDevices,
+        HeaderTag.FileINodes,
+        HeaderTag.FileRDevs
       )
       val sigTags: Set[SignatureTag] = Set.empty
       def extract(data: Data): Result[Vector[FileEntry]] = {
@@ -196,28 +205,86 @@ object Extractor {
           flags <- data(HeaderTag.FileFlags)
           modes <- data(HeaderTag.FileModes)
           digests <- data(HeaderTag.FileDigests)
+          usernames <- data(HeaderTag.FileUserName)
+          groupnames <- data(HeaderTag.FileGroupName)
+          mtimes <- data(HeaderTag.FileMTimes)
+          linktos <- data(HeaderTag.FileLinkTOS)
+          inodes <- data(HeaderTag.FileINodes)
+          devices <- data(HeaderTag.FileDevices)
+          rdevs <- data(HeaderTag.FileRDevs)
+          sizes <- {
+            // Use LongFileSizes if possible and fallback to FileSizes
+            data(HeaderTag.LongFileSizes).map(_.values)
+              .orElse(data(HeaderTag.FileSizes)
+              .map(_.values.map(_.toLong)))
+          }
           result <- baseNames.values.zip(dirIndexes.values).zipWithIndex.traverse {
             case ((base, idx), index) =>
+              val rdev = rdevs.values(index)
+              val inode = inodes.values(index)
+              val device = devices.values(index)
+              val size = sizes(index)
+              val mtime = Instant.ofEpochSecond(mtimes.values(index).toLong)
+              val linkTo = if (linktos.values(index).nonEmpty) {
+                Some(linktos.values(index))
+              } else None
+              val username = usernames.values(index)
+              val groupname = groupnames.values(index)
               val rawMode = modes.values(index)
               val flag = FileFlags(flags.values(index))
-              Stat.fromShort(rawMode).toRight(ConvertingError(s"$rawMode is not a valid mode value")).flatMap { mode =>
+              Stat.fromShort(rawMode).toRight(
+                ConvertingError(s"$rawMode is not a valid mode value")
+              ).flatMap { mode =>
                   if (mode.tpe == FileType.RegularFile && !flag.containsAll(FileFlags.Ghost)) {
-                    val hasher = data(HeaderTag.FileDigestAlgo).toOption.flatMap(_.values.headOption).map {
-                      case 1 =>  Md5.fromHex _
-                      case 2 =>  Sha1.fromHex _
-                      //case 3 =>   /*!< RIPEMD160 */
-                      //case 5 =>   /*!< MD2 */
-                      //case 6 =>   /*!< TIGER192 */
-                      //case 7 =>   /*!< HAVAL-5-160 */
-                      case 8 =>   Sha256.fromHex _
-                      //case 9 =>   /*!< SHA384 */
-                      case 10 =>   Sha512.fromHex _
-                    }.getOrElse(Md5.fromHex _)
-                    hasher(digests.values(index)).toRight(ConvertingError(s"'${digests.values(index)}' ${dirNames.values(idx) + base} ${flag} is not a valid checksum")).map {
-                      d => FileEntry(dirNames.values(idx) + base, mode, flag, Some(d))
-                    }
+                    val hasher = data(HeaderTag.FileDigestAlgo)
+                      .toOption
+                      .flatMap(_.values.headOption)
+                      .map {
+                        case 1 =>  Md5.fromHex _
+                        case 2 =>  Sha1.fromHex _
+                        //case 3 =>   /*!< RIPEMD160 */
+                        //case 5 =>   /*!< MD2 */
+                        //case 6 =>   /*!< TIGER192 */
+                        //case 7 =>   /*!< HAVAL-5-160 */
+                        case 8 =>   Sha256.fromHex _
+                        //case 9 =>   /*!< SHA384 */
+                        case 10 =>   Sha512.fromHex _
+                      }.getOrElse(Md5.fromHex _)
+                    hasher(digests.values(index)).toRight(
+                      ConvertingError(s"'${digests.values(index)}' is not a valid checksum"))
+                      .map { d =>
+                        FileEntry(
+                          path = dirNames.values(idx) + base,
+                          username = username,
+                          groupname = groupname,
+                          size = size,
+                          rdev = rdev,
+                          mtime = mtime,
+                          inode = inode,
+                          device = device,
+                          mode = mode,
+                          flags = flag,
+                          checksum = Some(d),
+                          linkto = linkTo
+                        )
+                      }
                   } else {
-                    Either.right(FileEntry(dirNames.values(idx) + base, mode, flag, None))
+                    Either.right(
+                      FileEntry(
+                        path = dirNames.values(idx) + base,
+                        username = username,
+                        groupname = groupname,
+                        size = size,
+                        rdev = rdev,
+                        mtime = mtime,
+                        inode = inode,
+                        device = device,
+                        mode = mode,
+                        flags = flag,
+                        checksum = None,
+                        linkto = linkTo
+                      )
+                    )
                   }
 
               }
