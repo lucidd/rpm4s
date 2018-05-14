@@ -12,7 +12,7 @@ object Release {
   val validChars: String = (('a' to 'z') ++ ('A' to 'Z')).mkString + "{}%+_.~"
   def isValidReleaseChar(char: Char): Boolean = isAlphaNumOr(char, "{}%+_.~")
   def fromString(value: String): Either[ConvertingError, Release] = {
-    if (value.forall(isValidReleaseChar))
+    if (value.nonEmpty && value.forall(isValidReleaseChar))
       Right(new Release(value))
     else Left(ConvertingError(s"invalid value $value for release"))
   }
