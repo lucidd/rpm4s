@@ -1,7 +1,8 @@
 import Dependencies._
 import org.scalajs.jsenv.nodejs.NodeJSEnv
-import org.scalajs.sbtplugin.cross.CrossProject
 import sbtassembly.AssemblyPlugin.defaultShellScript
+import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
+import sbtcrossproject.CrossProject
 
 lazy val cmdlineProfile =
   sys.env.getOrElse("SBT_PROFILE", "")
@@ -10,8 +11,6 @@ def profile: CrossProject ⇒ CrossProject = pr => cmdlineProfile match {
   case "coverage" => pr.enablePlugins(ScoverageSbtPlugin)
   case _ => pr.disablePlugins(ScoverageSbtPlugin)
 }
-
-val DebugTest = config("dtest") extend Test
 
 def scalacOptionsVersion(scalaVersion: String) = {
   Seq(
@@ -88,28 +87,21 @@ lazy val benchmarks = project
   .dependsOn(rpm4sJVM)
   .enablePlugins(JmhPlugin)
 
-lazy val rpm4s = crossProject
+lazy val rpm4s = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
   .in(file("."))
   .enablePlugins(BuildInfoPlugin)
-  .configs(DebugTest)
-  .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
   .configureCross(profile)
   .settings(
     coverageEnabled := true,
     coverageFailOnMinimum := true,
     buildInfoPackage := "rpm4s",
-    resolvers += Resolver.sonatypeRepo("snapshots"),
-    fork in DebugTest := true,
-    javaOptions in DebugTest ++= Seq(
-      "-Xdebug",
-      "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=127.0.0.1:5005"
-    ),
-    definedTests in DebugTest := (definedTests in Test).value
+    resolvers += Resolver.sonatypeRepo("snapshots")
   )
   .settings(
     organization := "io.lullabyte",
-    scalaVersion := "2.12.4",
-    crossScalaVersions := Seq("2.12.4"),
+    scalaVersion := "2.12.6",
+    crossScalaVersions := Seq("2.12.6"),
     name := "rpm4s",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % shapeless,
@@ -130,6 +122,7 @@ lazy val rpm4sJVM = rpm4s.jvm
   .settings(
     coverageMinimum := 65, // TODO: increase this once we have more
     libraryDependencies ++= Seq(
+      "org.apache.commons" % "commons-compress" % "1.12"
     )
   )
 
