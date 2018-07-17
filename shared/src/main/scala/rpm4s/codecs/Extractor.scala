@@ -59,6 +59,9 @@ object Extractor {
       def extract(data: Data): Result[T] = e.extract(data).map(gen.from)
       val sigTags: Set[SignatureTag] = e.sigTags
       val tags: Set[HeaderTag[_ <: IndexData]] = e.tags
+      override val lead: Boolean = e.lead
+      override val payload: Boolean = e.payload
+      override val headerRange: Boolean = e.headerRange
     }
 
   implicit val hnilExtractor: Extractor[HNil] = new Extractor[HNil] {
@@ -78,6 +81,9 @@ object Extractor {
       } yield h :: t
     val sigTags: Set[SignatureTag] = he.value.sigTags ++ te.value.sigTags
     val tags: Set[HeaderTag[_ <: IndexData]] = he.value.tags ++ te.value.tags
+    override val lead: Boolean = he.value.lead || te.value.lead
+    override val payload: Boolean = he.value.payload || te.value.payload
+    override val headerRange: Boolean = he.value.headerRange || te.value.headerRange
   }
 
   def dependencyExtractor[T](

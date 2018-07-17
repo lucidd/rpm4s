@@ -21,6 +21,8 @@ class RpmParseSpec
 
 
   case class TestSet(
+      lead: Lead,
+      payload: Payload,
       name: Name,
       version: Version,
       release: Release,
