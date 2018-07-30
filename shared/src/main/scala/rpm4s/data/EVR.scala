@@ -1,6 +1,7 @@
 package rpm4s.data
 
 import rpm4s.codecs.ConvertingError
+import cats.implicits._
 
 case class EVR(
     version: Version,
@@ -13,6 +14,24 @@ case class EVR(
   }
 }
 object EVR {
+
+  implicit val ordering: Ordering[EVR] = new Ordering[EVR] {
+    override def compare(x: EVR, y: EVR): Int = {
+      val epochCmp = Ordering[Option[Epoch]].compare(x.epoch, y.epoch)
+      if (epochCmp != 0) {
+        epochCmp
+      } else {
+        val versionCmp = Ordering[Version].compare(x.version, y.version)
+        if (versionCmp != 0) versionCmp
+        else {
+          val releaseCmp = Ordering[Option[Release]].compare(x.release, y.release)
+          releaseCmp
+        }
+      }
+    }
+  }
+
+
   //TODO: more validation for individual parts
   //TODO: Document format
   def parse(evr: String): Either[ConvertingError, EVR] = {

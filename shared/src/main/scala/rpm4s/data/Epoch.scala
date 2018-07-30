@@ -9,6 +9,8 @@ case class Epoch private (value: Int) {
 }
 object Epoch {
 
+  implicit val ordering: Ordering[Epoch] = Ordering.by(_.value)
+
   def apply(value: Int): Either[ConvertingError, Epoch] = fromInt(value)
 
   def fromString(value: String): Either[ConvertingError, Epoch] = {

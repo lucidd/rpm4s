@@ -1,6 +1,6 @@
 import org.scalacheck.{Arbitrary, Gen}
+import rpm4s.data.Segment.Separator
 import rpm4s.data.{EVR, Epoch, Release, Version}
-import rpm4s.data.Version.Separator
 
 object Utils {
 
