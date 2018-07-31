@@ -111,12 +111,12 @@ class VersionSpec extends FlatSpec with Matchers with PropertyChecks {
   }
 
   "version" should "not allow empty string" in {
-    Version.parse("") shouldBe Left(ConvertingError(s"version can not be empty"))
+    Version.fromString("") shouldBe Left(ConvertingError(s"version can not be empty"))
   }
 
   it should "roundtrip" in {
     forAll { v: Version =>
-      Version.parse(v.string) shouldBe Right(v)
+      Version.fromString(v.string) shouldBe Right(v)
     }
   }
 

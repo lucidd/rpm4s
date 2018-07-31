@@ -90,7 +90,7 @@ class RpmParseSpec
     val rpe = rpm4s.decode[TestSet](bits).require
     rpe.architecture shouldBe Architecture.x86_64
     rpe.name shouldBe Name.fromString("kernel-default").toOption.get
-    rpe.version shouldBe Version.parse("4.11.8").toOption.get
+    rpe.version shouldBe Version.fromString("4.11.8").toOption.get
 
     rpe.vendor shouldBe Vendor("openSUSE")
     rpe.license shouldBe License.`GPL-2.0`

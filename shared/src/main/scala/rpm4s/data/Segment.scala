@@ -3,6 +3,7 @@ package rpm4s.data
 import cats.Comparison
 import rpm4s.codecs.ConvertingError
 import rpm4s.data.Segment.{Alpha, Numeric, Separator, Tilde}
+import rpm4s.utils
 import rpm4s.utils.{isAlpha, isNum}
 
 import scala.annotation.tailrec
@@ -24,6 +25,11 @@ sealed trait Segment {
 }
 
 object Segment {
+
+  val validChars: String = (('a' to 'z') ++ ('A' to 'Z') ++ ('0' to '9')).mkString + "{}%+_.~"
+
+  def isValidSegmentChar(c: Char): Boolean =
+    utils.isAlphaNumOr(c, Separator.validChars + "~")
 
   implicit val ordering: Ordering[Segment] = new Ordering[Segment] {
     override def compare(x: Segment, y: Segment): Int = {
@@ -153,7 +159,8 @@ object Segment {
       else Left(ConvertingError(s"$value does contain invalid chars for a separator segment"))
     }
     // found in librpm source build/parsePreamble.c
-    val validSeparatorChars = HashSet("{}%+_.": _*)
+    val validChars = "{}%+_."
+    val validSeparatorChars = HashSet(validChars: _*)
   }
 
   case class Tilde(next: Option[Segment]) extends Segment with NotAlpha with NotNumeric with NotSeparator

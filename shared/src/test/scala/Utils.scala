@@ -11,16 +11,11 @@ object Utils {
 
   val segment = Gen.oneOf(numeric, alpha, tilde, sep)
   val genVersion = Gen.nonEmptyListOf(segment).map(_.mkString)
-    .map { verStr =>
-      Version.parse(verStr) match {
-        case Right(v) => v
-        case Left(err) => throw new RuntimeException(err.msg)
-      }
-    }
+    .map { verStr => Version.fromString(verStr).toOption.get }
 
   val genEpoch: Gen[Epoch] = Gen.posNum[Int].filter(_ >= 1).map(i => Epoch(i).toOption.get)
   val genRelease: Gen[Release] = Gen.nonEmptyListOf(Gen.oneOf(Release.validChars))
-    .map { x => Release(x.mkString).toOption.get }
+    .map { x => Release.fromString(x.mkString).toOption.get }
   val genEVR: Gen[EVR] = for {
     e <- Gen.option(genEpoch)
     r <- Gen.option(genRelease)

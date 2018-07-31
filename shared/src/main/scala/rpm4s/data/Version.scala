@@ -4,16 +4,21 @@ import cats.kernel.Comparison
 import rpm4s.codecs.ConvertingError
 
 
-case class Version (segment: Segment) {
-  def string: String = segment.string
+case class Version private (private val value: String) {
+  def string: String = value
+  // value has been validated before so it should be safe to assume no errors
+  lazy val segment: Segment = Segment.segment(value).toOption.flatten.get
 }
 
 object Version {
 
-  def parse(value: String): Either[ConvertingError, Version] = {
-    Segment.segment(value).flatMap {
-      case Some(seg) => Right(new Version(seg))
-      case None => Left(ConvertingError(s"version can not be empty"))
+  def fromString(value: String): Either[ConvertingError, Version] = {
+    if (value.isEmpty) {
+      Left(ConvertingError(s"version can not be empty"))
+    } else {
+      if (value.forall(Segment.isValidSegmentChar)) {
+        Right(Version(value))
+      } else Left(ConvertingError(s"$value contains invalid version chars."))
     }
   }
 
@@ -21,8 +26,8 @@ object Version {
 
   def rpmvercmp(v1: String, v2: String): Either[ConvertingError, Comparison] = {
     for {
-      a <- parse(v1)
-      b <- parse(v2)
+      a <- fromString(v1)
+      b <- fromString(v2)
     } yield Comparison.fromInt(ordering.compare(a, b))
   }
 

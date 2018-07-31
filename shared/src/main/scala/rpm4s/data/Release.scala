@@ -1,11 +1,9 @@
 package rpm4s.data
 
 import rpm4s.codecs.ConvertingError
-import rpm4s.utils._
 
 case class Release private (value: String) {
-  def copy(value: String = value): Either[ConvertingError, Release] =
-    Release(value)
+  lazy val segment: Segment = Segment.segment(value).toOption.flatten.get
 }
 object Release {
   //according to https://blog.jasonantman.com/2014/07/how-yum-and-rpm-compare-versions/ release is also compared with the logic for versions
@@ -14,12 +12,15 @@ object Release {
       Version.rpmvercmp(x.value, y.value).toOption.get.toInt
     }
   }
-  def apply(value: String): Either[ConvertingError, Release] = fromString(value)
-  val validChars: String = (('a' to 'z') ++ ('A' to 'Z')).mkString + "{}%+_.~"
-  def isValidReleaseChar(char: Char): Boolean = isAlphaNumOr(char, "{}%+_.~")
+
+  val validChars: String = Segment.validChars
   def fromString(value: String): Either[ConvertingError, Release] = {
-    if (value.nonEmpty && value.forall(isValidReleaseChar))
-      Right(new Release(value))
-    else Left(ConvertingError(s"invalid value $value for release"))
+    if (value.isEmpty) {
+      Left(ConvertingError(s"version can not be empty"))
+    } else {
+      if (value.forall(Segment.isValidSegmentChar)) {
+        Right(Release(value))
+      } else Left(ConvertingError(s"$value contains invalid release chars."))
+    }
   }
 }

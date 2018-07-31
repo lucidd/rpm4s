@@ -159,7 +159,7 @@ package object primary {
         val start = r.ref.nameString.indexOf("(")
         val end = r.ref.nameString.indexOf("(", start)
         val version = r.ref.nameString.slice(start + 1, end)
-        Version.parse(version).toOption.get
+        Version.fromString(version).toOption.get
       }(
         implicitly[Ordering[Version]].reverse
       )
@@ -273,7 +273,7 @@ package object primary {
                   pack(h1, acc.copy(size = Some(size(se))))
                 }
                 case "version" => {
-                  val version = Version.parse(se.getAttributeByName(verAttr).getValue)
+                  val version = Version.fromString(se.getAttributeByName(verAttr).getValue)
                   val epochString = se.getAttributeByName(epochAttr).getValue
                   val epoch =
                     if (epochString == "0") Either.right(None)

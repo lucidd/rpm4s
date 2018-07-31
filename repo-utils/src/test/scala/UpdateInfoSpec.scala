@@ -50,7 +50,7 @@ class UpdateInfoSpec
           PackageF[cats.Id](
             name = Name("openconnect").toOption.get,
             epoch = None,
-            version = Version.parse("7.08").toOption.get,
+            version = Version.fromString("7.08").toOption.get,
             release = Release.fromString("7.1").toOption.get,
             arch = "src",
             src = Uri.unsafeFromString("src/openconnect-7.08-7.1.src.rpm"),
@@ -62,7 +62,7 @@ class UpdateInfoSpec
           PackageF[cats.Id](
             name = Name("openconnect").toOption.get,
             epoch = None,
-            version = Version.parse("7.08").toOption.get,
+            version = Version.fromString("7.08").toOption.get,
             release = Release.fromString("7.1").toOption.get,
             arch = "x86_64",
             src = Uri.unsafeFromString("x86_64/openconnect-7.08-7.1.x86_64.rpm"),
@@ -104,7 +104,7 @@ class UpdateInfoSpec
           PackageF[cats.Id](
             name = Name("wireshark").toOption.get,
             epoch = Some(Epoch.fromInt(4).toOption.get),
-            version = Version.parse("2.2.8").toOption.get,
+            version = Version.fromString("2.2.8").toOption.get,
             release = Release.fromString("17.1").toOption.get,
             arch = "src",
             src = Uri.unsafeFromString("src/wireshark-2.2.8-17.1.src.rpm"),

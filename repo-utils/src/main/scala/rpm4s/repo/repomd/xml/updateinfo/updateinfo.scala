@@ -65,7 +65,7 @@ package object updateinfo {
                 val name = Name(se.getAttributeByName(nameAttr).getValue).toOption.get
                 val epoch = Option(se.getAttributeByName(epochAttr).getValue)
                   .flatMap(x => Epoch.fromString(x).toOption)
-                val version = Version.parse(se.getAttributeByName(versionAttr).getValue).toOption.get
+                val version = Version.fromString(se.getAttributeByName(versionAttr).getValue).toOption.get
                 val release = Release.fromString(se.getAttributeByName(releaseAttr).getValue).toOption.get
                 val arch = se.getAttributeByName(archAttr).getValue
                 val src = Uri.unsafeFromString(se.getAttributeByName(srcAttr).getValue)

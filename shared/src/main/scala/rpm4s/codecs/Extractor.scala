@@ -406,7 +406,7 @@ object Extractor {
     val sigTags: Set[SignatureTag] = Set.empty
     def extract(data: Data): Result[Version] =
       data(HeaderTag.Version).flatMap { x =>
-        Version.parse(x.value)
+        Version.fromString(x.value)
       }
   }
 

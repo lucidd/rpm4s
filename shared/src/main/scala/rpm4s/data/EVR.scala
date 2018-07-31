@@ -51,7 +51,7 @@ object EVR {
       (Some(ev.substring(0, epochIdx)), ev.substring(epochIdx + 1))
     }
     for {
-      ver <- Version.parse(version)
+      ver <- Version.fromString(version)
       rel <- release match {
         case Some(r) => Release.fromString(r).map(Some(_))
         case None => Right(None)
