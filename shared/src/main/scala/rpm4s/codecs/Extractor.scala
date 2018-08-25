@@ -497,6 +497,18 @@ object Extractor {
       data.lead.toRight(ConvertingError("missing lead."))
   }
 
+  implicit val payloadFormatExtractor: Extractor[PayloadFormat] = new Extractor[PayloadFormat] {
+    val tags: Set[HeaderTag[_ <: IndexData]] = Set(
+      HeaderTag.PayloadFormat
+    )
+    val sigTags: Set[SignatureTag] = Set.empty
+    def extract(data: Data): Result[PayloadFormat] =
+      for {
+        str <- data(HeaderTag.PayloadFormat)
+        x <- PayloadFormat.fromString(str.value).toRight(ConvertingError(s"${str.value} unknown payload format."))
+      } yield x
+  }
+
   implicit val payloadCompressionExtractor: Extractor[Compression] = new Extractor[Compression] {
     val tags: Set[HeaderTag[_ <: IndexData]] = Set(
       HeaderTag.PayloadCompressor
