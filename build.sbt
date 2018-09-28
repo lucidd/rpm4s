@@ -100,8 +100,8 @@ lazy val rpm4s = crossProject(JSPlatform, JVMPlatform)
   )
   .settings(
     organization := "io.lullabyte",
-    scalaVersion := "2.12.6",
-    crossScalaVersions := Seq("2.12.6"),
+    scalaVersion := "2.12.7",
+    crossScalaVersions := Seq("2.12.7"),
     name := "rpm4s",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % shapeless,
