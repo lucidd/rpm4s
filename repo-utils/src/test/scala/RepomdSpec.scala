@@ -15,6 +15,8 @@ import scodec.bits.{BitVector, ByteVector}
 import fs2.{Pure, Stream}
 import rpm4s.repo.repomd.xml.primary.{PackageF, SizeInfo, xml2packages}
 
+import scala.concurrent.ExecutionContext
+
 
 class RepomdSpec
     extends FlatSpec
@@ -98,9 +100,10 @@ class RepomdSpec
   }
 
   "createPrimary" should "should create primary.xml correctly" in {
+    implicit val cs = IO.contextShift(ExecutionContext.global)
     //TODO: currently this ignores the pkgid attribute of the checksum which has been manually removed from the test data
     val rpm = rpm4s.decode[RpmPrimaryEntry](BitVector.fromInputStream(getClass.getResourceAsStream("/kernel-default-4.11.8-1.2.x86_64.rpm"))).require
-    val expected = fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/cc_primary.xml")),4096)
+    val expected = fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/cc_primary.xml")), 4096, ExecutionContext.global)
       .through(fs2.text.utf8Decode)
       .compile.toVector
       .map(_.mkString)

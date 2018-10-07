@@ -2,7 +2,7 @@ package rpm4s.repo.yast2
 
 import cats._
 import cats.implicits._
-import fs2.{Pipe, Pull, Stream}
+import fs2.{Pipe, Pull, RaiseThrowable, Stream}
 import rpm4s.data.Checksum.{Sha1, Sha256}
 import rpm4s.data.{Architecture, Checksum, Name}
 import rpm4s.repo.data.Bytes
@@ -88,7 +88,7 @@ object Yast2 {
     } else Left(s"invalid siz line '$line'")
   }
 
-  def pipe[F[_]]: Pipe[F, String, Package] = h => {
+  def pipe[F[_]: RaiseThrowable]: Pipe[F, String, Package] = h => {
       def pack(h: Stream[F, String], acc: PackageBuilder)
         : Pull[F, Nothing, Option[(Package, Stream[F, String])]] = {
         h.pull.uncons1.flatMap {

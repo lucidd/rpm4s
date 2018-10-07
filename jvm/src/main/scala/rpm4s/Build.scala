@@ -163,7 +163,6 @@ object Build {
 
       val cpioOut = blueprint.files.foldLeft(new CpioArchiveOutputStream(lzmaOut, CpioConstants.FORMAT_NEW)) { case (cpio, fileinfo) =>
         val entry = new CpioArchiveEntry(CpioConstants.FORMAT_NEW, "." + fileinfo.fileEntry.path, fileinfo.content.size)
-        entry.set
         entry.setMode(fileinfo.fileEntry.mode.toShort.toLong)
         cpio.putArchiveEntry(entry)
         cpio.write(fileinfo.content.toArray)

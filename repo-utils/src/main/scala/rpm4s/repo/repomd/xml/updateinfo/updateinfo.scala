@@ -1,11 +1,11 @@
 package rpm4s.repo.repomd.xml
 
 import java.time.{Instant, ZoneOffset}
+
 import javax.xml.namespace.QName
 import javax.xml.stream.events.XMLEvent
-
-import cats.effect.Effect
-import fs2.{Pipe, Pull, Stream}
+import cats.effect.{ConcurrentEffect, Effect}
+import fs2.{Pipe, Pull, RaiseThrowable, Stream}
 import org.http4s.Uri
 import rpm4s.data._
 import rpm4s.repo.data.CVE
@@ -34,13 +34,13 @@ package object updateinfo {
   private val dateAttr = new QName("date")
 
 
-  def bytes2updates[F[_]: Effect](implicit EC: ExecutionContext): Pipe[F, Byte, UpdateF.Update] =
+  def bytes2updates[F[_]: ConcurrentEffect]: Pipe[F, Byte, UpdateF.Update] =
     _.through(fs2.io.toInputStream)
      .flatMap(is => xmlevents(is))
      .through(xml2updates)
 
 
-  def xml2updates[F[_]]: Pipe[F, XMLEvent, UpdateF.Update] = { h =>
+  def xml2updates[F[_]: RaiseThrowable]: Pipe[F, XMLEvent, UpdateF.Update] = { h =>
 
     def boolean(h: Stream[F, XMLEvent]):
       Pull[F, Nothing, (Boolean, Stream[F, XMLEvent])] =

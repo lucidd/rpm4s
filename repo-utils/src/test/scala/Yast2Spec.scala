@@ -8,14 +8,17 @@ import rpm4s.repo.data.Bytes
 import rpm4s.repo.yast2.Yast2.{Location, PackageF, Size}
 import rpm4s.repo.yast2.{Content, Yast2}
 
+import scala.concurrent.ExecutionContext
+
 class Yast2Spec
     extends FlatSpec
     with Matchers
     with PropertyChecks {
 
   "content" should "get parsed correctly" in {
+    implicit val cs = IO.contextShift(ExecutionContext.global)
     val r  =
-      fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/yast2/content")), 4096)
+      fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/yast2/content")), 4096, ExecutionContext.global)
         .through(fs2.text.utf8Decode)
         .through(fs2.text.lines).compile.toVector.map { lines =>
         Content.fromLines(lines.toList)
@@ -33,7 +36,8 @@ class Yast2Spec
   }
 
   "packages" should "get parsed correctly" in {
-    val r  = fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/yast2/packages")), 4096)
+    implicit val cs = IO.contextShift(ExecutionContext.global)
+    val r  = fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/yast2/packages")), 4096, ExecutionContext.global)
      .through(fs2.text.utf8Decode)
      .through(fs2.text.lines)
      .through(Yast2.pipe)

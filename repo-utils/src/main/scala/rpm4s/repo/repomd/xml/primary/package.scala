@@ -2,9 +2,8 @@ package rpm4s.repo.repomd.xml
 
 import javax.xml.namespace.QName
 import javax.xml.stream.events.{StartElement, XMLEvent}
-
-import cats.effect.Effect
-import fs2.{Pipe, Pull, Stream}
+import cats.effect.{ConcurrentEffect, Effect}
+import fs2.{Pipe, Pull, RaiseThrowable, Stream}
 import org.http4s.Uri
 import rpm4s.data.Dependency.Requires
 import rpm4s.data.SenseFlags.Sense
@@ -241,13 +240,13 @@ package object primary {
       Stream.emit("</metadata>")
   }
 
-  def bytes2packages[F[_]: Effect](implicit EC: ExecutionContext): Pipe[F, Byte, PackageF.Package] =
-    _.through(fs2.io.toInputStream)
+  def bytes2packages[F[_]: ConcurrentEffect]: Pipe[F, Byte, PackageF.Package] =
+    _.through(fs2.io.toInputStream[F])
       .flatMap(is => xmlevents(is))
       .through(xml2packages)
 
 
-  def xml2packages[F[_]]: Pipe[F, XMLEvent, PackageF.Package] = { h =>
+  def xml2packages[F[_]: RaiseThrowable]: Pipe[F, XMLEvent, PackageF.Package] = { h =>
     def size(e: StartElement): SizeInfo = {
       //TODO: unsafe toLong
       val pack = e.getAttributeByName(sizePackage).getValue.toLong

@@ -18,6 +18,7 @@ object createrepo {
     val primaryQuery = rpm4s.codecs.decoder[RpmPrimaryEntry]
     val executor = Executors.newFixedThreadPool(concurrent)
     implicit val EC = ExecutionContext.fromExecutor(executor)
+    implicit val CS = IO.contextShift(EC)
     val rpms = rpm4s.utils.file.ls[IO](root)
       .filter(f => File(f).extension.contains(".rpm"))
       .map { path =>
@@ -25,7 +26,12 @@ object createrepo {
         Stream.bracket(Effect[IO].delay {
           FileChannel.open(path)
         })(
-          fc => {
+          fc =>
+            Effect[IO].delay {
+              fc.close()
+            }
+        ).flatMap {
+          fc =>
             val bits = BitVector.fromMmap(fc)
             primaryQuery.decodeValue(bits) match {
               case Successful(rpm) =>
@@ -33,20 +39,16 @@ object createrepo {
               case Failure(err) =>
                 Stream.empty
             }
-          },
-          fc =>
-            Effect[IO].delay {
-              fc.close()
-            }
-        )
+        }
 
       }
-    rpm4s.repo.create(
+    rpm4s.repo.create[IO](
       root,
-      rpms.join(Int.MaxValue),
+      rpms.parJoin(Int.MaxValue),
       (_, c) => s"${c.toSelfDescribingHex}.rpm",
       revision,
-      None
+      None,
+      EC
     ).unsafeRunSync()
     executor.shutdown()
   }

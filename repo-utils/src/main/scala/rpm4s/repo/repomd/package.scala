@@ -1,11 +1,11 @@
 package rpm4s.repo
 
 import java.time.Instant
+
 import javax.xml.namespace.QName
 import javax.xml.stream.events.XMLEvent
-
-import cats.effect.Effect
-import fs2.{Pipe, Pull, Stream}
+import cats.effect.{ConcurrentEffect, Effect}
+import fs2.{Pipe, Pull, RaiseThrowable, Stream}
 import rpm4s.data.Checksum
 import rpm4s.data.Checksum.{Md5, Sha1, Sha256, Sha512}
 import rpm4s.repo.repomd.Data.Primary
@@ -32,7 +32,7 @@ package object repomd {
     case Sha512(_) => "sha512"
   }
 
-  private def data[F[_]](h: Stream[F, XMLEvent], acc: RMDataBuilder)
+  private def data[F[_]: RaiseThrowable](h: Stream[F, XMLEvent], acc: RMDataBuilder)
   : Pull[F, Nothing, (RMData, Stream[F, XMLEvent])] = {
     h.pull.uncons1.flatMap {
       case Some((event, h1)) =>
@@ -88,7 +88,7 @@ package object repomd {
   }
 
 
-  private def rmd[F[_]](h: Stream[F, XMLEvent], acc: RepoMdBuilder)
+  private def rmd[F[_]: RaiseThrowable](h: Stream[F, XMLEvent], acc: RepoMdBuilder)
   : Pull[F, Nothing, (RepoMd, Stream[F, XMLEvent])] = {
     h.pull.uncons1.flatMap {
       case Some((event, h1)) =>
@@ -131,7 +131,7 @@ package object repomd {
     }
   }
 
-  def xml2repomd[F[_]]: Pipe[F, XMLEvent, RepoMd] = s => {
+  def xml2repomd[F[_]: RaiseThrowable]: Pipe[F, XMLEvent, RepoMd] = s => {
     //TODO validate first event
     def go(h: Stream[F, XMLEvent]): Pull[F, RepoMd, Option[Unit]] = {
       h.pull.uncons1.flatMap {
@@ -156,7 +156,7 @@ package object repomd {
     go(s).stream
   }
 
-  def bytes2repomd[F[_]: Effect](implicit EC: ExecutionContext): Pipe[F, Byte, RepoMd] =
+  def bytes2repomd[F[_]: ConcurrentEffect]: Pipe[F, Byte, RepoMd] =
     _.through(fs2.io.toInputStream)
       .flatMap(is => xmlevents(is))
       .through(xml2repomd)

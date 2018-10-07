@@ -42,8 +42,8 @@ package object xml {
   def xmlevents[F[_]: Sync](in: InputStream): Stream[F, XMLEvent] = {
     val xmlif = XMLInputFactory.newInstance()
     xmlif.setEventAllocator(new XMLEventAllocatorImpl())
-    Stream.bracket(Sync[F].delay(xmlif.createXMLStreamReader(in)))(
-      xmlsr => {
+    Stream.bracket(Sync[F].delay(xmlif.createXMLStreamReader(in)))(xmlsr => Sync[F].delay(xmlsr.close()))
+      .flatMap { xmlsr =>
         Stream.unfoldEval[F, XMLStreamReader, XMLEvent](xmlsr) { xmlr =>
           Sync[F].delay {
             if (xmlr.hasNext) {
@@ -53,9 +53,7 @@ package object xml {
             } else None
           }
         }
-      },
-      xmlsr => Sync[F].delay(xmlsr.close())
-    )
+      }
   }
 
 }

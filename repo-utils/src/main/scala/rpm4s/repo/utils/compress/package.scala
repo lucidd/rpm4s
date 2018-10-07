@@ -2,7 +2,7 @@ package rpm4s.repo.utils
 
 import java.util.zip.{CRC32, Deflater}
 
-import fs2.{Chunk, Pipe, Pull, Stream}
+import fs2.{Chunk, Pipe, Pull, RaiseThrowable, Stream}
 
 package object compress {
 
@@ -28,7 +28,7 @@ package object compress {
         val crc = new CRC32()
         var inputSize = 0
 
-        Stream.chunk[Byte](header) ++
+        Stream.chunk[F, Byte](header) ++
           in.through(_.chunks.flatMap { chunk =>
               val bytes = chunk.toBytes
               inputSize = inputSize + bytes.size
@@ -43,7 +43,7 @@ package object compress {
                 strategy = strategy
               )
             ) ++
-          Stream.chunk[Byte](Chunk.bytes {
+          Stream.chunk[F, Byte](Chunk.bytes {
             val c = crc.getValue
             val size = inputSize % 4294967296L //2^32
             Array(
@@ -72,7 +72,7 @@ package object compress {
     }
   }
 
-  private def skipFlags[F[_]](flags: Byte, s: Stream[F, Byte]): Pull[F, Byte, Unit] = {
+  private def skipFlags[F[_]: RaiseThrowable](flags: Byte, s: Stream[F, Byte]): Pull[F, Byte, Unit] = {
     val FTEXT = 1
     val FHCRC = 2
     val FEXTRA = 4
@@ -105,7 +105,7 @@ package object compress {
 
   //TODO: refactor and upstream
   //http://www.zlib.org/rfc-gzip.html#header-trailer
-  def gunzip[F[_]](bufferSize: Int = 1024 * 32): Pipe[F, Byte, Byte] =  h => {
+  def gunzip[F[_]: RaiseThrowable](bufferSize: Int = 1024 * 32): Pipe[F, Byte, Byte] =  h => {
         val a = for {
           idOpt <- awaitShort(h)
           cmOpt <- idOpt match {

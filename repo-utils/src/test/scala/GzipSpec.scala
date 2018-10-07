@@ -9,14 +9,17 @@ import scodec.{Attempt, Codec}
 import fs2.Stream
 import rpm4s.repo.utils.compress.{gunzip, gzip}
 
+import scala.concurrent.ExecutionContext
+
 class GzipSpec
     extends FlatSpec
     with Matchers
     with PropertyChecks {
 
   "gunzip" should "uncompress correctly" in {
+    implicit val cs = IO.contextShift(ExecutionContext.global)
     val bits = fs2.io.readInputStream(
-      IO(getClass.getResourceAsStream("/text.gz")), 4096
+      IO(getClass.getResourceAsStream("/text.gz")), 4096, ExecutionContext.global
     )
 
     val text = bits
@@ -32,11 +35,13 @@ class GzipSpec
   it should "roundtrip" in {
     forAll { value: String =>
       val r = Stream.emit(value)
+        .covary[IO]
         .through(fs2.text.utf8Encode)
         .through(gzip())
         .through(gunzip())
         .through(fs2.text.utf8Decode)
-        .toList.mkString
+        .compile.toList.map(_.mkString)
+        .unsafeRunSync()
 
 
       r shouldEqual value

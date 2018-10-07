@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file._
 import java.security.MessageDigest
 
-import cats.effect.{Effect, Sync}
+import cats.effect.{ContextShift, Effect}
 import cats.implicits._
 import fs2.{Chunk, Sink, Stream}
 import rpm4s.data.Checksum.Sha256
@@ -12,22 +12,25 @@ import rpm4s.data._
 import rpm4s.repo.utils.compress.gzip
 import cats.implicits._
 
+import scala.concurrent.ExecutionContext
+
 package object repo {
 
-  def create[F[_]: Effect](
+  def create[F[_]: Effect: ContextShift](
     reporoot: Path,
     rpms: Stream[F, (RpmPrimaryEntry, Checksum)],
     nameFn: (RpmPrimaryEntry, Checksum) => String,
     revision: Long,
-    count: Option[Long]
+    count: Option[Long],
+    blockingEC: ExecutionContext
   ): F[Unit] = {
     val primaryFile = reporoot.resolve("primary.xml.gz")
     val repomdFile = reporoot.resolve("repomd.xml")
     Files.deleteIfExists(primaryFile)
     Files.deleteIfExists(repomdFile)
     create(
-      fs2.io.file.writeAll(repomdFile),
-      fs2.io.file.writeAll(primaryFile),
+      fs2.io.file.writeAll(repomdFile, blockingEC),
+      fs2.io.file.writeAll(primaryFile, blockingEC),
       nameFn,
       rpms,
       revision,
