@@ -37,6 +37,7 @@ trait Extractor[T] {
   def extract(data: Data): Extractor.Result[T]
 }
 
+//TODO: detect drpm via payloadformat
 object Extractor {
 
   /**
@@ -534,6 +535,12 @@ object Extractor {
     new Extractor[Option[T]] {
       val tags: Set[HeaderTag[_ <: IndexData]] = t.tags
       val sigTags: Set[SignatureTag] = t.sigTags
+      /*
+        TODO: figure out if this needs to be stricter.
+        currently this returns None if a header is missing but that could
+        mean if you have a set of headers that only come together as one or non of them
+        only missing one of those headers means the rpm is build in a broken way.
+       */
       def extract(data: Data): Result[Option[T]] =
         t.extract(data) match {
           case Left(MissingHeader(_)) => Right(None)
@@ -548,5 +555,8 @@ object Extractor {
       def extract(data: Data): Result[List[T]] =
         e.extract(data).map(_.toList)
     }
+
+  //TODO: implement extractor for source/nosource source conatains source file paths while no source contains indices
+  // source entries which are actually not sources
 
 }
