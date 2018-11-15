@@ -9,6 +9,7 @@ import rpm4s.data._
 
 
 case class RpmInfo(
+ lead: Lead,
  name: Name,
  version: Version,
  release: Release,

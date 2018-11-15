@@ -19,6 +19,7 @@ object info {
           val output =
             s"""|Name           : ${info.name.value}
                 |Version        : ${info.version.string}
+                |Type           : ${info.lead.tpe}
                 |Release        : ${info.release.value}
                 |Architecture   : ${Architecture.toRpmString(info.architecture)}
                 |Group          : ${info.group.locales}
