@@ -174,13 +174,13 @@ package object updateinfo {
                   collection(h1, Vector.empty).flatMap{
                     case (packs, h2) =>
                       update(h2, acc.copy(
-                        packages = Some(packs)
+                        packages = Some(packs.toSet)
                       ))
                   }
                 case "references" => {
                   references(h1, Vector.empty).flatMap {
                     case Some((refs, h2)) =>
-                      update(h2, acc.copy(references = Some(refs.toList)))
+                      update(h2, acc.copy(references = Some(refs.toSet)))
                     case None => Pull.raiseError(new RuntimeException("expected release"))
                   }
                 }

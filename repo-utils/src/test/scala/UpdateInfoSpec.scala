@@ -28,7 +28,7 @@ class UpdateInfoSpec
         version = "1",
         severity = Severity.Moderate,
         tpe = UpdateType.Recommended,
-        references = List(
+        references = Set(
           Bugzilla(
             href = Uri.unsafeFromString("https://bugzilla.opensuse.org/show_bug.cgi?id=1056389"),
             title = "Openconnect 7.06 fails on connect to Junos Pulse",
@@ -45,7 +45,7 @@ class UpdateInfoSpec
             title = "[TRACKERBUG] FATE#323554: [ECO] FIPS: include libkcapi library and tools and use them in dracut-fips"
           )
         ),
-        packages = Vector(
+        packages = Set(
           PackageF[cats.Id](
             name = Name("openconnect").toOption.get,
             epoch = None,
@@ -87,7 +87,7 @@ class UpdateInfoSpec
         release = "openSUSE Leap 42.3 Update",
         issued = Instant.ofEpochSecond(1501012170),
         description = "This update to Wireshark 2.2.8 fixes some minor vulnerabilities could be used\n      to trigger dissector crashes, infinite loops, or cause excessive use of memory\n      resources by making Wireshark read specially crafted packages from the network\n      or a capture file:\n\n      - CVE-2017-7702,CVE-2017-11410: WBMXL dissector infinite loop (wnpa-sec-2017-13)\n      - CVE-2017-9350,CVE-2017-11411: openSAFETY dissector memory exhaustion (wnpa-sec-2017-28)\n      - CVE-2017-11408: AMQP dissector crash (wnpa-sec-2017-34)\n      - CVE-2017-11407: MQ dissector crash (wnpa-sec-2017-35)\n      - CVE-2017-11406: DOCSIS infinite loop (wnpa-sec-2017-36)",
-        references = List(
+        references = Set(
           Bugzilla(
             href = Uri.unsafeFromString("https://bugzilla.opensuse.org/show_bug.cgi?id=1049255"),
             title = "VUL-0: wireshark: multiple vulnerabilties fixed in 2.2.8, 2.0.14",
@@ -99,7 +99,7 @@ class UpdateInfoSpec
             cve = CVE.fromString("CVE-2017-7702").get
           ),
         ),
-        packages = Vector(
+        packages = Set(
           PackageF[cats.Id](
             name = Name("wireshark").toOption.get,
             epoch = Some(Epoch.fromInt(4).toOption.get),

@@ -17,9 +17,9 @@ case class UpdateF[F[_]](
   severity: F[UpdateF.Severity],
   release: F[String],
   issued: F[Instant],
-  references: F[List[UpdateF.Reference]],
+  references: F[Set[UpdateF.Reference]],
   description: F[String],
-  packages: F[Vector[UpdateF.PackageF.Package]]
+  packages: F[Set[UpdateF.PackageF.Package]]
 )
 
 object UpdateF {
@@ -175,8 +175,8 @@ object UpdateF {
       release: Option[String] = None,
       issued: Option[Instant] = None,
       description: Option[String] = None,
-      references: Option[List[Reference]] = None,
-      packages: Option[Vector[UpdateF.PackageF.Package]] = None
+      references: Option[Set[Reference]] = None,
+      packages: Option[Set[UpdateF.PackageF.Package]] = None
     ): UpdateBuilder = UpdateF(
       from, status, tpe, version, id, title,
       severity, release, issued, references,
