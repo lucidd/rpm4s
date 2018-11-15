@@ -15,11 +15,19 @@ object Architecture {
   case object s390x extends Architecture
   case object NoArch extends Architecture
 
+  sealed trait SourceArch
+  case object Src extends SourceArch
+  case object NoSrc extends SourceArch
+
   def toRpmString(architecture: Architecture): String = architecture match {
     case Architecture.x86_64 => "x86_64"
     case Architecture.i586 => "i586"
     case Architecture.i686 => "i686"
     case Architecture.NoArch => "noarch"
+    case Architecture.ppc => "ppc"
+    case Architecture.ppc64 => "ppc64"
+    case Architecture.ppc64le => "ppc64le"
+    case Architecture.s390x => "s390x"
     case _ => ???
   }
 
@@ -28,6 +36,10 @@ object Architecture {
     case "i586" => Some(i586)
     case "i686" => Some(i686)
     case "noarch" => Some(NoArch)
+    case "ppc" => Some(ppc)
+    case "ppc64" => Some(ppc64)
+    case "ppc64le" => Some(ppc64le)
+    case "s390x" => Some(s390x)
     case _ => None
   }
 }
