@@ -5,9 +5,7 @@ import java.time.OffsetDateTime
 import cats.Id
 import cats.implicits._
 import org.http4s.Uri
-import rpm4s.data._
-import rpm4s.repo.data.CVE
-
+import rpm4s.data.{CVE, _}
 case class UpdateF[F[_]](
   from: F[String],
   status: F[UpdateF.Status],
@@ -56,6 +54,9 @@ object UpdateF {
       case "stable" => Some(Stable)
       case _ => None
     }
+    def toString(value: Status): String = value match {
+      case Stable => "stable"
+    }
     case object Stable extends Status
   }
 
@@ -66,6 +67,11 @@ object UpdateF {
       case "moderate" => Some(Moderate)
       case "low" => Some(Low)
       case _ => None
+    }
+    def toString(value: Severity): String = value match {
+      case Important => "important"
+      case Moderate => "moderate"
+      case Low => "low"
     }
     case object Important extends Severity
     case object Moderate extends Severity
@@ -79,6 +85,11 @@ object UpdateF {
       case "security" => Some(Security)
       case "optional" => Some(Optional)
       case _ => None
+    }
+    def toString(value: UpdateType): String = value match {
+      case Recommended => "recommended"
+      case Security => "security"
+      case Optional => "optional"
     }
     case object Recommended extends UpdateType
     case object Security extends UpdateType

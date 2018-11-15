@@ -7,8 +7,7 @@ import javax.xml.stream.events.XMLEvent
 import cats.effect.{ConcurrentEffect, Effect}
 import fs2.{Pipe, Pull, RaiseThrowable, Stream}
 import org.http4s.Uri
-import rpm4s.data._
-import rpm4s.repo.data.CVE
+import rpm4s.data.{CVE, _}
 import rpm4s.repo.utils.xml.{EndEvent, StartEvent, xmlevents}
 
 import scala.concurrent.ExecutionContext

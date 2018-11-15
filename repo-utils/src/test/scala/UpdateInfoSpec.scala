@@ -4,8 +4,7 @@ import cats.effect.IO
 import org.http4s.Uri
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
-import rpm4s.data.{Epoch, Name, Release, Version}
-import rpm4s.repo.data.CVE
+import rpm4s.data._
 import rpm4s.repo.repomd.xml.updateinfo.{UpdateF, xml2updates}
 import rpm4s.repo.repomd.xml.updateinfo.UpdateF._
 import rpm4s.repo.utils.xml.xmlevents
