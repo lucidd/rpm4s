@@ -1,4 +1,4 @@
-import java.time.{OffsetDateTime, ZoneOffset}
+import java.time.Instant
 
 import cats.effect.IO
 import org.http4s.Uri
@@ -72,7 +72,7 @@ class UpdateInfoSpec
           )
         ),
         release = "openSUSE Leap 42.3 Update",
-        issued = OffsetDateTime.of(2017, 9, 9, 5, 49, 34, 0, ZoneOffset.UTC),
+        issued = Instant.ofEpochSecond(1504936174),
         status = Status.Stable,
         description = "This update for openconnect fixes the following issues:\n\n- openconnect would fail to connect to a Junos Pulse gateway (bsc#1056389)\n\nThis update to version 7.08 also contains the following improvements and fixes:\n\n- Various cryptography related improvements and fixed\n- Improved support for Cisco DTLS, Pulse Secure 8.2R5, OpenVPN, Juniper VPN\n"
       ),
@@ -85,7 +85,7 @@ class UpdateInfoSpec
         title = "Security update for Wireshark",
         severity = Severity.Important,
         release = "openSUSE Leap 42.3 Update",
-        issued = OffsetDateTime.of(2017, 7, 25, 19, 49, 30, 0, ZoneOffset.UTC),
+        issued = Instant.ofEpochSecond(1501012170),
         description = "This update to Wireshark 2.2.8 fixes some minor vulnerabilities could be used\n      to trigger dissector crashes, infinite loops, or cause excessive use of memory\n      resources by making Wireshark read specially crafted packages from the network\n      or a capture file:\n\n      - CVE-2017-7702,CVE-2017-11410: WBMXL dissector infinite loop (wnpa-sec-2017-13)\n      - CVE-2017-9350,CVE-2017-11411: openSAFETY dissector memory exhaustion (wnpa-sec-2017-28)\n      - CVE-2017-11408: AMQP dissector crash (wnpa-sec-2017-34)\n      - CVE-2017-11407: MQ dissector crash (wnpa-sec-2017-35)\n      - CVE-2017-11406: DOCSIS infinite loop (wnpa-sec-2017-36)",
         references = List(
           Bugzilla(

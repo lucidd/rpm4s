@@ -222,7 +222,7 @@ package object updateinfo {
                 case "issued" => {
                   val issued = se.getAttributeByName(dateAttr).getValue
                   update(h1, acc.copy(issued = Some(
-                    Instant.ofEpochSecond(issued.toLong).atOffset(ZoneOffset.UTC)
+                    Instant.ofEpochSecond(issued.toLong)
                   )))
                 }
                 case _ => update(h1, acc)

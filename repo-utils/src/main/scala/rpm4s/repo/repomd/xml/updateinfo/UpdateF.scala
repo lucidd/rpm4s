@@ -1,6 +1,6 @@
 package rpm4s.repo.repomd.xml.updateinfo
 
-import java.time.OffsetDateTime
+import java.time.Instant
 
 import cats.Id
 import cats.implicits._
@@ -16,7 +16,7 @@ case class UpdateF[F[_]](
   title: F[String],
   severity: F[UpdateF.Severity],
   release: F[String],
-  issued: F[OffsetDateTime],
+  issued: F[Instant],
   references: F[List[UpdateF.Reference]],
   description: F[String],
   packages: F[Vector[UpdateF.PackageF.Package]]
@@ -173,7 +173,7 @@ object UpdateF {
       title: Option[String] = None,
       severity: Option[Severity] = None,
       release: Option[String] = None,
-      issued: Option[OffsetDateTime] = None,
+      issued: Option[Instant] = None,
       description: Option[String] = None,
       references: Option[List[Reference]] = None,
       packages: Option[Vector[UpdateF.PackageF.Package]] = None
