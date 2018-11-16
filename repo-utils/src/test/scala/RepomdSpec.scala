@@ -8,7 +8,7 @@ import org.scalatest.prop.PropertyChecks
 import rpm4s.data.Checksum.Sha256
 import rpm4s.data._
 import rpm4s.repo.data.Bytes
-import rpm4s.repo.repomd.Data.Primary
+import rpm4s.repo.repomd.Data.{Primary, UpdateInfo}
 import rpm4s.repo.repomd._
 import rpm4s.repo.utils.xml.xmlevents
 import scodec.bits.{BitVector, ByteVector}
@@ -38,6 +38,14 @@ class RepomdSpec
           size = Bytes(17781467),
           openSize = Bytes(139577942),
           openChecksum = Sha256.fromHex("baea56d3261c44c07b609658b09fa56bd4c8ce939f74d1ae08deff152b7ca010").get,
+        ),
+        updateinfo = UpdateInfo(
+          location = "repodata/f85c74f37d6450efd12bc1770b74d6ca64a9081b2a7d2748969d48395fa64bc9-updateinfo.xml.gz",
+          checksum = Sha256.fromHex("f85c74f37d6450efd12bc1770b74d6ca64a9081b2a7d2748969d48395fa64bc9").get,
+          timestamp = Instant.ofEpochSecond(1542097131),
+          size = Bytes(582817),
+          openSize = Bytes(4804840),
+          openChecksum = Sha256.fromHex("88d73b412e757e65acd17187d9f147a400f6bc5f8bb36fe77421504b07e29eab").get,
         )
       )
     )

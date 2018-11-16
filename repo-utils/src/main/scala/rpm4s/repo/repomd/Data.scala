@@ -14,6 +14,15 @@ sealed trait Data extends Product with Serializable {
   def size: Bytes
 }
 object Data {
+
+  case class UpdateInfo(
+    checksum: Checksum,
+    openChecksum: Checksum,
+    location: String,
+    timestamp: Instant,
+    openSize: Bytes,
+    size: Bytes
+  ) extends Data
   case class FileLists(
     checksum: Checksum,
     openChecksum: Checksum,

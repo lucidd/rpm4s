@@ -4,18 +4,16 @@ import java.time.Instant
 
 import javax.xml.namespace.QName
 import javax.xml.stream.events.XMLEvent
-import cats.effect.{ConcurrentEffect, Effect}
+import cats.effect.ConcurrentEffect
 import fs2.{Pipe, Pull, RaiseThrowable, Stream}
 import rpm4s.data.Checksum
 import rpm4s.data.Checksum.{Md5, Sha1, Sha256, Sha512}
-import rpm4s.repo.repomd.Data.Primary
+import rpm4s.repo.repomd.Data.{Primary, UpdateInfo}
 import rpm4s.repo.repomd.RMDataF.{RMData, RMDataBuilder}
 import rpm4s.repo.repomd.RepoMdF.RepoMdBuilder
 import rpm4s.repo.repomd.xml.updateinfo.UpdateF
 import rpm4s.repo.utils.xml.{EndEvent, StartEvent, xmlevents}
 import rpm4s.repo.repomd.xml._
-
-import scala.concurrent.ExecutionContext
 
 package object repomd {
 
@@ -100,22 +98,38 @@ package object repomd {
                   case Some((long, h2)) =>
                     rmd(h2, acc.copy(revision = long))
                 }
-              case "data"
-                if se
-                  .getAttributeByName(typeAttr)
-                  .getValue == "primary" =>
-                data(h1, RMDataBuilder.empty).flatMap {
-                  case (data, h) =>
-                    val primary = Primary(
-                      data.checksum,
-                      data.openChecksum,
-                      data.location,
-                      data.timestamp,
-                      data.openSize,
-                      data.size
-                    )
-                    rmd(h, acc.copy(primary = Some(primary)))
-                }
+              case "data" =>
+
+                  se.getAttributeByName(typeAttr)
+                  .getValue match {
+                    case "primary" =>
+                      data(h1, RMDataBuilder.empty).flatMap {
+                        case (data, h) =>
+                          val primary = Primary(
+                            data.checksum,
+                            data.openChecksum,
+                            data.location,
+                            data.timestamp,
+                            data.openSize,
+                            data.size
+                          )
+                          rmd(h, acc.copy(primary = Some(primary)))
+                      }
+                    case "updateinfo" =>
+                      data(h1, RMDataBuilder.empty).flatMap {
+                        case (data, h) =>
+                          val updateinfo = UpdateInfo(
+                            data.checksum,
+                            data.openChecksum,
+                            data.location,
+                            data.timestamp,
+                            data.openSize,
+                            data.size
+                          )
+                          rmd(h, acc.copy(updateinfo = Some(updateinfo)))
+                      }
+                    case _ => rmd(h1, acc)
+                  }
               case _ => rmd(h1, acc)
             }
           }

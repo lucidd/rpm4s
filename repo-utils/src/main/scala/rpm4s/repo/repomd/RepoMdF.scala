@@ -2,12 +2,13 @@ package rpm4s.repo.repomd
 
 import cats.Id
 import cats.implicits._
-import rpm4s.repo.repomd.Data.Primary
+import rpm4s.repo.repomd.Data.{Primary, UpdateInfo}
 
 
 case class RepoMdF[F[_]](
   revision: F[Long],
-  primary: F[Primary]
+  primary: F[Primary],
+  updateinfo: F[UpdateInfo]
 )
 
 object RepoMdF {
@@ -17,11 +18,12 @@ object RepoMdF {
     val empty: RepoMdBuilder = apply()
     def apply(
       revision: Option[Long] = None,
-      primary: Option[Primary] = None
-    ): RepoMdBuilder = RepoMdF(revision, primary)
+      primary: Option[Primary] = None,
+      updateinfo: Option[UpdateInfo] = None
+    ): RepoMdBuilder = RepoMdF(revision, primary, updateinfo)
 
-    def build(rmdDataBuilder: RepoMdBuilder): Option[RepoMd] = {
-      (rmdDataBuilder.revision, rmdDataBuilder.primary).mapN(RepoMdF[Id])
+    def build(builder: RepoMdBuilder): Option[RepoMd] = {
+      (builder.revision, builder.primary, builder.updateinfo).mapN(RepoMdF[Id])
     }
   }
 }
