@@ -70,7 +70,7 @@ def scalacOptionsVersion(scalaVersion: String) = {
 
 lazy val root = project
   .in(file("."))
-  .aggregate(rpm4sJS, rpm4sJVM, repoUtils, cli)
+  .aggregate(rpm4sJS, rpm4sJVM, repoUtilsJVM, repoUtilsJS, cli)
   .settings(
     coverageEnabled := false,
     coverageMinimum := 55, // TODO: increase this once we have more
@@ -134,7 +134,7 @@ lazy val rpm4sJS = rpm4s.js
   )
 
 lazy val cli = project.in(file("cli"))
-  .dependsOn(rpm4sJVM, repoUtils)
+  .dependsOn(rpm4sJVM, repoUtilsJVM)
   .enablePlugins(BuildInfoPlugin)
   .settings(
     organization := "io.lullabyte",
@@ -194,8 +194,37 @@ lazy val cli = project.in(file("cli"))
     )
   )
 
-lazy val repoUtils = project.in(file("repo-utils"))
-  .dependsOn(rpm4sJVM)
+lazy val repoUtilsJVM = repoUtils.jvm
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % scalatest,
+      "org.scalacheck" %%% "scalacheck" % scalacheck,
+      "org.typelevel" %%% "cats-core" % cats,
+      "org.typelevel" %%% "cats-free" % cats,
+      "co.fs2" %% "fs2-io" % fs2,
+      "co.fs2" %%% "fs2-core" % fs2,
+      "org.apache.commons" % "commons-compress" % "1.12",
+      "org.http4s" %% "http4s-core" % http4s,
+      "io.circe" %% "circe-core" % circe,
+      "io.circe" %% "circe-generic" % circe,
+      "io.circe" %% "circe-parser" % circe
+    )
+  ).dependsOn(rpm4sJVM)
+
+lazy val repoUtilsJS = repoUtils.js
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % scalatest,
+      "org.scalacheck" %%% "scalacheck" % scalacheck,
+      "org.typelevel" %%% "cats-core" % cats,
+      "org.typelevel" %%% "cats-free" % cats,
+      "org.apache.commons" % "commons-compress" % "1.12"
+    )
+  ).dependsOn(rpm4sJS)
+
+lazy val repoUtils = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("repo-utils"))
   .enablePlugins(BuildInfoPlugin)
   .settings(
     organization := "io.lullabyte",
@@ -220,17 +249,4 @@ lazy val repoUtils = project.in(file("repo-utils"))
     //  "-Xdebug",
     //  "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=127.0.0.1:5005"
     //),
-    libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % scalatest,
-      "org.scalacheck" %%% "scalacheck" % scalacheck,
-      "org.typelevel" %%% "cats-core" % cats,
-      "org.typelevel" %%% "cats-free" % cats,
-      "co.fs2" %% "fs2-io" % fs2,
-      "co.fs2" %%% "fs2-core" % fs2,
-      "org.apache.commons" % "commons-compress" % "1.12",
-      "org.http4s" %% "http4s-core" % http4s,
-      "io.circe" %% "circe-core" % circe,
-      "io.circe" %% "circe-generic" % circe,
-      "io.circe" %% "circe-parser" % circe
-    )
   )
