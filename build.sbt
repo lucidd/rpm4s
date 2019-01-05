@@ -71,6 +71,7 @@ def scalacOptionsVersion(scalaVersion: String) = {
 lazy val root = project
   .in(file("."))
   .aggregate(rpm4sJS, rpm4sJVM, repoUtilsJVM, repoUtilsJS, cli)
+  .settings(commonSettings)
   .settings(
     coverageMinimum := 55,
     publishArtifact := false,
@@ -80,11 +81,18 @@ lazy val root = project
 
 lazy val benchmarks = project
   .in(file("benchmarks"))
+  .settings(commonSettings)
   .settings(
     coverageEnabled := false
   )
   .dependsOn(rpm4sJVM)
   .enablePlugins(JmhPlugin)
+
+val commonSettings = Seq(
+    organization := "io.lullabyte",
+    scalaVersion := "2.12.8",
+    crossScalaVersions := Seq("2.12.8"),
+)
 
 lazy val rpm4s = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
@@ -97,10 +105,8 @@ lazy val rpm4s = crossProject(JSPlatform, JVMPlatform)
     buildInfoPackage := "rpm4s",
     resolvers += Resolver.sonatypeRepo("snapshots")
   )
+  .settings(commonSettings)
   .settings(
-    organization := "io.lullabyte",
-    scalaVersion := "2.12.7",
-    crossScalaVersions := Seq("2.12.7"),
     name := "rpm4s",
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % scalatest % Test,
@@ -135,6 +141,7 @@ lazy val rpm4sJS = rpm4s.js
 lazy val cli = project.in(file("cli"))
   .dependsOn(rpm4sJVM, repoUtilsJVM)
   .enablePlugins(BuildInfoPlugin)
+  .settings(commonSettings)
   .settings(
     organization := "io.lullabyte",
     coverageEnabled := false,
@@ -151,12 +158,6 @@ lazy val cli = project.in(file("cli"))
     assemblyOption in assembly := (assemblyOption in assembly).value
       .copy(prependShellScript = Some(defaultShellScript)),
     assemblyJarName in assembly := "rpm4s",
-    assemblyOption in assembly :=
-      (assemblyOption in assembly).value
-        .copy(
-          prependShellScript = Some(
-            Seq("#!/usr/bin/env sh", """exec java -jar "$0" "$@"""" + "\n")
-          )),
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % scalatest % Test,
       "org.scalacheck" %%% "scalacheck" % scalacheck % Test,
@@ -214,6 +215,7 @@ lazy val repoUtils = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("repo-utils"))
   .enablePlugins(BuildInfoPlugin)
+  .settings(commonSettings)
   .settings(
     organization := "io.lullabyte",
     coverageMinimum := 42,
