@@ -7,4 +7,5 @@ object Dependencies {
   val circe = "0.9.3"
   val shapeless = "2.3.3"
   val scodecCore = "1.10.3"
+  val scalaXML = "1.1.1"
 }

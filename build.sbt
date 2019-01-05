@@ -103,9 +103,9 @@ lazy val rpm4s = crossProject(JSPlatform, JVMPlatform)
     crossScalaVersions := Seq("2.12.7"),
     name := "rpm4s",
     libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % scalatest % Test,
+      "org.scalacheck" %%% "scalacheck" % scalacheck % Test,
       "com.chuusai" %% "shapeless" % shapeless,
-      "org.scalatest" %%% "scalatest" % scalatest,
-      "org.scalacheck" %%% "scalacheck" % scalacheck,
       "org.typelevel" %%% "cats-core" % cats,
       "org.scodec" %% "scodec-core" % scodecCore
     ),
@@ -158,14 +158,13 @@ lazy val cli = project.in(file("cli"))
             Seq("#!/usr/bin/env sh", """exec java -jar "$0" "$@"""" + "\n")
           )),
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % scalatest,
-      "org.scalacheck" %%% "scalacheck" % scalacheck,
+      "org.scalatest" %%% "scalatest" % scalatest % Test,
+      "org.scalacheck" %%% "scalacheck" % scalacheck % Test,
       "org.typelevel" %%% "cats-core" % cats,
       "org.typelevel" %%% "cats-free" % cats,
       "com.monovore" %% "decline" % "0.4.2",
       "co.fs2" %% "fs2-io" % fs2,
       "co.fs2" %%% "fs2-core" % fs2,
-      //"co.fs2" %% "fs2-cats" % fs2Cats,
       "org.apache.commons" % "commons-compress" % "1.12",
       "org.tukaani" % "xz" % "1.5",
       "com.github.pathikrit" %% "better-files-akka" % "3.0.0",
@@ -185,10 +184,10 @@ lazy val cli = project.in(file("cli"))
 lazy val repoUtilsJVM = repoUtils.jvm
   .settings(
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % scalatest,
-      "org.scalacheck" %%% "scalacheck" % scalacheck,
+      "org.scalatest" %%% "scalatest" % scalatest % Test,
+      "org.scalacheck" %%% "scalacheck" % scalacheck % Test,
+      "org.scala-lang.modules" %% "scala-xml" % scalaXML,
       "org.typelevel" %%% "cats-core" % cats,
-      "org.typelevel" %%% "cats-free" % cats,
       "co.fs2" %% "fs2-io" % fs2,
       "co.fs2" %%% "fs2-core" % fs2,
       "org.apache.commons" % "commons-compress" % "1.12",
@@ -203,8 +202,8 @@ lazy val repoUtilsJS = repoUtils.js
   .settings(
     coverageMinimum := 0,
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % scalatest,
-      "org.scalacheck" %%% "scalacheck" % scalacheck,
+      "org.scalatest" %%% "scalatest" % scalatest % Test,
+      "org.scalacheck" %%% "scalacheck" % scalacheck % Test,
       "org.typelevel" %%% "cats-core" % cats,
       "org.typelevel" %%% "cats-free" % cats,
       "org.apache.commons" % "commons-compress" % "1.12"
