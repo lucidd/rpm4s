@@ -7,7 +7,7 @@ import sbtcrossproject.CrossProject
 lazy val cmdlineProfile =
   sys.env.getOrElse("SBT_PROFILE", "")
 
-def profile: CrossProject ⇒ CrossProject = pr => cmdlineProfile match {
+  def profile: CrossProject => CrossProject = pr => cmdlineProfile match {
   case "coverage" => pr.enablePlugins(ScoverageSbtPlugin)
   case _ => pr.disablePlugins(ScoverageSbtPlugin)
 }
@@ -72,8 +72,7 @@ lazy val root = project
   .in(file("."))
   .aggregate(rpm4sJS, rpm4sJVM, repoUtilsJVM, repoUtilsJS, cli)
   .settings(
-    coverageEnabled := false,
-    coverageMinimum := 55, // TODO: increase this once we have more
+    coverageMinimum := 55,
     publishArtifact := false,
     publish := {},
     publishLocal := {}
@@ -120,7 +119,7 @@ lazy val rpm4s = crossProject(JSPlatform, JVMPlatform)
 
 lazy val rpm4sJVM = rpm4s.jvm
   .settings(
-    coverageMinimum := 65, // TODO: increase this once we have more
+    coverageMinimum := 65,
     libraryDependencies ++= Seq(
       "org.apache.commons" % "commons-compress" % "1.12"
     )
@@ -128,7 +127,7 @@ lazy val rpm4sJVM = rpm4s.jvm
 
 lazy val rpm4sJS = rpm4s.js
   .settings(
-    coverageMinimum := 38, // TODO: increase this once we have more
+    coverageMinimum := 38,
     parallelExecution := false,
     jsEnv := new NodeJSEnv()
   )
@@ -138,8 +137,7 @@ lazy val cli = project.in(file("cli"))
   .enablePlugins(BuildInfoPlugin)
   .settings(
     organization := "io.lullabyte",
-    coverageMinimum := 0,
-    coverageFailOnMinimum := true,
+    coverageEnabled := false,
     buildInfoKeys := Seq[BuildInfoKey](
       name,
       version,
@@ -150,16 +148,6 @@ lazy val cli = project.in(file("cli"))
     buildInfoPackage := "rpm4s.cli",
     mainClass in assembly := Some("rpm4s.cli.Main"),
     fork in run := true,
-    //javaOptions in run ++= Seq(
-    //  //"-Xmx2000m",
-    //  "-Xdebug",
-    //  "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
-    //),
-    //fork in Test := true,
-    //javaOptions in Test ++= Seq(
-    //  "-Xdebug",
-    //  "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=127.0.0.1:5005"
-    //),
     assemblyOption in assembly := (assemblyOption in assembly).value
       .copy(prependShellScript = Some(defaultShellScript)),
     assemblyJarName in assembly := "rpm4s",
@@ -213,6 +201,7 @@ lazy val repoUtilsJVM = repoUtils.jvm
 
 lazy val repoUtilsJS = repoUtils.js
   .settings(
+    coverageMinimum := 0,
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % scalatest,
       "org.scalacheck" %%% "scalacheck" % scalacheck,
@@ -229,6 +218,7 @@ lazy val repoUtils = crossProject(JSPlatform, JVMPlatform)
   .settings(
     organization := "io.lullabyte",
     coverageMinimum := 42,
+    coverageEnabled := true,
     coverageFailOnMinimum := true,
     scalacOptions ++= Seq("-deprecation"),
     buildInfoKeys := Seq[BuildInfoKey](
@@ -239,14 +229,4 @@ lazy val repoUtils = crossProject(JSPlatform, JVMPlatform)
     ),
     buildInfoPackage := "rpm4s.repo",
     fork in run := true,
-    //javaOptions in run ++= Seq(
-    //  //"-Xmx2000m",
-    //  "-Xdebug",
-    //  "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
-    //),
-    //fork in Test := true,
-    //javaOptions in Test ++= Seq(
-    //  "-Xdebug",
-    //  "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=127.0.0.1:5005"
-    //),
   )
