@@ -167,7 +167,7 @@ lazy val cli = project.in(file("cli"))
       "co.fs2" %% "fs2-io" % fs2,
       "co.fs2" %%% "fs2-core" % fs2,
       "org.apache.commons" % "commons-compress" % "1.12",
-      "org.tukaani" % "xz" % "1.5",
+      "org.tukaani" % "xz" % "1.8",
       "com.github.pathikrit" %% "better-files-akka" % "3.0.0",
       "org.http4s" %% "http4s-core" % http4s,
       "org.http4s" %% "http4s-dsl" % http4s,
