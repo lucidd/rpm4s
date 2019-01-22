@@ -3,7 +3,7 @@ object Dependencies {
   val fs2 = "1.0.2"
   val scalatest = "3.0.5"
   val scalacheck = "1.14.0"
-  val http4s = "0.19.0-M4"
+  val http4s = "0.20.0-M5"
   val circe = "0.11.1"
   val shapeless = "2.3.3"
   val scodecCore = "1.10.3"
