@@ -177,8 +177,8 @@ lazy val cli = project.in(file("cli"))
       "io.circe" %% "circe-core" % circe,
       "io.circe" %% "circe-generic" % circe,
       "io.circe" %% "circe-parser" % circe,
-      "org.bouncycastle" % "bcprov-jdk15on" % "1.57",
-      "org.bouncycastle" % "bcpg-jdk15on" % "1.57"
+      "org.bouncycastle" % "bcprov-jdk15on" % "1.61",
+      "org.bouncycastle" % "bcpg-jdk15on" % "1.61"
     )
   )
 
