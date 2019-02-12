@@ -7,7 +7,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.9.3")
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.0-M1")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.0")
 addSbtPlugin("ch.epfl.scala" % "sbt-bloop" % "1.0.0-RC1")
-addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.5.0")
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0")
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.0-M4")
