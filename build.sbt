@@ -127,7 +127,7 @@ lazy val rpm4sJVM = rpm4s.jvm
   .settings(
     coverageMinimum := 65,
     libraryDependencies ++= Seq(
-      "org.apache.commons" % "commons-compress" % "1.12"
+      "org.apache.commons" % "commons-compress" % "1.18"
     )
   )
 
@@ -166,7 +166,7 @@ lazy val cli = project.in(file("cli"))
       "com.monovore" %% "decline" % "0.6.0",
       "co.fs2" %% "fs2-io" % fs2,
       "co.fs2" %%% "fs2-core" % fs2,
-      "org.apache.commons" % "commons-compress" % "1.12",
+      "org.apache.commons" % "commons-compress" % "1.18",
       "org.tukaani" % "xz" % "1.8",
       "com.github.pathikrit" %% "better-files-akka" % "3.0.0",
       "org.http4s" %% "http4s-core" % http4s,
@@ -191,7 +191,7 @@ lazy val repoUtilsJVM = repoUtils.jvm
       "org.typelevel" %%% "cats-core" % cats,
       "co.fs2" %% "fs2-io" % fs2,
       "co.fs2" %%% "fs2-core" % fs2,
-      "org.apache.commons" % "commons-compress" % "1.12",
+      "org.apache.commons" % "commons-compress" % "1.18",
       "org.http4s" %% "http4s-core" % http4s,
       "io.circe" %% "circe-core" % circe,
       "io.circe" %% "circe-generic" % circe,
@@ -207,7 +207,7 @@ lazy val repoUtilsJS = repoUtils.js
       "org.scalacheck" %%% "scalacheck" % scalacheck % Test,
       "org.typelevel" %%% "cats-core" % cats,
       "org.typelevel" %%% "cats-free" % cats,
-      "org.apache.commons" % "commons-compress" % "1.12"
+      "org.apache.commons" % "commons-compress" % "1.18"
     )
   ).dependsOn(rpm4sJS)
 
