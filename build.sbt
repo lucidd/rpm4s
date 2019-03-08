@@ -163,7 +163,7 @@ lazy val cli = project.in(file("cli"))
       "org.scalacheck" %%% "scalacheck" % scalacheck % Test,
       "org.typelevel" %%% "cats-core" % cats,
       "org.typelevel" %%% "cats-free" % cats,
-      "com.monovore" %% "decline" % "0.6.0",
+      "com.monovore" %% "decline" % "0.6.1",
       "co.fs2" %% "fs2-io" % fs2,
       "co.fs2" %%% "fs2-core" % fs2,
       "org.apache.commons" % "commons-compress" % "1.18",
