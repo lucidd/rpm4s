@@ -6,7 +6,7 @@ import java.security.MessageDigest
 
 import cats.effect.{ContextShift, Effect}
 import cats.implicits._
-import fs2.{Chunk, Sink, Stream}
+import fs2.{Chunk, Pipe, Stream}
 import rpm4s.data.Checksum.Sha256
 import rpm4s.data._
 import rpm4s.repo.utils.compress.gzip
@@ -39,8 +39,8 @@ package object repo {
   }
 
   def create[F[_]: Effect](
-    repomdSink: Sink[F, Byte],
-    primarySink: Sink[F, Byte],
+    repomdSink: Pipe[F, Byte, Unit],
+    primarySink: Pipe[F, Byte, Unit],
     nameFn: (RpmPrimaryEntry, Checksum) => String,
     rpms: Stream[F, (RpmPrimaryEntry, Checksum)],
     revision: Long,
@@ -57,7 +57,7 @@ package object repo {
         val repomdBytes =
           repomd.create(gzSize, openSize, gzChecksum, openChecksum, revision)(
             new StringBuilder).toString.getBytes(StandardCharsets.UTF_8)
-        Stream.chunk(Chunk.bytes(repomdBytes)).covary[F].to(repomdSink).compile.drain
+        Stream.chunk(Chunk.bytes(repomdBytes)).covary[F].through(repomdSink).compile.drain
     }
   }
 

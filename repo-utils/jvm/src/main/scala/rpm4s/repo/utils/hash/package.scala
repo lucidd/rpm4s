@@ -3,7 +3,7 @@ package rpm4s.repo.utils
 import java.security.MessageDigest
 
 import cats.effect.{Effect, Sync}
-import fs2.{Pipe, Sink, Stream}
+import fs2.{Pipe, Stream}
 import rpm4s.data.Checksum
 import cats.implicits._
 
@@ -14,7 +14,7 @@ package object hash {
     pipe: Pipe[F, Byte, Byte],
     digest: => MessageDigest,
     fromBytes: Vector[Byte] => Option[Checksum],
-    sink: Sink[F, Byte]
+    sink: Pipe[F, Byte, Unit]
   ): F[(Checksum, Long, Checksum, Long)] = {
     Sync[F].suspend {
       val before = digest
@@ -34,7 +34,7 @@ package object hash {
           after.update(bytes)
           Stream.chunk(chunk)
         })
-        .to(sink)
+        .through(sink)
         .compile.drain
         .map(_ => {
           (
