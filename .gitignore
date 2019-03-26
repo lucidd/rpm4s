@@ -2,3 +2,4 @@ target
 .idea
 TODO.md
 *.class
+.ensime_cache

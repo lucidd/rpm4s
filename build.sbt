@@ -127,7 +127,7 @@ lazy val rpm4sJVM = rpm4s.jvm
   .settings(
     coverageMinimum := 65,
     libraryDependencies ++= Seq(
-      "org.apache.commons" % "commons-compress" % "1.18"
+      "org.apache.commons" % "commons-compress" % commonsCompress
     )
   )
 
@@ -163,12 +163,12 @@ lazy val cli = project.in(file("cli"))
       "org.scalacheck" %%% "scalacheck" % scalacheck % Test,
       "org.typelevel" %%% "cats-core" % cats,
       "org.typelevel" %%% "cats-free" % cats,
-      "com.monovore" %% "decline" % "0.6.0",
+      "com.monovore" %% "decline" % decline,
       "co.fs2" %% "fs2-io" % fs2,
       "co.fs2" %%% "fs2-core" % fs2,
-      "org.apache.commons" % "commons-compress" % "1.18",
-      "org.tukaani" % "xz" % "1.8",
-      "com.github.pathikrit" %% "better-files-akka" % "3.0.0",
+      "org.apache.commons" % "commons-compress" % commonsCompress,
+      "org.tukaani" % "xz" % xz,
+      "com.github.pathikrit" %% "better-files-akka" % betterFiles,
       "org.http4s" %% "http4s-core" % http4s,
       "org.http4s" %% "http4s-dsl" % http4s,
       "org.http4s" %% "http4s-jawn" % http4s,
@@ -177,8 +177,8 @@ lazy val cli = project.in(file("cli"))
       "io.circe" %% "circe-core" % circe,
       "io.circe" %% "circe-generic" % circe,
       "io.circe" %% "circe-parser" % circe,
-      "org.bouncycastle" % "bcprov-jdk15on" % "1.61",
-      "org.bouncycastle" % "bcpg-jdk15on" % "1.61"
+      "org.bouncycastle" % "bcprov-jdk15on" % bouncyCastle,
+      "org.bouncycastle" % "bcpg-jdk15on" % bouncyCastle
     )
   )
 
@@ -191,7 +191,7 @@ lazy val repoUtilsJVM = repoUtils.jvm
       "org.typelevel" %%% "cats-core" % cats,
       "co.fs2" %% "fs2-io" % fs2,
       "co.fs2" %%% "fs2-core" % fs2,
-      "org.apache.commons" % "commons-compress" % "1.18",
+      "org.apache.commons" % "commons-compress" % commonsCompress,
       "org.http4s" %% "http4s-core" % http4s,
       "io.circe" %% "circe-core" % circe,
       "io.circe" %% "circe-generic" % circe,
@@ -207,7 +207,7 @@ lazy val repoUtilsJS = repoUtils.js
       "org.scalacheck" %%% "scalacheck" % scalacheck % Test,
       "org.typelevel" %%% "cats-core" % cats,
       "org.typelevel" %%% "cats-free" % cats,
-      "org.apache.commons" % "commons-compress" % "1.18"
+      "org.apache.commons" % "commons-compress" % commonsCompress
     )
   ).dependsOn(rpm4sJS)
 
