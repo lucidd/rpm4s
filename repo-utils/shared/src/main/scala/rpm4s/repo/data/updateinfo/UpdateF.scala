@@ -101,7 +101,7 @@ object UpdateF {
     release: F[Release],
     epoch: F[Option[Epoch]],
     //TODO: find out how this arch relates to rpm arch
-    arch: F[String],
+    arch: F[Architecture],
     src: F[String],
     //TODO: find out if filename is always also in src
     filename: F[String],
@@ -132,7 +132,7 @@ object UpdateF {
         version: Option[Version] = None,
         release: Option[Release] = None,
         epoch: Option[Option[Epoch]] = None,
-        arch: Option[String] = None,
+        arch: Option[Architecture] = None,
         src: Option[String] = None,
         filename: Option[String] = None,
         restartSuggested: Option[Boolean] = Some(false),

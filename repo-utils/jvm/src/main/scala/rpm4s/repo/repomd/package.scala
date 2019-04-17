@@ -34,6 +34,7 @@ package object repomd {
   private def data[F[_]: RaiseThrowable](h: Stream[F, XMLEvent], acc: RMDataBuilder)
   : Pull[F, Nothing, (RMData, Stream[F, XMLEvent])] = {
     h.pull.uncons1.flatMap {
+      case None => Pull.raiseError(new RuntimeException("premature end of xml."))
       case Some((event, h1)) =>
         event match {
           case StartEvent(se) => {
@@ -90,12 +91,14 @@ package object repomd {
   private def rmd[F[_]: RaiseThrowable](h: Stream[F, XMLEvent], acc: RepoMdBuilder)
   : Pull[F, Nothing, (RepoMd, Stream[F, XMLEvent])] = {
     h.pull.uncons1.flatMap {
+      case None => Pull.raiseError(new RuntimeException("premature end of xml."))
       case Some((event, h1)) =>
         event match {
           case StartEvent(se) => {
             se.getName.getLocalPart match {
               case "revision" =>
                 long(h1).flatMap {
+                  case None => Pull.raiseError(new RuntimeException("premature end of xml."))
                   case Some((long, h2)) =>
                     rmd(h2, acc.copy(revision = long))
                 }

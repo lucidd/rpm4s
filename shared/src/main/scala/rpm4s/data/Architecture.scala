@@ -13,9 +13,9 @@ object Architecture {
   case object ppc64 extends Architecture
   case object ppc64le extends Architecture
   case object s390x extends Architecture
+  case object aarch64 extends Architecture
   case object NoArch extends Architecture
-
-  sealed trait SourceArch
+  sealed trait SourceArch extends Architecture
   case object Src extends SourceArch
   case object NoSrc extends SourceArch
 
@@ -28,6 +28,9 @@ object Architecture {
     case Architecture.ppc64 => "ppc64"
     case Architecture.ppc64le => "ppc64le"
     case Architecture.s390x => "s390x"
+    case Architecture.Src => "src"
+    case Architecture.NoSrc => "nosrc"
+    case Architecture.aarch64 => "aarch64"
     case _ => ???
   }
 
@@ -40,6 +43,9 @@ object Architecture {
     case "ppc64" => Some(ppc64)
     case "ppc64le" => Some(ppc64le)
     case "s390x" => Some(s390x)
+    case "nosrc" => Some(Architecture.NoSrc)
+    case "src" => Some(Architecture.Src)
+    case "aarch64" => Some(Architecture.aarch64)
     case _ => None
   }
 }

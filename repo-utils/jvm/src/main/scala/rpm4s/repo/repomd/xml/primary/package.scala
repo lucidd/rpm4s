@@ -259,6 +259,7 @@ package object primary {
     def pack(h: Stream[F, XMLEvent], acc: PackageBuilder)
     : Pull[F, Nothing, (PackageF.Package, Stream[F, XMLEvent])] = {
       h.pull.uncons1.flatMap {
+        case None => Pull.raiseError(new RuntimeException("premature end of xml."))
         case Some((event, h1)) =>
           event match {
             case StartEvent(se) => {

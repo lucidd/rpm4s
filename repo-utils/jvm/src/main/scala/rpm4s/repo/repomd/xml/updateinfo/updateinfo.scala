@@ -58,6 +58,7 @@ package object updateinfo {
     def pack(h: Stream[F, XMLEvent], acc: UpdateF.PackageF.PackageBuilder):
       Pull[F, Nothing, Option[(UpdateF.PackageF.Package, Stream[F, XMLEvent])]] = {
       h.pull.uncons1.flatMap {
+        case None => Pull.raiseError(new RuntimeException("premature end of xml."))
         case Some((event, h1)) =>
           event match {
             case StartEvent(se) => se.getName.getLocalPart match {
@@ -67,7 +68,7 @@ package object updateinfo {
                   .flatMap(x => Epoch.fromString(x).toOption)
                 val version = Version.fromString(se.getAttributeByName(versionAttr).getValue).toOption.get
                 val release = Release.fromString(se.getAttributeByName(releaseAttr).getValue).toOption.get
-                val arch = se.getAttributeByName(archAttr).getValue
+                val arch = Architecture.fromString(se.getAttributeByName(archAttr).getValue).get
                 val src = se.getAttributeByName(srcAttr).getValue
                 val acc2 = acc.copy(
                     name = Some(name),
@@ -120,14 +121,17 @@ package object updateinfo {
           case Some((event, h1)) => event match {
             case StartEvent(se) if se.getName.getLocalPart == "package" =>
               pack(h1, PackageBuilder.empty).flatMap {
+                case None => Pull.raiseError(new RuntimeException("premature end of xml."))
                 case Some((p, h3)) => collection(h3, acc :+ p)
               }
             case EndEvent(ee) if ee.getName.getLocalPart == "collection" =>
               h1.pull.drop(1).flatMap {
+                case None => Pull.raiseError(new RuntimeException("premature end of xml."))
                 case Some(h2) => Pull.pure((acc, h2))
               }
             case x =>
               h1.pull.drop(1).flatMap {
+                case None => Pull.raiseError(new RuntimeException("premature end of xml."))
                 case Some(h2) => collection(h2, acc)
               }
           }
