@@ -62,6 +62,7 @@ object UpdateF {
   sealed trait Severity extends Product with Serializable
   object Severity {
     def fromString(value: String): Option[Severity] = value match {
+      case "critical" => Some(Critical)
       case "important" => Some(Important)
       case "moderate" => Some(Moderate)
       case "low" => Some(Low)
@@ -71,7 +72,9 @@ object UpdateF {
       case Important => "important"
       case Moderate => "moderate"
       case Low => "low"
+      case Critical => "critical"
     }
+    case object Critical extends Severity
     case object Important extends Severity
     case object Moderate extends Severity
     case object Low extends Severity
