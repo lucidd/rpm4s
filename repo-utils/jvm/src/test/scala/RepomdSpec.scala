@@ -62,7 +62,7 @@ class RepomdSpec
     val expected = Vector(
       PackageF[cats.Id](
         name = Name("0ad").toOption.get,
-        arch = Some(Architecture.i586),
+        arch = Architecture.i586,
         version = Version.fromString("0.0.22").toOption.get,
         epoch = None,
         release = Release.fromString("1.2").toOption.get,
@@ -76,7 +76,7 @@ class RepomdSpec
       ),
       PackageF[cats.Id](
         name = Name("389-ds").toOption.get,
-        arch = Some(Architecture.i586),
+        arch = Architecture.i586,
         version = Version.fromString("1.3.6.6").toOption.get,
         epoch = None,
         release = Release.fromString("2.1").toOption.get,
@@ -90,7 +90,7 @@ class RepomdSpec
       ),
       PackageF[cats.Id](
         name = Name("389-ds-devel").toOption.get,
-        arch = Some(Architecture.i586),
+        arch = Architecture.i586,
         version = Version.fromString("1.3.6.6").toOption.get,
         epoch = None,
         release = Release.fromString("2.1").toOption.get,

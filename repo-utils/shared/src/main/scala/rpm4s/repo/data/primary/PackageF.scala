@@ -12,7 +12,7 @@ case class PackageF[F[_]](
   /**
   * arch is Some(arch) in case of binary rpms and None for source rpms
   */
-  arch: F[Option[Architecture]],
+  arch: F[Architecture],
   loc: F[String],
   checksum: F[Checksum],
   size: F[SizeInfo]
@@ -38,7 +38,7 @@ object PackageF {
       version: Option[Version] = None,
       epoch: Option[Option[Epoch]] = None,
       release: Option[Release] = None,
-      arch: Option[Option[Architecture]] = None,
+      arch: Option[Architecture] = None,
       loc: Option[String] = None,
       checksum: Option[Checksum] = None,
       size: Option[SizeInfo] = None

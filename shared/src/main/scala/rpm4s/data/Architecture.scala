@@ -2,19 +2,24 @@ package rpm4s.data
 
 sealed trait Architecture
 object Architecture {
-  case object x86_64 extends Architecture
-  case object i386 extends Architecture
-  case object i486 extends Architecture
-  case object i586 extends Architecture
-  case object i686 extends Architecture
+  sealed trait RequiredArch extends Architecture
+  sealed trait HardwareArch extends RequiredArch
+
+  case object x86_64 extends HardwareArch
+  case object i386 extends HardwareArch
+  case object i486 extends HardwareArch
+  case object i586 extends HardwareArch
+  case object i686 extends HardwareArch
   //TODO: find out what the relationship between those architectures is
   //TODO: find out if modeling compatability between architectures is sanely possible
-  case object ppc extends Architecture
-  case object ppc64 extends Architecture
-  case object ppc64le extends Architecture
-  case object s390x extends Architecture
-  case object aarch64 extends Architecture
-  case object NoArch extends Architecture
+  case object ppc extends HardwareArch
+  case object ppc64 extends HardwareArch
+  case object ppc64le extends HardwareArch
+  case object s390x extends HardwareArch
+  case object aarch64 extends HardwareArch
+
+  case object NoArch extends RequiredArch
+
   sealed trait SourceArch extends Architecture
   case object Src extends SourceArch
   case object NoSrc extends SourceArch
