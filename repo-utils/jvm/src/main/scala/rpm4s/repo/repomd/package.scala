@@ -10,15 +10,14 @@ import rpm4s.data.Checksum
 import rpm4s.data.Checksum.{Md5, Sha1, Sha256, Sha512}
 import rpm4s.repo.data.Data.{Primary, UpdateInfo}
 import rpm4s.repo.data.RMDataF.{RMData, RMDataBuilder}
-import rpm4s.repo.data.RepoMdF
-import rpm4s.repo.data.RepoMdF.RepoMdBuilder
+import rpm4s.repo.data.Repomd
+import rpm4s.repo.data.Repomd.RepoMdBuilder
 import rpm4s.repo.data.updateinfo.UpdateF
 import rpm4s.repo.utils.xml.{EndEvent, StartEvent, xmlevents}
 import rpm4s.repo.repomd.xml._
 
 package object repomd {
 
-  type RepoMd = RepoMdF.RepoMd
   type Update = UpdateF.Update
 
   private val typeAttr = new QName("type")
@@ -89,7 +88,7 @@ package object repomd {
 
 
   private def rmd[F[_]: RaiseThrowable](h: Stream[F, XMLEvent], acc: RepoMdBuilder)
-  : Pull[F, Nothing, (RepoMd, Stream[F, XMLEvent])] = {
+  : Pull[F, Nothing, (Repomd, Stream[F, XMLEvent])] = {
     h.pull.uncons1.flatMap {
       case None => Pull.raiseError(new RuntimeException("premature end of xml."))
       case Some((event, h1)) =>
@@ -149,9 +148,9 @@ package object repomd {
     }
   }
 
-  def xml2repomd[F[_]: RaiseThrowable]: Pipe[F, XMLEvent, RepoMd] = s => {
+  def xml2repomd[F[_]: RaiseThrowable]: Pipe[F, XMLEvent, Repomd] = s => {
     //TODO validate first event
-    def go(h: Stream[F, XMLEvent]): Pull[F, RepoMd, Option[Unit]] = {
+    def go(h: Stream[F, XMLEvent]): Pull[F, Repomd, Option[Unit]] = {
       h.pull.uncons1.flatMap {
         case None => Pull.pure(None)
         case Some((event, h1)) =>
@@ -174,7 +173,7 @@ package object repomd {
     go(s).stream
   }
 
-  def bytes2repomd[F[_]: ConcurrentEffect]: Pipe[F, Byte, RepoMd] =
+  def bytes2repomd[F[_]: ConcurrentEffect]: Pipe[F, Byte, Repomd] =
     _.through(fs2.io.toInputStream)
       .flatMap(is => xmlevents(is))
       .through(xml2repomd)

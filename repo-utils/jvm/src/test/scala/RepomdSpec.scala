@@ -6,7 +6,7 @@ import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 import rpm4s.data.Checksum.Sha256
 import rpm4s.data._
-import rpm4s.repo.data.{Bytes, RepoMdF}
+import rpm4s.repo.data.{Bytes, Repomd}
 import rpm4s.repo.data.Data.{Primary, UpdateInfo}
 import rpm4s.repo.repomd._
 import rpm4s.repo.utils.xml.xmlevents
