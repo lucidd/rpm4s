@@ -86,16 +86,19 @@ object UpdateF {
       case "recommended" => Some(Recommended)
       case "security" => Some(Security)
       case "optional" => Some(Optional)
+      case "feature" => Some(Feature)
       case _ => None
     }
     def toString(value: UpdateType): String = value match {
       case Recommended => "recommended"
       case Security => "security"
       case Optional => "optional"
+      case Feature => "feature"
     }
     case object Recommended extends UpdateType
     case object Security extends UpdateType
     case object Optional extends UpdateType
+    case object Feature extends UpdateType
   }
 
   case class PackageF[F[_]](
