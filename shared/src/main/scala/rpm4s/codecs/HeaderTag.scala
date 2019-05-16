@@ -143,6 +143,10 @@ object HeaderTag {
   case object FileCaps extends HeaderTag[StringArrayData]
   case object FileDigestAlgo extends HeaderTag[Int32Data]
 
+  case object OrderName extends HeaderTag[StringArrayData]
+  case object OrderVersion extends HeaderTag[StringArrayData]
+  case object OrderFlags extends HeaderTag[Int32Data]
+
   case object RecommendName extends HeaderTag[StringArrayData]
   case object RecommendVersion extends HeaderTag[StringArrayData]
   case object RecommendFlags extends HeaderTag[Int32Data]

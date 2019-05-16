@@ -168,6 +168,13 @@ object Extractor {
     Suggests
   )
 
+  implicit val orderExtractor = dependencyExtractor[Order](
+    HeaderTag.OrderName,
+    HeaderTag.OrderVersion,
+    HeaderTag.OrderFlags,
+    Order
+  )
+
   implicit val recommendsExtractor = dependencyExtractor[Recommends](
     HeaderTag.RecommendName,
     HeaderTag.RecommendVersion,

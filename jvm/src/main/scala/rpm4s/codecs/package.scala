@@ -325,6 +325,10 @@ package object codecs {
       case 5010 => Attempt.successful(FileCaps)
       case 5011 => Attempt.successful(FileDigestAlgo)
 
+      case 5035 => Attempt.successful(OrderName)
+      case 5036 => Attempt.successful(OrderVersion)
+      case 5037 => Attempt.successful(OrderFlags)
+
       case 5046 => Attempt.successful(RecommendName)
       case 5047 => Attempt.successful(RecommendVersion)
       case 5048 => Attempt.successful(RecommendFlags)
@@ -483,6 +487,10 @@ package object codecs {
       case LongSize => 5009
       case FileCaps => 5010
       case FileDigestAlgo => 5011
+
+      case OrderName    => 5035
+      case OrderVersion => 5036
+      case OrderFlags   => 5037
 
       case RecommendName    => 5046
       case RecommendVersion => 5047
