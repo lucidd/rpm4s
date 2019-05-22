@@ -100,6 +100,9 @@ package object codecs {
       case 267   => Attempt.successful(DSAHeader)
       case 268   => Attempt.successful(RSAHeader)
       case 269   => Attempt.successful(SHA1Header)
+      case 270   => Attempt.successful(LongSigSize)
+      case 271   => Attempt.successful(LongArchiveSize)
+      case 273   => Attempt.successful(SHA256Header)
       case 1000  => Attempt.successful(SignatureTag.Size)
       case 1001  => Attempt.successful(LEMD5_1)
       case 1002  => Attempt.successful(PGP)
@@ -115,6 +118,9 @@ package object codecs {
       case DSAHeader         => 267
       case RSAHeader         => 268
       case SHA1Header        => 269
+      case LongSigSize       => 270
+      case LongArchiveSize   => 271
+      case SHA256Header      => 273
       case SignatureTag.Size => 1000
       case LEMD5_1           => 1001
       case PGP               => 1002
@@ -371,6 +377,9 @@ package object codecs {
       case DSAHeader        => 267
       case RSAHeader        => 268
       case SHA1Header       => 269
+      case LongSigSize      => 270
+      case LongArchiveSize  => 271
+      case SHA256Header     => 273
       case Name             => 1000
       case Version          => 1001
       case Release          => 1002

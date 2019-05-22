@@ -19,6 +19,9 @@ object HeaderTag {
   case object DSAHeader extends HeaderTag[BinaryData] with SignatureTag
   case object RSAHeader extends HeaderTag[BinaryData] with SignatureTag
   case object SHA1Header extends HeaderTag[StringData] with SignatureTag
+  case object SHA256Header extends HeaderTag[StringData] with SignatureTag
+  case object LongSigSize extends HeaderTag[Int64Data] with SignatureTag
+  case object LongArchiveSize extends HeaderTag[Int64Data] with SignatureTag
 
   case object Name extends HeaderTag[StringData]
   case object Version extends HeaderTag[StringData]
