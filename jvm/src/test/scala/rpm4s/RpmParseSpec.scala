@@ -1,6 +1,6 @@
 package rpm4s
 
-import java.time.{Instant, ZoneOffset}
+import java.time.Instant
 
 import org.scalacheck.Arbitrary
 import org.scalatest._
@@ -197,17 +197,17 @@ GIT Branch: stable"""
     rpe.changeLog(0) shouldBe ChangeLogEntry(
       "jslaby@suse.cz",
       "- Linux 4.11.8 (bnc#1012628).\n- commit 42bd7a0",
-      Instant.ofEpochSecond(1498737600).atOffset(ZoneOffset.UTC)
+      Instant.ofEpochSecond(1498737600)
     )
     rpe.changeLog(2000) shouldBe ChangeLogEntry(
       "agraf@suse.de",
       "- Refresh patches.arch/arm-exynos-nosparse.patch.\n- commit 55fbf60",
-      Instant.ofEpochSecond(1350907200).atOffset(ZoneOffset.UTC)
+      Instant.ofEpochSecond(1350907200)
     )
     rpe.changeLog(4006) shouldBe ChangeLogEntry(
       "jeffm@suse.com",
       "- patches.suse/export-security_inode_permission: Export\n  security_inode_permission for aufs.",
-      Instant.ofEpochSecond(1236168000).atOffset(ZoneOffset.UTC)
+      Instant.ofEpochSecond(1236168000)
     )
 
   }

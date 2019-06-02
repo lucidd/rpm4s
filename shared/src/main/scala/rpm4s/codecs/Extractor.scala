@@ -1,6 +1,6 @@
 package rpm4s.codecs
 
-import java.time.{Instant, ZoneOffset}
+import java.time.Instant
 
 import rpm4s.codecs.Extractor.Data
 import rpm4s.codecs.IndexData.{Int32Data, StringArrayData}
@@ -326,7 +326,7 @@ object Extractor {
               ChangeLogEntry(
                 name,
                 text,
-                Instant.ofEpochSecond(time.toLong).atOffset(ZoneOffset.UTC)
+                Instant.ofEpochSecond(time.toLong)
               )
           }
         }
