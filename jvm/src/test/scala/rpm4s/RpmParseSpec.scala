@@ -23,6 +23,7 @@ class RpmParseSpec
   case class TestSet(
       lead: Lead,
       payload: Payload,
+      payloadDigest: PayloadDigest,
       name: Name,
       version: Version,
       release: Release,
@@ -94,6 +95,8 @@ class RpmParseSpec
 
     rpe.vendor shouldBe Vendor("openSUSE")
     rpe.license shouldBe License.`GPL-2.0`
+
+    rpe.payloadDigest.checksum.toSelfDescribingHex shouldBe "sha256-a6c622dcbfc90c84332966370b73ce54cbd5388bf8561e28338b23529627572b"
 
     rpe.description shouldBe Description(
       Map(

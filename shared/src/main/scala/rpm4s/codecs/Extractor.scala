@@ -253,17 +253,8 @@ object Extractor {
                     val hasher = data(HeaderTag.FileDigestAlgo)
                       .toOption
                       .flatMap(_.values.headOption)
-                      .map {
-                        case 1 =>  Md5.fromHex _
-                        case 2 =>  Sha1.fromHex _
-                        //case 3 =>   /*!< RIPEMD160 */
-                        //case 5 =>   /*!< MD2 */
-                        //case 6 =>   /*!< TIGER192 */
-                        //case 7 =>   /*!< HAVAL-5-160 */
-                        case 8 =>   Sha256.fromHex _
-                        //case 9 =>   /*!< SHA384 */
-                        case 10 =>   Sha512.fromHex _
-                      }.getOrElse(Md5.fromHex _)
+                      .map(digestNum2Hasher)
+                      .getOrElse(Md5.fromHex _)
                     hasher(digests.values(index)).toRight(
                       ConvertingError(s"'${digests.values(index)}' is not a valid checksum"))
                       .map { d =>
@@ -503,6 +494,35 @@ object Extractor {
     val sigTags: Set[SignatureTag] = Set.empty
     def extract(data: Data): Result[Lead] =
       data.lead.toRight(ConvertingError("missing lead."))
+  }
+
+  private def digestNum2Hasher(num: Int): String => Option[Checksum] = num match {
+      case 1 =>  Md5.fromHex _
+      case 2 =>  Sha1.fromHex _
+      //case 3 =>   /*!< RIPEMD160 */
+      //case 5 =>   /*!< MD2 */
+      //case 6 =>   /*!< TIGER192 */
+      //case 7 =>   /*!< HAVAL-5-160 */
+      case 8 =>   Sha256.fromHex _
+      //case 9 =>   /*!< SHA384 */
+      case 10 =>   Sha512.fromHex _
+  } 
+
+  implicit val payloadDigestExtractor: Extractor[PayloadDigest] = new Extractor[PayloadDigest] {
+    val tags: Set[HeaderTag[_ <: IndexData]] = Set(
+      HeaderTag.PayloadDigest,
+      HeaderTag.PayloadDigestAlgo
+    )
+    val sigTags: Set[SignatureTag] = Set.empty
+    def extract(data: Data): Result[PayloadDigest] =
+      for {
+        format <- data(HeaderTag.PayloadDigestAlgo)
+        hex <- data(HeaderTag.PayloadDigest)
+        digest <- digestNum2Hasher(format.values.head)
+          .apply(hex.values.head)
+          .toRight(ConvertingError(s"${hex.values.head} invalid checksum value for type ${format.values.head}."))
+          .map(PayloadDigest)
+      } yield digest
   }
 
   implicit val payloadFormatExtractor: Extractor[PayloadFormat] = new Extractor[PayloadFormat] {
