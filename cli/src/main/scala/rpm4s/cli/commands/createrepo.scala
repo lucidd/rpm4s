@@ -11,6 +11,7 @@ import scodec.Attempt.{Failure, Successful}
 import scodec.bits.BitVector
 
 import scala.concurrent.ExecutionContext
+import rpm4s.data.Checksum
 
 object createrepo {
 
@@ -45,7 +46,8 @@ object createrepo {
     rpm4s.repo.create[IO](
       root,
       rpms.parJoin(Int.MaxValue),
-      (_, c) => s"${c.toSelfDescribingHex}.rpm",
+      Stream.empty,
+      (_: RpmPrimaryEntry, c: Checksum) => s"${c.toSelfDescribingHex}.rpm",
       revision,
       None,
       EC

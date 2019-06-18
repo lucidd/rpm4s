@@ -144,21 +144,6 @@ class RepomdSpec
     
     generated.size shouldBe expected.size
     generated shouldBe expected
-    generated.zip(expected).foreach { case (g, e) =>
-      g.id shouldBe e.id
-      g.title shouldBe e.title
-      g.description shouldBe e.description
-      g.from shouldBe e.from
-      g.issued shouldBe e.issued
-      g.tpe shouldBe e.tpe
-      g.release shouldBe e.release
-      g.version shouldBe e.version
-      g.status shouldBe e.status
-      g.severity shouldBe e.severity
-      g.release shouldBe e.release
-      g.references shouldBe e.references
-      g.packages shouldBe e.packages
-    }
   }
 
 }

@@ -179,16 +179,20 @@ package object repomd {
       .through(xml2repomd)
 
   def create(
-    size: Long,
-    openSize: Long,
-    checksum: Checksum,
-    openChecksum: Checksum,
+    primSize: Long,
+    primOpenSize: Long,
+    primChecksum: Checksum,
+    primOpenChecksum: Checksum,
+    upSize: Long,
+    upOpenSize: Long,
+    upChecksum: Checksum,
+    upOpenChecksum: Checksum,
     revision: Long,
     location: String = "repodata/primary.xml.gz"
   )(sb: StringBuilder): StringBuilder = {
     val timestamp = Instant.now().getEpochSecond
-    val ctype = checksum2type(checksum)
-    val octype = checksum2type(openChecksum)
+    val ctype = checksum2type(primChecksum)
+    val octype = checksum2type(primOpenChecksum)
 
     sb.append("""<?xml version="1.0" encoding="UTF-8"?>""")
     sb.append("""<repomd>""")
@@ -196,13 +200,24 @@ package object repomd {
 
     sb.append("""<data type="primary">""")
     sb.append(
-      s"""<checksum type="$ctype">${checksum.toHex.toLowerCase}</checksum>""")
+      s"""<checksum type="$ctype">${primChecksum.toHex.toLowerCase}</checksum>""")
     sb.append(
-      s"""<open-checksum type="$octype">${openChecksum.toHex.toLowerCase}</open-checksum>""")
+      s"""<open-checksum type="$octype">${primOpenChecksum.toHex.toLowerCase}</open-checksum>""")
     sb.append(s"""<location href="$location"/>""")
     sb.append(s"""<timestamp>$timestamp</timestamp>""")
-    sb.append(s"""<size>$size</size>""")
-    sb.append(s"""<open-size>$openSize</open-size>""")
+    sb.append(s"""<size>$primSize</size>""")
+    sb.append(s"""<open-size>$primOpenSize</open-size>""")
+    sb.append("""</data>""")
+
+    sb.append("""<data type="updateinfo">""")
+    sb.append(
+      s"""<checksum type="$ctype">${upChecksum.toHex.toLowerCase}</checksum>""")
+    sb.append(
+      s"""<open-checksum type="$octype">${upOpenChecksum.toHex.toLowerCase}</open-checksum>""")
+    sb.append(s"""<location href="$location"/>""")
+    sb.append(s"""<timestamp>$timestamp</timestamp>""")
+    sb.append(s"""<size>$upSize</size>""")
+    sb.append(s"""<open-size>$upOpenSize</open-size>""")
     sb.append("""</data>""")
 
     sb.append("""</repomd>""")
