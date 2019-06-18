@@ -14,6 +14,7 @@ import scodec.bits.{BitVector, ByteVector}
 import fs2.{Pure, Stream}
 import rpm4s.repo.data.primary.{PackageF, SizeInfo}
 import rpm4s.repo.repomd.xml.primary.xml2packages
+import cats.implicits._
 
 import scala.concurrent.ExecutionContext
 
@@ -121,6 +122,43 @@ class RepomdSpec
       (rpe, cksum) => "kernel-default-4.11.8-1.2.x86_64.rpm"
     ).compile.toVector.map(_.mkString).unsafeRunSync()
     generated shouldBe expected
+  }
+
+  "createUpdateinfo" should "should create updateinfo.xml correctly" in {
+    implicit val cs = IO.contextShift(ExecutionContext.global)
+    //TODO: currently this ignores the pkgid attribute of the checksum which has been manually removed from the test data
+    val expected = fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/repomd/updateinfo-full.xml")), 4096, ExecutionContext.global)
+      .through(rpm4s.repo.repomd.xml.updateinfo.bytes2updates)
+      .compile
+      .toList
+      .unsafeRunSync()
+      
+    val generated = rpm4s.repo.repomd.xml.updateinfo.create[IO](Stream.emits(expected).covary[IO])
+      .through(fs2.text.utf8Encode)
+      .through(rpm4s.repo.repomd.xml.updateinfo.bytes2updates)
+      .compile
+      .toList
+      .unsafeRunSync()
+    
+   
+    
+    generated.size shouldBe expected.size
+    generated shouldBe expected
+    generated.zip(expected).foreach { case (g, e) =>
+      g.id shouldBe e.id
+      g.title shouldBe e.title
+      g.description shouldBe e.description
+      g.from shouldBe e.from
+      g.issued shouldBe e.issued
+      g.tpe shouldBe e.tpe
+      g.release shouldBe e.release
+      g.version shouldBe e.version
+      g.status shouldBe e.status
+      g.severity shouldBe e.severity
+      g.release shouldBe e.release
+      g.references shouldBe e.references
+      g.packages shouldBe e.packages
+    }
   }
 
 }

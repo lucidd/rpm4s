@@ -279,5 +279,56 @@ package object updateinfo {
     go(h).stream
   }
 
+  def create[F[_]](updates: Stream[F, Update]): Stream[F, String] = {
+    Stream.emit("<updates>") ++
+    updates.map { update =>
+      update2xml(update)
+    } ++
+    Stream.emit("</updates>")
+  }
+
+  def update2xml(update: Update): String = {
+    
+    val node = 
+      <update from={update.from} status={Status.toString(update.status)} type={UpdateType.toString(update.tpe)} version={update.version}>
+        <id>{update.id}</id>
+        <title>{update.title}</title>
+        <severity>{Severity.toString(update.severity)}</severity>
+        <release>{update.release}</release>
+        <issued date={update.issued.getEpochSecond().toString} />
+        <description>{update.description}</description>
+        <references>
+          {
+            update.references.map { ref =>
+              val tpe = ref match {
+                case Bugzilla(href, id, title) => "bugzilla"
+                case CVERef(href, cve, title) => "cve"
+                case Fate(href, id, title) => "fate"
+              }
+              <reference href={ref.href} id={ref.id} title={ref.title} type={tpe} />
+            }
+          }
+        </references>
+        <pkglist>
+          <collection>
+            {
+              update.packages.map { pkg =>
+                    val suggests =
+                      (if (pkg.restartSuggested) Some(<restart_suggested>True</restart_suggested>) else None) ++
+                      (if (pkg.rebootSuggested) Some(<reboot_suggested>True</reboot_suggested>) else None) ++
+                      (if (pkg.reloginSuggested) Some(<relogin_suggested>True</relogin_suggested>) else None)
+                <package name={pkg.name.value} epoch={pkg.epoch.getOrElse(0).toString} version={pkg.version.string} release={pkg.release.value} arch={Architecture.toRpmString(pkg.arch)} src={pkg.src} >
+                  <filename>{pkg.filename}</filename>
+                  {suggests}
+                </package>
+              }
+            }
+          </collection>
+        </pkglist>
+      </update>
+
+    node.toString
+  }
+
 
 }
