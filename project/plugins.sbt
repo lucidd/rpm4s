@@ -10,4 +10,4 @@ addSbtPlugin("ch.epfl.scala" % "sbt-bloop" % "1.0.0-RC1")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.1")
 
 resolvers += Resolver.sonatypeRepo("snapshots")
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.0-M4")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.0")
