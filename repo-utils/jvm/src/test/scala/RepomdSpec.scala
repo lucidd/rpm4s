@@ -1,7 +1,8 @@
 import java.nio.file.Paths
 import java.time.Instant
+import java.util.concurrent.Executors
 
-import cats.effect.IO
+import cats.effect.{Blocker, IO}
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 import rpm4s.data.Checksum.Sha256
@@ -112,10 +113,13 @@ class RepomdSpec
     implicit val cs = IO.contextShift(ExecutionContext.global)
     //TODO: currently this ignores the pkgid attribute of the checksum which has been manually removed from the test data
     val rpm = rpm4s.decode[RpmPrimaryEntry](BitVector.fromInputStream(getClass.getResourceAsStream("/kernel-default-4.11.8-1.2.x86_64.rpm"))).require
-    val expected = fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/cc_primary.xml")), 4096, ExecutionContext.global)
-      .through(fs2.text.utf8Decode)
-      .compile.toVector
-      .map(_.mkString)
+    val expected =
+    Blocker.fromExecutorService(IO(Executors.newCachedThreadPool())).use { blocker =>
+      fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/cc_primary.xml")), 4096, blocker)
+        .through(fs2.text.utf8Decode)
+        .compile.toVector
+        .map(_.mkString)
+    }
       .unsafeRunSync()
     val checksum = Sha256.fromHex("65f2c93d2bd4178590ac46531668108389729df9f7f0a527af4f1566e0ee94e8").get
     val generated = rpm4s.repo.repomd.xml.primary.create[IO](Some(1), Stream.emit(rpm -> checksum),
@@ -127,10 +131,13 @@ class RepomdSpec
   "createUpdateinfo" should "should create updateinfo.xml correctly" in {
     implicit val cs = IO.contextShift(ExecutionContext.global)
     //TODO: currently this ignores the pkgid attribute of the checksum which has been manually removed from the test data
-    val expected = fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/repomd/updateinfo-full.xml")), 4096, ExecutionContext.global)
-      .through(rpm4s.repo.repomd.xml.updateinfo.bytes2updates)
-      .compile
-      .toList
+    val expected =
+      Blocker.fromExecutorService(IO(Executors.newCachedThreadPool())).use { blocker =>
+        fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/repomd/updateinfo-full.xml")), 4096, blocker)
+          .through(rpm4s.repo.repomd.xml.updateinfo.bytes2updates)
+          .compile
+          .toList
+      }
       .unsafeRunSync()
       
     val generated = rpm4s.repo.repomd.xml.updateinfo.create[IO](Stream.emits(expected).covary[IO])

@@ -132,9 +132,9 @@ object Yast2 {
         }
       }
 
-      def go(h: Stream[F, String]): Pull[F, Package, Option[Unit]] = {
+      def go(h: Stream[F, String]): Pull[F, Package, Unit] = {
         h.pull.uncons1.flatMap {
-          case None => Pull.pure(None)
+          case None => Pull.done
           case Some((line, h1)) =>
             if (line.startsWith("=Pkg:")) {
               val (name, arch) = pkg(line).toOption.get

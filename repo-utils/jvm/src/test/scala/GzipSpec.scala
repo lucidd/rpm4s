@@ -1,4 +1,6 @@
-import cats.effect.IO
+import java.util.concurrent.Executors
+
+import cats.effect.{Blocker, IO}
 import org.scalacheck.Arbitrary
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
@@ -18,15 +20,15 @@ class GzipSpec
 
   "gunzip" should "uncompress correctly" in {
     implicit val cs = IO.contextShift(ExecutionContext.global)
-    val bits = fs2.io.readInputStream(
-      IO(getClass.getResourceAsStream("/text.gz")), 4096, ExecutionContext.global
-    )
-
-    val text = bits
-      .through(gunzip())
-      .through(fs2.text.utf8Decode)
-      .compile.toVector.map(_.mkString)
-      .unsafeRunSync()
+    val text = Blocker.fromExecutorService(IO(Executors.newCachedThreadPool())).use { blocker =>
+      val bits = fs2.io.readInputStream(
+        IO(getClass.getResourceAsStream("/text.gz")), 4096, blocker
+      )
+      bits
+        .through(gunzip())
+        .through(fs2.text.utf8Decode)
+        .compile.toVector.map(_.mkString)
+    }.unsafeRunSync()
 
 
     text shouldEqual "hello world!\n"

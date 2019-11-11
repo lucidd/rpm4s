@@ -4,7 +4,7 @@ import java.nio.file.Path
 import java.util.concurrent.Executors
 
 import better.files.File
-import cats.effect.{Effect, IO}
+import cats.effect.{Blocker, Effect, IO}
 import fs2.Stream
 import rpm4s.data.RpmPrimaryEntry
 import scodec.Attempt.{Failure, Successful}
@@ -50,7 +50,7 @@ object createrepo {
       (_: RpmPrimaryEntry, c: Checksum) => s"${c.toSelfDescribingHex}.rpm",
       revision,
       None,
-      EC
+      Blocker.liftExecutionContext(EC)
     ).unsafeRunSync()
     executor.shutdown()
   }

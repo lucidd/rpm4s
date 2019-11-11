@@ -150,9 +150,9 @@ package object repomd {
 
   def xml2repomd[F[_]: RaiseThrowable]: Pipe[F, XMLEvent, Repomd] = s => {
     //TODO validate first event
-    def go(h: Stream[F, XMLEvent]): Pull[F, Repomd, Option[Unit]] = {
+    def go(h: Stream[F, XMLEvent]): Pull[F, Repomd, Unit] = {
       h.pull.uncons1.flatMap {
-        case None => Pull.pure(None)
+        case None => Pull.done
         case Some((event, h1)) =>
           event match {
             case StartEvent(se) => {

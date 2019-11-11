@@ -324,10 +324,10 @@ package object primary {
       }
     }
 
-    def go(h: Stream[F, XMLEvent]): Pull[F, PackageF.Package, Option[Unit]] = {
+    def go(h: Stream[F, XMLEvent]): Pull[F, PackageF.Package, Unit] = {
       h.pull.uncons1.flatMap {
         case None =>
-          Pull.pure(None)
+          Pull.done
         case Some((event, h1)) =>
           event match {
             case StartEvent(se) => {

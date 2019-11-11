@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file._
 import java.security.MessageDigest
 
-import cats.effect.{ContextShift, Effect}
+import cats.effect.{Blocker, ContextShift, Effect}
 import cats.implicits._
 import fs2.{Chunk, Pipe, Stream}
 import rpm4s.data.Checksum.Sha256
@@ -13,7 +13,6 @@ import rpm4s.repo.utils.compress.gzip
 import rpm4s.repo.data.updateinfo.UpdateF.Update
 import cats.implicits._
 
-import scala.concurrent.ExecutionContext
 
 package object repo {
 
@@ -24,7 +23,7 @@ package object repo {
     nameFn: (RpmPrimaryEntry, Checksum) => String,
     revision: Long,
     count: Option[Long],
-    blockingEC: ExecutionContext
+    blocker: Blocker
   ): F[Unit] = {
     val primaryFile = reporoot.resolve("primary.xml.gz")
     val updateinfoFile = reporoot.resolve("updateinfo.xml.gz")
@@ -32,9 +31,9 @@ package object repo {
     Files.deleteIfExists(primaryFile)
     Files.deleteIfExists(repomdFile)
     create(
-      fs2.io.file.writeAll(repomdFile, blockingEC),
-      fs2.io.file.writeAll(primaryFile, blockingEC),
-      fs2.io.file.writeAll(updateinfoFile, blockingEC),
+      fs2.io.file.writeAll(repomdFile, blocker),
+      fs2.io.file.writeAll(primaryFile, blocker),
+      fs2.io.file.writeAll(updateinfoFile, blocker),
       nameFn,
       rpms,
       updates,

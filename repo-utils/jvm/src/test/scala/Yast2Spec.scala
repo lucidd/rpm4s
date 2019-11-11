@@ -1,4 +1,6 @@
-import cats.effect.IO
+import java.util.concurrent.Executors
+
+import cats.effect.{Blocker, IO}
 import org.http4s.Uri
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
@@ -18,11 +20,14 @@ class Yast2Spec
   "content" should "get parsed correctly" in {
     implicit val cs = IO.contextShift(ExecutionContext.global)
     val r  =
-      fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/yast2/content")), 4096, ExecutionContext.global)
-        .through(fs2.text.utf8Decode)
-        .through(fs2.text.lines).compile.toVector.map { lines =>
-        Content.fromLines(lines.toList)
-      }.unsafeRunSync()
+      Blocker.fromExecutorService(IO(Executors.newCachedThreadPool())).use { blocker =>
+        fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/yast2/content")), 4096, blocker)
+          .through(fs2.text.utf8Decode)
+          .through(fs2.text.lines).compile.toVector.map { lines =>
+          Content.fromLines(lines.toList)
+        }
+      }
+      .unsafeRunSync()
 
 
     r shouldEqual Some(
@@ -37,11 +42,13 @@ class Yast2Spec
 
   "packages" should "get parsed correctly" in {
     implicit val cs = IO.contextShift(ExecutionContext.global)
-    val r  = fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/yast2/packages")), 4096, ExecutionContext.global)
-     .through(fs2.text.utf8Decode)
-     .through(fs2.text.lines)
-     .through(Yast2.pipe)
-     .compile.toVector.unsafeRunSync()
+      val r = Blocker.fromExecutorService(IO(Executors.newCachedThreadPool())).use { blocker =>
+        fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/yast2/packages")), 4096, blocker)
+          .through(fs2.text.utf8Decode)
+          .through(fs2.text.lines)
+          .through(Yast2.pipe)
+          .compile.toVector
+      }.unsafeRunSync()
 
     val expected = Vector(
       PackageF[cats.Id](

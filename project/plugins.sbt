@@ -1,5 +1,4 @@
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % "2.0.0-RC3-3")
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.28")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.29")
 addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.3.7")
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.9")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.9.0")

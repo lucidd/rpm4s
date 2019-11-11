@@ -246,10 +246,10 @@ package object updateinfo {
       }
     }
 
-    def go(h: Stream[F, XMLEvent]): Pull[F, UpdateF.Update, Option[Unit]] = {
+    def go(h: Stream[F, XMLEvent]): Pull[F, UpdateF.Update, Unit] = {
       h.pull.uncons1.flatMap {
         case None =>
-          Pull.pure(None)
+          Pull.done
         case Some((event, h1)) =>
           event match {
             case StartEvent(se) => {
