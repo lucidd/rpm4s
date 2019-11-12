@@ -12,8 +12,8 @@ It fully implemented in scala and does not require librpm as dependency.
 This project is still under heavy development and will probably change a lot.
 While parsing rpms was already successfully tested on 100k+ rpms, there are still
 some unimplemented codepaths and missing headers that are not implemented yet.
-Most of those things will be implemented on demand once i encounter them in an rpm.
-In case you give this libaray a try and encounter an error parsing some rpm,
+Most of those things will be implemented on demand once I encounter them in an rpm.
+In case you give this library a try and encounter an error parsing some rpm,
 please let me know by opening an issue. :smile:
 
 # Goals
