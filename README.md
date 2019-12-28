@@ -18,4 +18,4 @@ please let me know by opening an issue. :smile:
 
 # Goals
 
-- Provide a strongly typed interface to work with rpm and related data.
+- Provide a highlevel interface for working with rpm packages and related data like repositories.
