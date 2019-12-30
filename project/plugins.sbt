@@ -8,4 +8,4 @@ addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.6")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.1")
 
 resolvers += Resolver.sonatypeRepo("snapshots")
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.0-M4")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.1")
