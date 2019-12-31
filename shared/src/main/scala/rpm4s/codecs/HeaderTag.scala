@@ -176,6 +176,7 @@ object HeaderTag {
   case object FileTriggerVersion extends HeaderTag[StringArrayData]
   case object FileTriggerFlags extends HeaderTag[Int32Data]
 
+  case object TransFileTriggerFlags extends HeaderTag[StringArrayData]
   case object FileTriggerPriorities extends HeaderTag[Int32Data]
   case object TransFileTriggerPriorities extends HeaderTag[Int32Data]
 
