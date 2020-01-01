@@ -448,8 +448,16 @@ object Extractor {
     def extract(data: Data): Result[Summery] =
       for {
         summery <- data(HeaderTag.Summery)
-        i18n <- data(HeaderTag.HeaderI18NTable)
-      } yield Summery(i18n.values.zip(summery.values).toMap)
+        r <- data(HeaderTag.HeaderI18NTable) match {
+          case Left(MissingHeader(_)) =>
+            assert(summery.values.size == 1)
+            Right(Summery(List("C").zip(summery.values).toMap))
+          case Left(value) => Left(value)
+          case Right(i18n) =>
+            assert(summery.values.size == i18n.values.size)
+            Right(Summery(i18n.values.zip(summery.values).toMap))
+        }
+      } yield r
   }
 
   implicit val descriptionExtractor: Extractor[Description] =
@@ -462,8 +470,17 @@ object Extractor {
       def extract(data: Data): Result[Description] =
         for {
           description <- data(HeaderTag.Description)
-          i18n <- data(HeaderTag.HeaderI18NTable)
-        } yield Description(i18n.values.zip(description.values).toMap)
+          r <- data(HeaderTag.HeaderI18NTable) match {
+            case Left(MissingHeader(_)) =>
+              assert(description.values.size == 1)
+              Right(Description(List("C").zip(description.values).toMap))
+            case Left(value) => Left(value)
+            case Right(i18n) =>
+              assert(description.values.size == i18n.values.size)
+              Right(Description(i18n.values.zip(description.values).toMap))
+          }
+        } yield r
+
     }
 
   implicit val groupExtractor: Extractor[Group] = new Extractor[Group] {
@@ -475,8 +492,16 @@ object Extractor {
     def extract(data: Data): Result[Group] =
       for {
         group <- data(HeaderTag.Group)
-        i18n <- data(HeaderTag.HeaderI18NTable)
-      } yield Group(i18n.values.zip(group.values).toMap)
+        r <- data(HeaderTag.HeaderI18NTable) match {
+          case Left(MissingHeader(_)) =>
+            assert(group.values.size == 1)
+            Right(Group(List("C").zip(group.values).toMap))
+          case Left(value) => Left(value)
+          case Right(i18n) =>
+            assert(group.values.size == i18n.values.size)
+            Right(Group(i18n.values.zip(group.values).toMap))
+        }
+      } yield r
   }
 
   implicit val packagerExtractor: Extractor[Packager] = new Extractor[Packager] {
