@@ -454,7 +454,6 @@ object Extractor {
             Right(Summary(List("C").zip(summary.values).toMap))
           case Left(value) => Left(value)
           case Right(i18n) =>
-            assert(summary.values.size == i18n.values.size, s"Summary ${summary.values} and i18n header ${i18n.values} dont have the same amount of values.")
             Right(Summary(i18n.values.zip(summary.values).toMap))
         }
       } yield r
@@ -476,7 +475,6 @@ object Extractor {
               Right(Description(List("C").zip(description.values).toMap))
             case Left(value) => Left(value)
             case Right(i18n) =>
-              assert(description.values.size == i18n.values.size, s"Description ${description.values} and i18n header ${i18n.values} dont have the same amount of values.")
               Right(Description(i18n.values.zip(description.values).toMap))
           }
         } yield r
@@ -498,7 +496,6 @@ object Extractor {
             Right(Group(List("C").zip(group.values).toMap))
           case Left(value) => Left(value)
           case Right(i18n) =>
-            assert(group.values.size == i18n.values.size, s"Group ${group.values} and i18n header ${i18n.values} dont have the same amount of values.")
             Right(Group(i18n.values.zip(group.values).toMap))
         }
       } yield r
