@@ -16,7 +16,7 @@ case class RpmInfo(
  architecture: Architecture,
  vendor: Vendor,
  license: License,
- summery: Summery,
+ summery: Summary,
  description: Description,
  group: rpm4s.data.Group,
  compression: Compression,
