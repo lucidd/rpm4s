@@ -11,7 +11,7 @@ case class RpmBlueprint(
   license: License,
   architecture: Architecture,
   description: Description,
-  summery: Summery,
+  summery: Summary,
   group: Group,
   requires: List[Requires] = List.empty,
   provides: List[Provides] = List.empty,

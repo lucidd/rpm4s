@@ -9,7 +9,7 @@ case class RPM(
     architecture: Architecture,
     vendor: Vendor,
     license: License,
-    summery: Summery,
+    summery: Summary,
     description: Description,
     group: Group,
     epoch: Option[Epoch] = None,

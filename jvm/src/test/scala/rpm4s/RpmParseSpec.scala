@@ -30,7 +30,7 @@ class RpmParseSpec
       architecture: Architecture,
       vendor: Vendor,
       license: License,
-      summery: Summery,
+      summery: Summary,
       description: Description,
       group: rpm4s.data.Group,
       headerRange: HeaderRange,
@@ -110,7 +110,7 @@ GIT Branch: stable"""
       )
     )
 
-    rpe.summery shouldBe Summery(
+    rpe.summery shouldBe Summary(
       Map(
         "C" -> """The Standard Kernel"""
       )

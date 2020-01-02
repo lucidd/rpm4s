@@ -439,23 +439,23 @@ object Extractor {
         data(HeaderTag.BuildHost).map(x => BuildHost(x.value))
     }
 
-  implicit val summeryExtractor: Extractor[Summery] = new Extractor[Summery] {
+  implicit val summeryExtractor: Extractor[Summary] = new Extractor[Summary] {
     val tags: Set[HeaderTag[_ <: IndexData]] = Set(
       HeaderTag.Summery,
       HeaderTag.HeaderI18NTable
     )
     val sigTags: Set[SignatureTag] = Set.empty
-    def extract(data: Data): Result[Summery] =
+    def extract(data: Data): Result[Summary] =
       for {
-        summery <- data(HeaderTag.Summery)
+        summary <- data(HeaderTag.Summery)
         r <- data(HeaderTag.HeaderI18NTable) match {
           case Left(MissingHeader(_)) =>
-            assert(summery.values.size == 1)
-            Right(Summery(List("C").zip(summery.values).toMap))
+            assert(summary.values.size == 1, s"Summary without i18n header and more then one value ${summary.values}")
+            Right(Summary(List("C").zip(summary.values).toMap))
           case Left(value) => Left(value)
           case Right(i18n) =>
-            assert(summery.values.size == i18n.values.size)
-            Right(Summery(i18n.values.zip(summery.values).toMap))
+            assert(summary.values.size == i18n.values.size, s"Summary ${summary.values} and i18n header ${i18n.values} dont have the same amount of values.")
+            Right(Summary(i18n.values.zip(summary.values).toMap))
         }
       } yield r
   }
@@ -472,11 +472,11 @@ object Extractor {
           description <- data(HeaderTag.Description)
           r <- data(HeaderTag.HeaderI18NTable) match {
             case Left(MissingHeader(_)) =>
-              assert(description.values.size == 1)
+              assert(description.values.size == 1, s"Description without i18n header and more then one value ${description.values}")
               Right(Description(List("C").zip(description.values).toMap))
             case Left(value) => Left(value)
             case Right(i18n) =>
-              assert(description.values.size == i18n.values.size)
+              assert(description.values.size == i18n.values.size, s"Description ${description.values} and i18n header ${i18n.values} dont have the same amount of values.")
               Right(Description(i18n.values.zip(description.values).toMap))
           }
         } yield r
@@ -494,11 +494,11 @@ object Extractor {
         group <- data(HeaderTag.Group)
         r <- data(HeaderTag.HeaderI18NTable) match {
           case Left(MissingHeader(_)) =>
-            assert(group.values.size == 1)
+            assert(group.values.size == 1, s"Group without i18n header and more then one value ${group.values}")
             Right(Group(List("C").zip(group.values).toMap))
           case Left(value) => Left(value)
           case Right(i18n) =>
-            assert(group.values.size == i18n.values.size)
+            assert(group.values.size == i18n.values.size, s"Group ${group.values} and i18n header ${i18n.values} dont have the same amount of values.")
             Right(Group(i18n.values.zip(group.values).toMap))
         }
       } yield r
