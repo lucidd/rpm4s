@@ -104,7 +104,7 @@ package object primary {
     val summery = rpm.summery.locales.values.head
     val description = rpm.description.locales.values.head
     //val fileTime = ""
-    //val buildTime = ""
+    val buildTime = rpm.buildtime.map(_.time.toEpochMilli / 1000).get
     //val packageSize = ""
     //val installedSize = ""
     //val archiveSize = ""
@@ -125,7 +125,8 @@ package object primary {
     sb.append(s"<description>${Utility.escape(description)}</description>")
     //sb.append(s"<packager>$summery</packager>")
     //sb.append(s"<url>$summery</url>")
-    //sb.append(s"""<time file="$fileTime" build="$buildTime"/>""")
+    //TODO: filetime should be set correctly at some point but not sure what even uses that
+    sb.append(s"""<time file="$buildTime" build="$buildTime"/>""")
     //sb.append(s"""<size package="$packageSize" installed="$installedSize" archive="$archiveSize"/>""")
     sb.append(s"""<location href="${Utility.escape(filePath)}"/>""")
     sb.append("<format>")
