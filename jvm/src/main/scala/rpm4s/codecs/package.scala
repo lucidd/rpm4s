@@ -360,6 +360,14 @@ package object codecs {
       case 5071 => Attempt.successful(FileTriggerVersion)
       case 5072 => Attempt.successful(FileTriggerFlags)
 
+      case 5076 => Attempt.successful(TransFileTriggerScripts)
+      case 5077 => Attempt.successful(TransFileTriggerScriptProg)
+      case 5078 => Attempt.successful(TransFileTriggerScriptFlags)
+      case 5079 => Attempt.successful(TransFileTriggerName)
+      case 5080 => Attempt.successful(TransFileTriggerIndex)
+      case 5081 => Attempt.successful(TransFileTriggerVersion)
+      case 5082 => Attempt.successful(TransFileTriggerFlags)
+
       case 5084 => Attempt.successful(FileTriggerPriorities)
       case 5085 => Attempt.successful(TransFileTriggerPriorities)
 
@@ -528,6 +536,14 @@ package object codecs {
       case FileTriggerIndex       => 5070
       case FileTriggerVersion     => 5071
       case FileTriggerFlags       => 5072
+
+      case TransFileTriggerScripts => 5076
+      case TransFileTriggerScriptProg =>  5077
+      case TransFileTriggerScriptFlags => 5078
+      case TransFileTriggerName => 5079
+      case TransFileTriggerIndex => 5080
+      case TransFileTriggerVersion => 5081
+      case TransFileTriggerFlags => 5082
 
       case FileTriggerPriorities      => 5084
       case TransFileTriggerPriorities => 5085
