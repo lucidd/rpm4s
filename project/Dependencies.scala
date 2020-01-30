@@ -1,9 +1,9 @@
 object Dependencies {
-  val cats = "2.1.0"
-  val fs2 = "2.2.1"
+  val cats = "2.0.0"
+  val fs2 = "2.2.2"
   val scalatest = "3.0.5"
-  val scalacheck = "1.14.0"
-  val http4s = "0.21.0-M5"
+  val scalacheck = "1.14.3"
+  val http4s = "0.21.0-RC2"
   val circe = "0.12.3"
   val shapeless = "2.3.3"
   val scodecCore = "1.11.4"
