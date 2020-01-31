@@ -331,6 +331,9 @@ package object codecs {
       case 5010 => Attempt.successful(FileCaps)
       case 5011 => Attempt.successful(FileDigestAlgo)
 
+      case 5021 => Attempt.successful(PostInFlags)
+      case 5025 => Attempt.successful(PostTransFlags)
+
       case 5035 => Attempt.successful(OrderName)
       case 5036 => Attempt.successful(OrderVersion)
       case 5037 => Attempt.successful(OrderFlags)
@@ -504,6 +507,9 @@ package object codecs {
       case LongSize => 5009
       case FileCaps => 5010
       case FileDigestAlgo => 5011
+
+      case PostInFlags => 5021
+      case PostTransFlags => 5025
 
       case OrderName    => 5035
       case OrderVersion => 5036
