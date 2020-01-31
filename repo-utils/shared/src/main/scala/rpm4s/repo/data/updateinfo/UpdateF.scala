@@ -39,12 +39,17 @@ object UpdateF {
     cve: CVE,
     title: String
   ) extends Reference {
-    def id = cve.string
+    def id: String = cve.string
   }
   case class Fate(
     href: String,
     id: String,
     title: String
+  ) extends Reference
+  case class Self(
+    href: String,
+    title: String,
+    id: String
   ) extends Reference
 
   sealed trait Status extends Product with Serializable
