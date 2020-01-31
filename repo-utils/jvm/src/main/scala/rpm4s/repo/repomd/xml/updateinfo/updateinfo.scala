@@ -1,6 +1,7 @@
 package rpm4s.repo.repomd.xml
 
-import java.time.{Instant, ZoneOffset}
+import java.time.format.DateTimeFormatter
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 import javax.xml.namespace.QName
 import javax.xml.stream.events.XMLEvent
@@ -16,7 +17,11 @@ import rpm4s.repo.data.updateinfo.UpdateF.PackageF.PackageBuilder
 import rpm4s.repo.data.updateinfo.UpdateF
 import rpm4s.repo.data.updateinfo.UpdateF._
 
+import scala.util.Try
+
 package object updateinfo {
+
+  private val dateTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
   private val fromAttr = new QName("from")
   private val statusAttr = new QName("status")
@@ -226,9 +231,14 @@ package object updateinfo {
                 }
                 case "issued" => {
                   val issued = se.getAttributeByName(dateAttr).getValue
-                  update(h1, acc.copy(issued = Some(
-                    Instant.ofEpochSecond(issued.toLong)
-                  )))
+                  val parsedIssued = Try(Instant.ofEpochSecond(issued.toLong))
+                    .getOrElse(
+                      LocalDateTime
+                        .parse(issued, dateTimeFormat)
+                        .toInstant(ZoneOffset.UTC)
+                    )
+
+                  update(h1, acc.copy(issued = Some(parsedIssued)))
                 }
                 case _ => update(h1, acc)
               }
