@@ -32,7 +32,7 @@ class RepomdSpec
 
     r shouldEqual Some(
       Repomd(
-        revision = 1504283245,
+        revision = Some(1504283245),
         primary = Some(Primary(
           location = "repodata/03b53138f32575f30326c7028857cb013b709570614b7bb6190ff3ec2eac3ea7-primary.xml.gz",
           checksum = Sha256.fromHex("03b53138f32575f30326c7028857cb013b709570614b7bb6190ff3ec2eac3ea7").get,
