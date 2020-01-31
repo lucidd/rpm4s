@@ -109,11 +109,15 @@ package object updateinfo {
                       restartSuggested = Some(bool)
                     ))
                 }
+              case _ =>
+                pack(h1, acc)
             }
             case EndEvent(ee) =>
               ee.getName.getLocalPart match {
                 case "package" =>
                   Pull.pure(Some((PackageBuilder.build(acc).get, h1)))
+                case _ =>
+                  pack(h1, acc)
               }
             case _ => pack(h1, acc)
           }
