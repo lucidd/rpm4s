@@ -122,6 +122,7 @@ object HeaderTag {
   case object PostTrans extends HeaderTag[StringData]
   case object PreTransProg extends HeaderTag[StringData]
   case object PostTransProg extends HeaderTag[StringData]
+  case object PostTransFlags extends HeaderTag[Int32Data]
 
   case object ConflictFlags extends HeaderTag[Int32Data]
   case object ConflictName extends HeaderTag[StringArrayData]
@@ -138,6 +139,7 @@ object HeaderTag {
   case object PostUn extends HeaderTag[StringData]
   case object PreInProg extends HeaderTag[StringArrayData]
   case object PostInProg extends HeaderTag[StringArrayData]
+  case object PostInFlags extends HeaderTag[Int32Data]
   case object PreUnProg extends HeaderTag[StringArrayData]
   case object PostUnProg extends HeaderTag[StringArrayData]
 
