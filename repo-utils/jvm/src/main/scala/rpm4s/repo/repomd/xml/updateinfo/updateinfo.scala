@@ -22,6 +22,7 @@ import scala.util.Try
 package object updateinfo {
 
   private val dateTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+  private val dateTimeFormat2 = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
 
   private val fromAttr = new QName("from")
   private val statusAttr = new QName("status")
@@ -237,14 +238,23 @@ package object updateinfo {
                 }
                 case "issued" => {
                   val issued = se.getAttributeByName(dateAttr).getValue
-                  val parsedIssued = Try(Instant.ofEpochSecond(issued.toLong))
-                    .getOrElse(
-                      LocalDateTime
-                        .parse(issued, dateTimeFormat)
-                        .toInstant(ZoneOffset.UTC)
-                    )
 
-                  update(h1, acc.copy(issued = Some(parsedIssued)))
+                  val format1 = Try(
+                    LocalDateTime
+                      .parse(issued, dateTimeFormat)
+                      .toInstant(ZoneOffset.UTC)
+                  )
+                  val format2 = Try(
+                    LocalDateTime
+                      .parse(issued, dateTimeFormat2)
+                      .toInstant(ZoneOffset.UTC)
+                  )
+
+                  val parsedIssued = Try(Instant.ofEpochSecond(issued.toLong))
+                      .orElse(format1)
+                      .orElse(format2)
+
+                  update(h1, acc.copy(issued = parsedIssued.toOption))
                 }
                 case _ => update(h1, acc)
               }
