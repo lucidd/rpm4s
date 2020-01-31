@@ -75,7 +75,7 @@ package object updateinfo {
                 val version = Version.fromString(se.getAttributeByName(versionAttr).getValue).toOption.get
                 val release = Release.fromString(se.getAttributeByName(releaseAttr).getValue).toOption.get
                 val arch = Architecture.fromString(se.getAttributeByName(archAttr).getValue).get
-                val src = se.getAttributeByName(srcAttr).getValue
+                val src = Option(se.getAttributeByName(srcAttr)).map(_.getValue)
                 val acc2 = acc.copy(
                     name = Some(name),
                     epoch = Some(epoch),
@@ -333,7 +333,7 @@ package object updateinfo {
                       (if (pkg.restartSuggested) Some(<restart_suggested>True</restart_suggested>) else None) ++
                       (if (pkg.rebootSuggested) Some(<reboot_suggested>True</reboot_suggested>) else None) ++
                       (if (pkg.reloginSuggested) Some(<relogin_suggested>True</relogin_suggested>) else None)
-                <package name={pkg.name.value} epoch={pkg.epoch.getOrElse(0).toString} version={pkg.version.string} release={pkg.release.value} arch={Architecture.toRpmString(pkg.arch)} src={pkg.src} >
+                <package name={pkg.name.value} epoch={pkg.epoch.getOrElse(0).toString} version={pkg.version.string} release={pkg.release.value} arch={Architecture.toRpmString(pkg.arch)} src={pkg.src.orNull} >
                   <filename>{pkg.filename}</filename>
                   {suggests}
                 </package>
