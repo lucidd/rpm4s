@@ -366,10 +366,14 @@ object Extractor {
     val tags: Set[HeaderTag[_ <: IndexData]] = Set(HeaderTag.Epoch)
     val sigTags: Set[SignatureTag] = Set.empty
     def extract(data: Data): Result[Option[Epoch]] =
-      data(HeaderTag.Epoch).flatMap { x =>
-        val value = x.values.head
-        if (value > 0) Epoch.fromInt(value).map(Some(_))
-        else Right(None)
+      data(HeaderTag.Epoch) match {
+        case Left(MissingHeader(_)) =>
+          Right(None)
+        case Right(x) =>
+          val value = x.values.head
+          if (value > 0) Epoch.fromInt(value).map(Some(_))
+          else Right(None)
+        case Left(value) => Left(value)
       }
   }
 
