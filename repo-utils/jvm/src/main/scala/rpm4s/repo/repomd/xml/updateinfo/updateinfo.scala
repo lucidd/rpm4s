@@ -148,7 +148,7 @@ package object updateinfo {
         }
       }
 
-    def references(h: Stream[F, XMLEvent], acc: Vector[Reference]):
+    def references(h: Stream[F, XMLEvent], acc: Vector[Reference], updateId: String):
       Pull[F, Nothing, Option[(Vector[Reference], Stream[F, XMLEvent])]] = {
       h.pull.uncons1.flatMap {
         case Some((event, h1)) => event match {
@@ -156,19 +156,20 @@ package object updateinfo {
             se.getName.getLocalPart match {
               case "reference" =>
                 val href = se.getAttributeByName(hrefAttr).getValue
-                val id = se.getAttributeByName(idAttr).getValue
+                val id = Option(se.getAttributeByName(idAttr)).map(_.getValue)
                 val title = se.getAttributeByName(titleAttr).getValue
                 val tpe = se.getAttributeByName(typeAttr).getValue
                 val ref = tpe match {
-                  case "bugzilla" => Bugzilla(href, id, title)
-                  case "cve" => UpdateF.CVERef(href, CVE.fromString(id).get, title)
-                  case "fate" => Fate(href, id, title)
+                  case "bugzilla" => Bugzilla(href, id.get, title)
+                  case "cve" => UpdateF.CVERef(href, CVE.fromString(id.get).get, title)
+                  case "fate" => Fate(href, id.get, title)
+                  case "self" => Self(href, title, updateId)
                 }
-                references(h1, acc :+ ref)
+                references(h1, acc :+ ref, updateId)
             }
           case EndEvent(ee) if ee.getName.getLocalPart == "references" =>
             Pull.pure(Some((acc, h1)))
-          case _ => references(h1, acc)
+          case _ => references(h1, acc, updateId)
         }
         case None => Pull.pure(None)
       }
@@ -192,7 +193,7 @@ package object updateinfo {
                       ))
                   }
                 case "references" => {
-                  references(h1, Vector.empty).flatMap {
+                  references(h1, Vector.empty, acc.id.get).flatMap {
                     case Some((refs, h2)) =>
                       update(h2, acc.copy(references = Some(refs.toSet)))
                     case None => Pull.raiseError(new RuntimeException("expected release"))
