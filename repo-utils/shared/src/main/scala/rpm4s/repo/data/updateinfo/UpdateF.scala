@@ -51,17 +51,20 @@ object UpdateF {
   object Status {
     def fromString(value: String): Option[Status] = value match {
       case "stable" => Some(Stable)
+      case "final" => Some(Final)
       case _ => None
     }
     def toString(value: Status): String = value match {
       case Stable => "stable"
+      case Final => "final"
     }
     case object Stable extends Status
+    case object Final extends Status
   }
 
   sealed trait Severity extends Product with Serializable
   object Severity {
-    def fromString(value: String): Option[Severity] = value match {
+    def fromString(value: String): Option[Severity] = value.toLowerCase match {
       case "critical" => Some(Critical)
       case "important" => Some(Important)
       case "moderate" => Some(Moderate)
@@ -87,6 +90,8 @@ object UpdateF {
       case "security" => Some(Security)
       case "optional" => Some(Optional)
       case "feature" => Some(Feature)
+      case "enhancement" => Some(Enhancement)
+      case "bugfix" => Some(Bugfix)
       case _ => None
     }
     def toString(value: UpdateType): String = value match {
@@ -94,11 +99,16 @@ object UpdateF {
       case Security => "security"
       case Optional => "optional"
       case Feature => "feature"
+      case Enhancement => "enhancement"
+      case Bugfix => "bugfix"
     }
     case object Recommended extends UpdateType
     case object Security extends UpdateType
     case object Optional extends UpdateType
     case object Feature extends UpdateType
+
+    case object Enhancement extends UpdateType
+    case object Bugfix extends UpdateType
   }
 
   case class PackageF[F[_]](
