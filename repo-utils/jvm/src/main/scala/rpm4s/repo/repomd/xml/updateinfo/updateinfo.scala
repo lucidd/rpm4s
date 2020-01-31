@@ -69,7 +69,8 @@ package object updateinfo {
             case StartEvent(se) => se.getName.getLocalPart match {
               case "package" =>
                 val name = Name(se.getAttributeByName(nameAttr).getValue).toOption.get
-                val epoch = Option(se.getAttributeByName(epochAttr).getValue)
+                val epoch = Option(se.getAttributeByName(epochAttr))
+                  .map(_.getValue)
                   .flatMap(x => Epoch.fromString(x).toOption)
                 val version = Version.fromString(se.getAttributeByName(versionAttr).getValue).toOption.get
                 val release = Release.fromString(se.getAttributeByName(releaseAttr).getValue).toOption.get
