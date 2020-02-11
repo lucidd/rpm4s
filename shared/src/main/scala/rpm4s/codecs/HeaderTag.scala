@@ -175,8 +175,15 @@ object HeaderTag {
   case object FileTriggerIndex extends HeaderTag[Int32Data]
   case object FileTriggerVersion extends HeaderTag[StringArrayData]
   case object FileTriggerFlags extends HeaderTag[Int32Data]
-
   case object FileTriggerPriorities extends HeaderTag[Int32Data]
+
+  case object TransFileTriggerScripts extends HeaderTag[StringArrayData]
+  case object TransFileTriggerScriptProg extends HeaderTag[StringArrayData]
+  case object TransFileTriggerScriptFlags extends HeaderTag[Int32Data]
+  case object TransFileTriggerName extends HeaderTag[StringArrayData]
+  case object TransFileTriggerIndex extends HeaderTag[Int32Data]
+  case object TransFileTriggerVersion extends HeaderTag[StringArrayData]
+  case object TransFileTriggerFlags extends HeaderTag[Int32Data]
   case object TransFileTriggerPriorities extends HeaderTag[Int32Data]
 
   case object FileSignatures extends HeaderTag[StringArrayData]
