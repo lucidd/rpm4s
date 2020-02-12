@@ -100,7 +100,7 @@ lazy val rpm4s = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(BuildInfoPlugin)
   .configureCross(profile)
   .settings(
-    coverageEnabled := true,
+    coverageEnabled := false,
     coverageFailOnMinimum := true,
     buildInfoPackage := "rpm4s",
     resolvers += Resolver.sonatypeRepo("snapshots")
@@ -219,7 +219,7 @@ lazy val repoUtils = crossProject(JSPlatform, JVMPlatform)
   .settings(
     organization := "io.lullabyte",
     coverageMinimum := 42,
-    coverageEnabled := true,
+    coverageEnabled := false,
     coverageFailOnMinimum := true,
     scalacOptions ++= Seq("-deprecation"),
     buildInfoKeys := Seq[BuildInfoKey](
