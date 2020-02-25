@@ -1,5 +1,5 @@
 object Dependencies {
-  val cats = "2.1.0"
+  val cats = "2.1.1"
   val fs2 = "2.2.2"
   val scalatest = "3.0.5"
   val scalacheck = "1.14.3"
