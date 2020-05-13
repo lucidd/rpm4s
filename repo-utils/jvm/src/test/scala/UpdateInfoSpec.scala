@@ -1,6 +1,6 @@
 import java.time.Instant
 
-import cats.effect.IO
+import cats.effect.{Blocker, IO}
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 import rpm4s.data._
@@ -9,14 +9,19 @@ import rpm4s.repo.data.updateinfo.UpdateF
 import rpm4s.repo.data.updateinfo.UpdateF._
 import rpm4s.repo.utils.xml.xmlevents
 
+import scala.concurrent.ExecutionContext
+
 class UpdateInfoSpec
     extends FlatSpec
     with Matchers
     with PropertyChecks {
 
   "repomd/updateinfo.xml" should "get parsed correctly" in {
+    implicit val contextShift = IO.contextShift(ExecutionContext.global)
+    val blocker = Blocker.liftExecutionContext(ExecutionContext.global)
     val r  = xmlevents[IO](
-      getClass.getResourceAsStream("/repomd/updateinfo.xml")
+      getClass.getResourceAsStream("/repomd/updateinfo.xml"),
+      blocker
     ).through(xml2updates)
      .compile.toVector.unsafeRunSync()
 

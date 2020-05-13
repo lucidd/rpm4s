@@ -2,7 +2,7 @@ package rpm4s.repo.repomd.xml
 
 import javax.xml.namespace.QName
 import javax.xml.stream.events.{StartElement, XMLEvent}
-import cats.effect.{ConcurrentEffect, Effect}
+import cats.effect.{Blocker, ConcurrentEffect, ContextShift, Effect}
 import fs2.{Pipe, Pull, RaiseThrowable, Stream}
 import org.http4s.Uri
 import rpm4s.data.Dependency.Requires
@@ -242,9 +242,9 @@ package object primary {
       Stream.emit("</metadata>")
   }
 
-  def bytes2packages[F[_]: ConcurrentEffect]: Pipe[F, Byte, PackageF.Package] =
+  def bytes2packages[F[_]: ConcurrentEffect: ContextShift](blocker: Blocker): Pipe[F, Byte, PackageF.Package] =
     _.through(fs2.io.toInputStream[F])
-      .flatMap(is => xmlevents(is))
+      .flatMap(is => xmlevents(is, blocker))
       .through(xml2packages)
 
 
