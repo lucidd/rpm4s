@@ -5,7 +5,7 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 import javax.xml.namespace.QName
 import javax.xml.stream.events.XMLEvent
-import cats.effect.{ConcurrentEffect, Effect}
+import cats.effect.{Blocker, ConcurrentEffect, ContextShift, Effect}
 import fs2.{Pipe, Pull, RaiseThrowable, Stream}
 import org.http4s.Uri
 import rpm4s.data.{CVE, _}
@@ -40,9 +40,9 @@ package object updateinfo {
   private val dateAttr = new QName("date")
 
 
-  def bytes2updates[F[_]: ConcurrentEffect]: Pipe[F, Byte, UpdateF.Update] =
+  def bytes2updates[F[_]: ConcurrentEffect: ContextShift](blocker: Blocker): Pipe[F, Byte, UpdateF.Update] =
     _.through(fs2.io.toInputStream)
-     .flatMap(is => xmlevents(is))
+     .flatMap(is => xmlevents(is, blocker))
      .through(xml2updates)
 
 

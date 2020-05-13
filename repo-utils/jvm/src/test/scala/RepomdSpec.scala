@@ -2,7 +2,7 @@ import java.nio.file.Paths
 import java.time.Instant
 import java.util.concurrent.Executors
 
-import cats.effect.{Blocker, IO}
+import cats.effect.{Blocker, ContextShift, IO}
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 import rpm4s.data.Checksum.Sha256
@@ -26,7 +26,9 @@ class RepomdSpec
     with PropertyChecks {
 
   "repomd.xml" should "get parsed correctly" in {
-    val r  = xmlevents[IO](getClass.getResourceAsStream("/repomd/repomd.xml"))
+    implicit val contextShift = IO.contextShift(ExecutionContext.global)
+    val blocker = Blocker.liftExecutionContext(ExecutionContext.global)
+    val r  = xmlevents[IO](getClass.getResourceAsStream("/repomd/repomd.xml"), blocker)
         .through(rpm4s.repo.repomd.xml2repomd)
         .compile.last.unsafeRunSync()
 
@@ -55,8 +57,11 @@ class RepomdSpec
   }
 
   "primary.xml" should "get parsed correctly" in {
+    implicit val contextShift = IO.contextShift(ExecutionContext.global)
+    val blocker = Blocker.liftExecutionContext(ExecutionContext.global)
     val r  = xmlevents[IO](
-      getClass.getResourceAsStream("/repomd/primary.xml")
+      getClass.getResourceAsStream("/repomd/primary.xml"),
+      blocker
     ).through(xml2packages)
      .compile.toVector.unsafeRunSync()
 
@@ -130,11 +135,12 @@ class RepomdSpec
 
   "createUpdateinfo" should "should create updateinfo.xml correctly" in {
     implicit val cs = IO.contextShift(ExecutionContext.global)
+    val blocker = Blocker.liftExecutionContext(ExecutionContext.global)
     //TODO: currently this ignores the pkgid attribute of the checksum which has been manually removed from the test data
     val expected =
       Blocker.fromExecutorService(IO(Executors.newCachedThreadPool())).use { blocker =>
         fs2.io.readInputStream[IO](IO(getClass.getResourceAsStream("/repomd/updateinfo-full.xml")), 4096, blocker)
-          .through(rpm4s.repo.repomd.xml.updateinfo.bytes2updates)
+          .through(rpm4s.repo.repomd.xml.updateinfo.bytes2updates(blocker))
           .compile
           .toList
       }
@@ -142,7 +148,7 @@ class RepomdSpec
       
     val generated = rpm4s.repo.repomd.xml.updateinfo.create[IO](Stream.emits(expected).covary[IO])
       .through(fs2.text.utf8Encode)
-      .through(rpm4s.repo.repomd.xml.updateinfo.bytes2updates)
+      .through(rpm4s.repo.repomd.xml.updateinfo.bytes2updates(blocker))
       .compile
       .toList
       .unsafeRunSync()
