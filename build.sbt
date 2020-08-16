@@ -25,14 +25,7 @@ def scalacOptionsVersion(scalaVersion: String) = {
     "-unchecked", // Enable additional warnings where generated code depends on assumptions.
     "-Xcheckinit", // Wrap field accessors to throw an exception on uninitialized access.
     "-Xfatal-warnings", // Fail the compilation if there are any warnings.
-    "-Xfuture", // Turn on future language features.
-    "-Yno-adapted-args", // Do not adapt an argument list (either by inserting () or creating a tuple) to match the receiver.
-    "-Ypartial-unification", // Enable partial unification in type constructor inference
     "-Ywarn-dead-code", // Warn when dead code is identified.
-    "-Ywarn-inaccessible", // Warn about inaccessible types in method signatures.
-    "-Ywarn-infer-any", // Warn when a type argument is inferred to be `Any`.
-    "-Ywarn-nullary-override", // Warn when non-nullary `def f()' overrides nullary `def f'.
-    "-Ywarn-nullary-unit", // Warn when nullary methods return Unit.
     "-Ywarn-numeric-widen", // Warn when numerics are widened.
     "-Ywarn-value-discard", // Warn when non-Unit expression results are unused.
     "-Ypatmat-exhaust-depth", "40"
@@ -90,8 +83,8 @@ lazy val benchmarks = project
 
 val commonSettings = Seq(
     organization := "io.lullabyte",
-    scalaVersion := "2.12.8",
-    crossScalaVersions := Seq("2.12.8"),
+    scalaVersion := "2.13.3",
+    crossScalaVersions := Seq("2.13.3"),
 )
 
 lazy val rpm4s = crossProject(JSPlatform, JVMPlatform)
