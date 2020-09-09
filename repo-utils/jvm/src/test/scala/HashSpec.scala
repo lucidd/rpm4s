@@ -3,13 +3,13 @@ import java.security.MessageDigest
 import cats.effect.IO
 import fs2.{Pipe, Stream}
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.data.Checksum.Sha256
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 class HashSpec
     extends FlatSpec
     with Matchers
-    with PropertyChecks {
+    with ScalaCheckPropertyChecks {
 
   "checksumsBeforeAndAfter" should "produce the same result as doing each step manually" in {
     forAll { value: String =>

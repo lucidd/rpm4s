@@ -1,9 +1,9 @@
 import org.scalacheck.Gen
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.data.CVE
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class CVESpec extends FlatSpec with Matchers with PropertyChecks {
+class CVESpec extends FlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   "CVE string / fromString" should "roundtrip" in {
     val yearGen = Gen.chooseNum(1000, 9999)

@@ -1,10 +1,10 @@
 import org.scalacheck.Gen
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.codecs.ConvertingError
 import rpm4s.data.Epoch
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class EpochSpec extends FlatSpec with Matchers with PropertyChecks {
+class EpochSpec extends FlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   "Epoch.fromInt" should "only allow ints > 0" in {
     forAll(Gen.chooseNum(Int.MinValue, 0)) { i =>
