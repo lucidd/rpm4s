@@ -2,17 +2,17 @@ import java.time.Instant
 
 import cats.effect.IO
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.data._
 import rpm4s.repo.repomd.xml.updateinfo.xml2updates
 import rpm4s.repo.data.updateinfo.UpdateF
 import rpm4s.repo.data.updateinfo.UpdateF._
 import rpm4s.repo.utils.xml.xmlevents
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 class UpdateInfoSpec
     extends FlatSpec
     with Matchers
-    with PropertyChecks {
+    with ScalaCheckPropertyChecks {
 
   "repomd/updateinfo.xml" should "get parsed correctly" in {
     val r  = xmlevents[IO](

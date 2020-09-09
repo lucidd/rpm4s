@@ -1,14 +1,14 @@
 import org.scalacheck.Gen
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.data.Version._
 import rpm4s.data.Version
 import cats.kernel.Comparison._
 import rpm4s.codecs.ConvertingError
 import Utils._
 import rpm4s.data.Segment._
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class VersionSpec extends FlatSpec with Matchers with PropertyChecks {
+class VersionSpec extends FlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   "rpmvercmp" should "be symmetric" in {
     forAll { (v1: Version, v2: Version) =>

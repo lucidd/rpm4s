@@ -1,11 +1,11 @@
 import org.scalacheck.{Arbitrary, Gen, Shrink}
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.data.Checksum
 import rpm4s.data.Checksum.{Md5, Sha1, Sha256, Sha512}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 
-class ChecksumSpec extends FlatSpec with Matchers with PropertyChecks {
+class ChecksumSpec extends FlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   val hashChars: Set[Char] = (('a' to 'f') ++ ('0' to '9')).toSet
 

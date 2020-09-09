@@ -3,7 +3,6 @@ import java.util.concurrent.Executors
 import cats.effect.{Blocker, IO}
 import org.scalacheck.Arbitrary
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.codecs.IndexData.StringData
 import rpm4s.data.{Architecture, Name, RpmPrimaryEntry, Version}
 import scodec.bits.BitVector
@@ -12,11 +11,12 @@ import fs2.Stream
 import rpm4s.repo.utils.compress.{gunzip, gzip}
 
 import scala.concurrent.ExecutionContext
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 class GzipSpec
     extends FlatSpec
     with Matchers
-    with PropertyChecks {
+    with ScalaCheckPropertyChecks {
 
   "gunzip" should "uncompress correctly" in {
     implicit val cs = IO.contextShift(ExecutionContext.global)

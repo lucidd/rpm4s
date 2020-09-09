@@ -4,7 +4,6 @@ import java.util.concurrent.Executors
 
 import cats.effect.{Blocker, IO}
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.data.Checksum.Sha256
 import rpm4s.data._
 import rpm4s.repo.data.{Bytes, Repomd}
@@ -18,12 +17,13 @@ import rpm4s.repo.repomd.xml.primary.xml2packages
 import cats.implicits._
 
 import scala.concurrent.ExecutionContext
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 
 class RepomdSpec
     extends FlatSpec
     with Matchers
-    with PropertyChecks {
+    with ScalaCheckPropertyChecks {
 
   "repomd.xml" should "get parsed correctly" in {
     val r  = xmlevents[IO](getClass.getResourceAsStream("/repomd/repomd.xml"))

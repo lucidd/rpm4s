@@ -1,10 +1,10 @@
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.data.{EVR, Epoch, Release, Version}
 import Utils._
 import cats.Comparison
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class EVRSpec extends FlatSpec with Matchers with PropertyChecks {
+class EVRSpec extends FlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   "EVR.parse" should "handle v correctly" in {
     val expected = for {

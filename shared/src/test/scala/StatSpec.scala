@@ -1,8 +1,8 @@
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.data._
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class StatSpec extends FlatSpec with Matchers with PropertyChecks {
+class StatSpec extends FlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   "Stat" should "be parsed correctly" in {
     val stat = Stat.fromShort(16877).get
