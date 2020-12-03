@@ -70,9 +70,9 @@ package object updateinfo {
             case StartEvent(se) => se.getName.getLocalPart match {
               case "package" =>
                 val name = Name(se.getAttributeByName(nameAttr).getValue).toOption.get
-                val epoch = Option(se.getAttributeByName(epochAttr))
-                  .map(_.getValue)
-                  .flatMap(x => Epoch.fromString(x).toOption)
+                val epoch = Option(se.getAttributeByName(epochAttr).getValue)
+                  .map(x => Epoch.fromString(x).toOption.get)
+                  .getOrElse(Epoch.ZERO)
                 val version = Version.fromString(se.getAttributeByName(versionAttr).getValue).toOption.get
                 val release = Release.fromString(se.getAttributeByName(releaseAttr).getValue).toOption.get
                 val arch = Architecture.fromString(se.getAttributeByName(archAttr).getValue).get
@@ -343,7 +343,7 @@ package object updateinfo {
                       (if (pkg.restartSuggested) Some(<restart_suggested>True</restart_suggested>) else None) ++
                       (if (pkg.rebootSuggested) Some(<reboot_suggested>True</reboot_suggested>) else None) ++
                       (if (pkg.reloginSuggested) Some(<relogin_suggested>True</relogin_suggested>) else None)
-                <package name={pkg.name.value} epoch={pkg.epoch.getOrElse(0).toString} version={pkg.version.string} release={pkg.release.value} arch={Architecture.toRpmString(pkg.arch)} src={pkg.src.orNull} >
+                <package name={pkg.name.value} epoch={pkg.epoch.toString} version={pkg.version.string} release={pkg.release.value} arch={Architecture.toRpmString(pkg.arch)} src={pkg.src.orNull} >
                   <filename>{pkg.filename}</filename>
                   {suggests}
                 </package>

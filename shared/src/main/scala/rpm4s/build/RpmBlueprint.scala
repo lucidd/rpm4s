@@ -7,7 +7,7 @@ case class RpmBlueprint(
   name: Name,
   version: Version,
   release: Release,
-  epoch: Option[Epoch],
+  epoch: Epoch,
   license: License,
   architecture: Architecture,
   description: Description,

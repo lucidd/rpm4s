@@ -69,7 +69,7 @@ package object primary {
   private def pkgref2xml(pkgRef: PkgRef): String = {
     val (name, epoch, version, release) = pkgRef match {
       case RpmRef(name, evr, flags) =>
-        (name.value, evr.flatMap(_.epoch).map(_.value.toString), evr.map(_.version.string), evr.flatMap(_.release).map(_.value))
+        (name.value, evr.map(_.epoch).map(_.value.toString), evr.map(_.version.string), evr.flatMap(_.release).map(_.value))
       case VirtualRef(name, None, flags) =>
         (name, None, None, None)
       case VirtualRef(name, Some(version), flags) =>
@@ -96,7 +96,7 @@ package object primary {
   )(sb: StringBuilder): StringBuilder = {
     val name = rpm.name.value
     val arch = Architecture.toRpmString(rpm.architecture)
-    val epoch = rpm.epoch.map(_.value).getOrElse(0).toString
+    val epoch = rpm.epoch.value.toString
     val version = rpm.version.string
     val release = rpm.release.value
     val ckType = checksum2type(checksum)
@@ -277,9 +277,7 @@ package object primary {
                 case "version" => {
                   val version = Version.fromString(se.getAttributeByName(verAttr).getValue)
                   val epochString = se.getAttributeByName(epochAttr).getValue
-                  val epoch =
-                    if (epochString == "0") Either.right(None)
-                    else Epoch.fromString(epochString).map(Some(_))
+                  val epoch = Epoch.fromString(epochString)
                   val release = Release.fromString(se.getAttributeByName(relAttr).getValue)
                   (version, epoch, release) match {
                     case (Right(v), Right(e), Right(r)) =>
