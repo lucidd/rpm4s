@@ -12,7 +12,7 @@ case class RPM(
     summery: Summary,
     description: Description,
     group: Group,
-    epoch: Option[Epoch] = None,
+    epoch: Epoch = Epoch.ZERO,
     buildhost: Option[BuildHost] = None,
     buildtime: Option[BuildTime] = None,
     requires: Vector[Requires] = Vector.empty,

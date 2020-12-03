@@ -7,7 +7,7 @@ import rpm4s.data._
 case class PackageF[F[_]](
   name: F[Name],
   version: F[Version],
-  epoch: F[Option[Epoch]],
+  epoch: F[Epoch],
   release: F[Release],
   /**
   * arch is Some(arch) in case of binary rpms and None for source rpms
@@ -36,7 +36,7 @@ object PackageF {
     def apply(
       name: Option[Name] = None,
       version: Option[Version] = None,
-      epoch: Option[Option[Epoch]] = None,
+      epoch: Option[Epoch] = None,
       release: Option[Release] = None,
       arch: Option[Architecture] = None,
       loc: Option[String] = None,

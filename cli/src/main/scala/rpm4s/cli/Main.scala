@@ -22,7 +22,7 @@ case class RpmInfo(
  compression: Compression,
  payloadFormat: PayloadFormat,
  packager: Option[Packager],
- epoch: Option[Epoch] = None,
+ epoch: Epoch = Epoch.ZERO,
  buildhost: Option[BuildHost] = None,
  buildtime: Option[BuildTime] = None,
 )

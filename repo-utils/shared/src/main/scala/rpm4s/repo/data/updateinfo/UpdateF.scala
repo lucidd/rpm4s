@@ -120,7 +120,7 @@ object UpdateF {
     name: F[Name],
     version: F[Version],
     release: F[Release],
-    epoch: F[Option[Epoch]],
+    epoch: F[Epoch],
     //TODO: find out how this arch relates to rpm arch
     arch: F[Architecture],
     src: F[Option[String]],
@@ -152,7 +152,7 @@ object UpdateF {
         name: Option[Name] = None,
         version: Option[Version] = None,
         release: Option[Release] = None,
-        epoch: Option[Option[Epoch]] = None,
+        epoch: Option[Epoch] = None,
         arch: Option[Architecture] = None,
         src: Option[Option[String]] = None,
         filename: Option[String] = None,

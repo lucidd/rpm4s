@@ -362,27 +362,17 @@ object Extractor {
         }
     }
 
-  implicit val epochOptionExtractor: Extractor[Option[Epoch]] = new Extractor[Option[Epoch]] {
-    val tags: Set[HeaderTag[_ <: IndexData]] = Set(HeaderTag.Epoch)
-    val sigTags: Set[SignatureTag] = Set.empty
-    def extract(data: Data): Result[Option[Epoch]] =
-      data(HeaderTag.Epoch) match {
-        case Left(MissingHeader(_)) =>
-          Right(None)
-        case Right(x) =>
-          val value = x.values.head
-          if (value > 0) Epoch.fromInt(value).map(Some(_))
-          else Right(None)
-        case Left(value) => Left(value)
-      }
-  }
-
   implicit val epochExtractor: Extractor[Epoch] = new Extractor[Epoch] {
     val tags: Set[HeaderTag[_ <: IndexData]] = Set(HeaderTag.Epoch)
     val sigTags: Set[SignatureTag] = Set.empty
     def extract(data: Data): Result[Epoch] =
-      data(HeaderTag.Epoch).flatMap { x =>
-        Epoch.fromInt(x.values.head)
+      data(HeaderTag.Epoch) match {
+        case Left(MissingHeader(_)) =>
+          Right(Epoch.ZERO)
+        case Right(x) =>
+          val value = x.values.head
+          Epoch.fromInt(value)
+        case Left(value) => Left(value)
       }
   }
 

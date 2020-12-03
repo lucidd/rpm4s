@@ -34,7 +34,7 @@ class RpmParseSpec
       description: Description,
       group: rpm4s.data.Group,
       headerRange: HeaderRange,
-      epoch: Option[Epoch] = None,
+      epoch: Epoch = Epoch.ZERO,
       buildhost: Option[BuildHost] = None,
       buildtime: Option[BuildTime] = None,
       fileEntries: Option[Vector[FileEntry]] = None,
