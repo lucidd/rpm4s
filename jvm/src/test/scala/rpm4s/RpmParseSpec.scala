@@ -4,7 +4,8 @@ import java.time.Instant
 
 import org.scalacheck.Arbitrary
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import rpm4s.codecs.IndexData.StringData
 import scodec.{Attempt, Codec}
 import scodec.bits.BitVector
@@ -14,9 +15,8 @@ import rpm4s.data.Dependency._
 import rpm4s.data._
 
 class RpmParseSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with Matchers
-    with PropertyChecks
     with CustomMatchers {
 
 
