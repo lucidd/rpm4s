@@ -103,6 +103,7 @@ lazy val rpm4s = crossProject(JSPlatform, JVMPlatform)
     name := "rpm4s",
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % scalatest % Test,
+      "org.scalatestplus" %%% "scalacheck-1-14" % scalatestplus % Test,
       "org.scalacheck" %%% "scalacheck" % scalacheck % Test,
       "com.chuusai" %% "shapeless" % shapeless,
       "org.typelevel" %%% "cats-core" % cats,
@@ -153,6 +154,7 @@ lazy val cli = project.in(file("cli"))
     assemblyJarName in assembly := "rpm4s",
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % scalatest % Test,
+      "org.scalatestplus" %%% "scalacheck-1-14" % scalatestplus % Test,
       "org.scalacheck" %%% "scalacheck" % scalacheck % Test,
       "org.typelevel" %%% "cats-core" % cats,
       "org.typelevel" %%% "cats-free" % cats,
@@ -179,6 +181,7 @@ lazy val repoUtilsJVM = repoUtils.jvm
   .settings(
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % scalatest % Test,
+      "org.scalatestplus" %%% "scalacheck-1-14" % scalatestplus % Test,
       "org.scalacheck" %%% "scalacheck" % scalacheck % Test,
       "org.scala-lang.modules" %% "scala-xml" % scalaXML,
       "org.typelevel" %%% "cats-core" % cats,

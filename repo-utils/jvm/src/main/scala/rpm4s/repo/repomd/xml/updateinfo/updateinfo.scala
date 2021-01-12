@@ -343,7 +343,7 @@ package object updateinfo {
                       (if (pkg.restartSuggested) Some(<restart_suggested>True</restart_suggested>) else None) ++
                       (if (pkg.rebootSuggested) Some(<reboot_suggested>True</reboot_suggested>) else None) ++
                       (if (pkg.reloginSuggested) Some(<relogin_suggested>True</relogin_suggested>) else None)
-                <package name={pkg.name.value} epoch={pkg.epoch.toString} version={pkg.version.string} release={pkg.release.value} arch={Architecture.toRpmString(pkg.arch)} src={pkg.src.orNull} >
+                <package name={pkg.name.value} epoch={pkg.epoch.value.toString} version={pkg.version.string} release={pkg.release.value} arch={Architecture.toRpmString(pkg.arch)} src={pkg.src.orNull} >
                   <filename>{pkg.filename}</filename>
                   {suggests}
                 </package>

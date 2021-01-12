@@ -1,10 +1,8 @@
 import java.nio.file.Paths
 import java.time.Instant
 import java.util.concurrent.Executors
-
 import cats.effect.{Blocker, ContextShift, IO}
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.data.Checksum.Sha256
 import rpm4s.data._
 import rpm4s.repo.data.{Bytes, Repomd}
@@ -16,14 +14,17 @@ import fs2.{Pure, Stream}
 import rpm4s.repo.data.primary.{PackageF, SizeInfo}
 import rpm4s.repo.repomd.xml.primary.xml2packages
 import cats.implicits._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.concurrent.ExecutionContext
 
 
 class RepomdSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with Matchers
-    with PropertyChecks {
+    with ScalaCheckPropertyChecks {
 
   "repomd.xml" should "get parsed correctly" in {
     implicit val contextShift = IO.contextShift(ExecutionContext.global)
@@ -71,7 +72,7 @@ class RepomdSpec
         name = Name("0ad").toOption.get,
         arch = Architecture.i586,
         version = Version.fromString("0.0.22").toOption.get,
-        epoch = None,
+        epoch = Epoch.ZERO,
         release = Release.fromString("1.2").toOption.get,
         checksum = Sha256.fromHex("526e7af8c90ef5a41a7fb17d7a42277e06727f3bbb443cc795819e0feb1e5021").get,
         size = SizeInfo(
@@ -85,7 +86,7 @@ class RepomdSpec
         name = Name("389-ds").toOption.get,
         arch = Architecture.i586,
         version = Version.fromString("1.3.6.6").toOption.get,
-        epoch = None,
+        epoch = Epoch.ZERO,
         release = Release.fromString("2.1").toOption.get,
         checksum = Sha256.fromHex("bc7b674119d3c37c2b595567a583cf41dc3296f944871f076e184db5525955e1").get,
         size = SizeInfo(
@@ -99,7 +100,7 @@ class RepomdSpec
         name = Name("389-ds-devel").toOption.get,
         arch = Architecture.i586,
         version = Version.fromString("1.3.6.6").toOption.get,
-        epoch = None,
+        epoch = Epoch.ZERO,
         release = Release.fromString("2.1").toOption.get,
         checksum = Sha256.fromHex("9e231c26fd27defa79da040c0249091b6f44fd32b1b3d34e97d423e14a83643e").get,
         size = SizeInfo(
