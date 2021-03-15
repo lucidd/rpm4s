@@ -15,7 +15,6 @@ import rpm4s.repo.data.primary._
 import rpm4s.repo.data.primary.PackageF.PackageBuilder
 import rpm4s.repo.utils.xml.{EndEvent, StartEvent, xmlevents}
 import cats._
-import cats.implicits._
 import cats.syntax._
 
 import scala.annotation.tailrec
