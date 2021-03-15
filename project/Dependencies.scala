@@ -12,6 +12,6 @@ object Dependencies {
   val decline = "1.0.0"
   val commonsCompress = "1.19"
   val betterFiles = "3.9.1"
-  val bouncyCastle = "1.62"
+  val bouncyCastle = "1.68"
   val xz = "1.8"
 }
