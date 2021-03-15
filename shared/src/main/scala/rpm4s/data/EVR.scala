@@ -6,9 +6,9 @@ import cats.implicits._
 case class EVR(
     version: Version,
     release: Option[Release] = None,
-    epoch: Option[Epoch] = None) {
+    epoch: Epoch = Epoch.ZERO) {
   def string: String = {
-    val e = epoch.map(e => s"${e.value}:").getOrElse("")
+    val e = if (epoch == Epoch.ZERO) "" else s"${epoch.value}:"
     val r = release.map(r => s"-${r.value}").getOrElse("")
     s"$e${version.string}$r"
   }
@@ -17,7 +17,7 @@ object EVR {
 
   implicit val ordering: Ordering[EVR] = new Ordering[EVR] {
     override def compare(x: EVR, y: EVR): Int = {
-      val epochCmp = Ordering[Option[Epoch]].compare(x.epoch, y.epoch)
+      val epochCmp = Ordering[Epoch].compare(x.epoch, y.epoch)
       if (epochCmp != 0) {
         epochCmp
       } else {
@@ -57,8 +57,8 @@ object EVR {
         case None => Right(None)
       }
       ep <- epoch match {
-        case Some(e) =>  Epoch.fromString(e).map(Some(_))
-        case None => Right(None)
+        case Some(e) =>  Epoch.fromString(e)
+        case None => Right(Epoch.ZERO)
       }
     } yield EVR(ver, rel, ep)
   }

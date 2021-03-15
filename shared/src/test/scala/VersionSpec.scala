@@ -1,14 +1,16 @@
 import org.scalacheck.Gen
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.data.Version._
 import rpm4s.data.Version
 import cats.kernel.Comparison._
 import rpm4s.codecs.ConvertingError
 import Utils._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rpm4s.data.Segment._
 
-class VersionSpec extends FlatSpec with Matchers with PropertyChecks {
+class VersionSpec extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   "rpmvercmp" should "be symmetric" in {
     forAll { (v1: Version, v2: Version) =>
@@ -86,7 +88,29 @@ class VersionSpec extends FlatSpec with Matchers with PropertyChecks {
       ("1.0~rc2", "1.0~rc1", GreaterThan),
       ("1.0~rc1~git123", "1.0~rc1~git123", EqualTo),
       ("1.0~rc1~git123", "1.0~rc1", LessThan),
-      ("1.0~rc1", "1.0~rc1~git123", GreaterThan)
+      ("1.0~rc1", "1.0~rc1~git123", GreaterThan),
+      ("1.0^", "1.0^", EqualTo),
+      ("1.0^", "1.0", GreaterThan),
+      ("1.0", "1.0^", LessThan),
+      ("1.0^git1", "1.0^git1", EqualTo),
+      ("1.0^git1", "1.0", GreaterThan),
+      ("1.0", "1.0^git1", LessThan),
+      ("1.0^git1", "1.0^git2", LessThan),
+      ("1.0^git2", "1.0^git1", GreaterThan),
+      ("1.0^git1", "1.01", LessThan),
+      ("1.01", "1.0^git1", GreaterThan),
+      ("1.0^20160101", "1.0^20160101", EqualTo),
+      ("1.0^20160101", "1.0.1", LessThan),
+      ("1.0.1", "1.0^20160101", GreaterThan),
+      ("1.0^20160101^git1", "1.0^20160101^git1", EqualTo),
+      ("1.0^20160102", "1.0^20160101^git1", GreaterThan),
+      ("1.0^20160101^git1", "1.0^20160102", LessThan),
+      ("1.0~rc1^git1", "1.0~rc1^git1", EqualTo),
+      ("1.0~rc1^git1", "1.0~rc1", GreaterThan),
+      ("1.0~rc1", "1.0~rc1^git1", LessThan),
+      ("1.0^git1~pre", "1.0^git1~pre", EqualTo),
+      ("1.0^git1", "1.0^git1~pre", GreaterThan),
+      ("1.0^git1~pre", "1.0^git1", LessThan)
   )
 
   // verified with rpmdev-vercmp utility

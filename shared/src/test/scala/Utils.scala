@@ -13,11 +13,11 @@ object Utils {
   val genVersion = Gen.nonEmptyListOf(segment).map(_.mkString)
     .map { verStr => Version.fromString(verStr).toOption.get }
 
-  val genEpoch: Gen[Epoch] = Gen.posNum[Int].filter(_ >= 1).map(i => Epoch(i).toOption.get)
+  val genEpoch: Gen[Epoch] = Gen.posNum[Int].map(i => Epoch(i).toOption.get)
   val genRelease: Gen[Release] = Gen.nonEmptyListOf(Gen.oneOf(Release.validChars))
     .map { x => Release.fromString(x.mkString).toOption.get }
   val genEVR: Gen[EVR] = for {
-    e <- Gen.option(genEpoch)
+    e <- genEpoch
     r <- Gen.option(genRelease)
     v <- genVersion
   } yield EVR(v, r, e)

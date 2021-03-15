@@ -366,8 +366,13 @@ object Extractor {
     val tags: Set[HeaderTag[_ <: IndexData]] = Set(HeaderTag.Epoch)
     val sigTags: Set[SignatureTag] = Set.empty
     def extract(data: Data): Result[Epoch] =
-      data(HeaderTag.Epoch).flatMap { x =>
-        Epoch.fromInt(x.values.head)
+      data(HeaderTag.Epoch) match {
+        case Left(MissingHeader(_)) =>
+          Right(Epoch.ZERO)
+        case Right(x) =>
+          val value = x.values.head
+          Epoch.fromInt(value)
+        case Left(value) => Left(value)
       }
   }
 
@@ -439,17 +444,24 @@ object Extractor {
         data(HeaderTag.BuildHost).map(x => BuildHost(x.value))
     }
 
-  implicit val summeryExtractor: Extractor[Summery] = new Extractor[Summery] {
+  implicit val summeryExtractor: Extractor[Summary] = new Extractor[Summary] {
     val tags: Set[HeaderTag[_ <: IndexData]] = Set(
       HeaderTag.Summery,
       HeaderTag.HeaderI18NTable
     )
     val sigTags: Set[SignatureTag] = Set.empty
-    def extract(data: Data): Result[Summery] =
+    def extract(data: Data): Result[Summary] =
       for {
-        summery <- data(HeaderTag.Summery)
-        i18n <- data(HeaderTag.HeaderI18NTable)
-      } yield Summery(i18n.values.zip(summery.values).toMap)
+        summary <- data(HeaderTag.Summery)
+        r <- data(HeaderTag.HeaderI18NTable) match {
+          case Left(MissingHeader(_)) =>
+            assert(summary.values.size == 1, s"Summary without i18n header and more then one value ${summary.values}")
+            Right(Summary(List("C").zip(summary.values).toMap))
+          case Left(value) => Left(value)
+          case Right(i18n) =>
+            Right(Summary(i18n.values.zip(summary.values).toMap))
+        }
+      } yield r
   }
 
   implicit val descriptionExtractor: Extractor[Description] =
@@ -462,8 +474,16 @@ object Extractor {
       def extract(data: Data): Result[Description] =
         for {
           description <- data(HeaderTag.Description)
-          i18n <- data(HeaderTag.HeaderI18NTable)
-        } yield Description(i18n.values.zip(description.values).toMap)
+          r <- data(HeaderTag.HeaderI18NTable) match {
+            case Left(MissingHeader(_)) =>
+              assert(description.values.size == 1, s"Description without i18n header and more then one value ${description.values}")
+              Right(Description(List("C").zip(description.values).toMap))
+            case Left(value) => Left(value)
+            case Right(i18n) =>
+              Right(Description(i18n.values.zip(description.values).toMap))
+          }
+        } yield r
+
     }
 
   implicit val groupExtractor: Extractor[Group] = new Extractor[Group] {
@@ -475,8 +495,15 @@ object Extractor {
     def extract(data: Data): Result[Group] =
       for {
         group <- data(HeaderTag.Group)
-        i18n <- data(HeaderTag.HeaderI18NTable)
-      } yield Group(i18n.values.zip(group.values).toMap)
+        r <- data(HeaderTag.HeaderI18NTable) match {
+          case Left(MissingHeader(_)) =>
+            assert(group.values.size == 1, s"Group without i18n header and more then one value ${group.values}")
+            Right(Group(List("C").zip(group.values).toMap))
+          case Left(value) => Left(value)
+          case Right(i18n) =>
+            Right(Group(i18n.values.zip(group.values).toMap))
+        }
+      } yield r
   }
 
   implicit val packagerExtractor: Extractor[Packager] = new Extractor[Packager] {

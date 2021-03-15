@@ -331,6 +331,9 @@ package object codecs {
       case 5010 => Attempt.successful(FileCaps)
       case 5011 => Attempt.successful(FileDigestAlgo)
 
+      case 5021 => Attempt.successful(PostInFlags)
+      case 5025 => Attempt.successful(PostTransFlags)
+
       case 5035 => Attempt.successful(OrderName)
       case 5036 => Attempt.successful(OrderVersion)
       case 5037 => Attempt.successful(OrderFlags)
@@ -376,6 +379,10 @@ package object codecs {
 
       case 5092 => Attempt.successful(PayloadDigest)
       case 5093 => Attempt.successful(PayloadDigestAlgo)
+      case 5094 => Attempt.successful(AutoInstalled)
+      case 5095 => Attempt.successful(Identity)
+      case 5096 => Attempt.successful(ModularityLabel)
+      case 5097 => Attempt.successful(PayloadDigestAlt)
 
       case value => Attempt.failure(Err(s"Unknown value $value for RPM Tag"))
     } {
@@ -505,6 +512,9 @@ package object codecs {
       case FileCaps => 5010
       case FileDigestAlgo => 5011
 
+      case PostInFlags => 5021
+      case PostTransFlags => 5025
+
       case OrderName    => 5035
       case OrderVersion => 5036
       case OrderFlags   => 5037
@@ -552,6 +562,10 @@ package object codecs {
       case FileSignatureLength => 5091
       case PayloadDigest => 5092
       case PayloadDigestAlgo => 5093
+      case AutoInstalled => 5094
+      case Identity => 5095
+      case ModularityLabel => 5096
+      case PayloadDigestAlt => 5097
     }
 
   implicit def headerCodec[T <: RPMTag: Codec]: Codec[Header[T]] =

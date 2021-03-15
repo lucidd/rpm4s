@@ -5,6 +5,8 @@ import java.time.Instant
 import cats.Id
 import cats.implicits._
 import rpm4s.data.{CVE, _}
+
+
 case class UpdateF[F[_]](
   from: F[String],
   status: F[UpdateF.Status],
@@ -39,29 +41,43 @@ object UpdateF {
     cve: CVE,
     title: String
   ) extends Reference {
-    def id = cve.string
+    def id: String = cve.string
   }
   case class Fate(
     href: String,
     id: String,
     title: String
   ) extends Reference
+  case class Self(
+    href: String,
+    title: String,
+    id: String
+  ) extends Reference
 
   sealed trait Status extends Product with Serializable
   object Status {
     def fromString(value: String): Option[Status] = value match {
       case "stable" => Some(Stable)
+      case "final" => Some(Final)
+      case "retracted" => Some(Retracted)
+      case "testing" => Some(Testing)
       case _ => None
     }
     def toString(value: Status): String = value match {
       case Stable => "stable"
+      case Final => "final"
+      case Testing => "testing"
+      case Retracted => "retracted"
     }
     case object Stable extends Status
+    case object Testing extends Status
+    case object Final extends Status
+    case object Retracted extends Status
   }
 
   sealed trait Severity extends Product with Serializable
   object Severity {
-    def fromString(value: String): Option[Severity] = value match {
+    def fromString(value: String): Option[Severity] = value.toLowerCase match {
       case "critical" => Some(Critical)
       case "important" => Some(Important)
       case "moderate" => Some(Moderate)
@@ -87,6 +103,8 @@ object UpdateF {
       case "security" => Some(Security)
       case "optional" => Some(Optional)
       case "feature" => Some(Feature)
+      case "enhancement" => Some(Enhancement)
+      case "bugfix" => Some(Bugfix)
       case _ => None
     }
     def toString(value: UpdateType): String = value match {
@@ -94,21 +112,26 @@ object UpdateF {
       case Security => "security"
       case Optional => "optional"
       case Feature => "feature"
+      case Enhancement => "enhancement"
+      case Bugfix => "bugfix"
     }
     case object Recommended extends UpdateType
     case object Security extends UpdateType
     case object Optional extends UpdateType
     case object Feature extends UpdateType
+
+    case object Enhancement extends UpdateType
+    case object Bugfix extends UpdateType
   }
 
   case class PackageF[F[_]](
     name: F[Name],
     version: F[Version],
     release: F[Release],
-    epoch: F[Option[Epoch]],
+    epoch: F[Epoch],
     //TODO: find out how this arch relates to rpm arch
     arch: F[Architecture],
-    src: F[String],
+    src: F[Option[String]],
     //TODO: find out if filename is always also in src
     filename: F[String],
     restartSuggested: F[Boolean],
@@ -137,9 +160,9 @@ object UpdateF {
         name: Option[Name] = None,
         version: Option[Version] = None,
         release: Option[Release] = None,
-        epoch: Option[Option[Epoch]] = None,
+        epoch: Option[Epoch] = None,
         arch: Option[Architecture] = None,
-        src: Option[String] = None,
+        src: Option[Option[String]] = None,
         filename: Option[String] = None,
         restartSuggested: Option[Boolean] = Some(false),
         rebootSuggested: Option[Boolean] = Some(false),
