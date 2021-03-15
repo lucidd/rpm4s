@@ -1,14 +1,16 @@
 package rpm4s
 
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rpm4s.data.{Lead, OS, RPMType}
 import rpm4s.codecs._
 
 class LeadSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with Matchers
-    with PropertyChecks
+    with ScalaCheckPropertyChecks
     with CustomMatchers {
 
   "Lead" should "roundtrip" in {

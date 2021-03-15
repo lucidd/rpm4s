@@ -4,7 +4,7 @@ import java.time.Instant
 
 import javax.xml.namespace.QName
 import javax.xml.stream.events.XMLEvent
-import cats.effect.ConcurrentEffect
+import cats.effect.{Blocker, ConcurrentEffect, ContextShift}
 import fs2.{Pipe, Pull, RaiseThrowable, Stream}
 import rpm4s.data.Checksum
 import rpm4s.data.Checksum.{Md5, Sha1, Sha256, Sha512}
@@ -173,9 +173,9 @@ package object repomd {
     go(s).stream
   }
 
-  def bytes2repomd[F[_]: ConcurrentEffect]: Pipe[F, Byte, Repomd] =
+  def bytes2repomd[F[_]: ConcurrentEffect: ContextShift](blocker: Blocker): Pipe[F, Byte, Repomd] =
     _.through(fs2.io.toInputStream)
-      .flatMap(is => xmlevents(is))
+      .flatMap(is => xmlevents(is, blocker))
       .through(xml2repomd)
 
   def create(

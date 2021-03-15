@@ -1,15 +1,17 @@
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
 import rpm4s.data.{EVR, Epoch, Release, Version}
 import Utils._
 import cats.Comparison
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class EVRSpec extends FlatSpec with Matchers with PropertyChecks {
+class EVRSpec extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   "EVR.parse" should "handle v correctly" in {
     val expected = for {
       v <- Version.fromString("1.2.3")
-    } yield EVR(v, None, None)
+    } yield EVR(v, None, Epoch.ZERO)
     EVR.parse("1.2.3") shouldEqual expected
   }
 
@@ -17,7 +19,7 @@ class EVRSpec extends FlatSpec with Matchers with PropertyChecks {
     val expected = for {
       v <- Version.fromString("1.2.3")
       e <-Epoch.fromInt(12)
-    } yield EVR(v, None, Some(e))
+    } yield EVR(v, None, e)
     EVR.parse("12:1.2.3") shouldEqual expected
   }
 
@@ -25,7 +27,7 @@ class EVRSpec extends FlatSpec with Matchers with PropertyChecks {
     val expected = for {
       v <- Version.fromString("1.2.3")
       r <- Release.fromString("4.5")
-    } yield EVR(v, Some(r), None)
+    } yield EVR(v, Some(r), Epoch.ZERO)
     EVR.parse("1.2.3-4.5") shouldEqual expected
   }
 
@@ -34,7 +36,7 @@ class EVRSpec extends FlatSpec with Matchers with PropertyChecks {
       v <- Version.fromString("1.2.3")
       e <- Epoch.fromInt(12)
       r <- Release.fromString("4.5")
-    } yield EVR(v, Some(r), Some(e))
+    } yield EVR(v, Some(r), e)
     EVR.parse("12:1.2.3-4.5") shouldEqual expected
   }
 

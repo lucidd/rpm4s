@@ -9,6 +9,8 @@ case class Epoch private (value: Int) {
 }
 object Epoch {
 
+  val ZERO = new Epoch(0)
+
   implicit val ordering: Ordering[Epoch] = Ordering.by(_.value)
 
   def apply(value: Int): Either[ConvertingError, Epoch] = fromInt(value)
@@ -22,8 +24,8 @@ object Epoch {
   }
 
   def fromInt(value: Int): Either[ConvertingError, Epoch] = {
-    if (value >= 1)
+    if (value >= 0)
       Right(new Epoch(value))
-    else Left(ConvertingError(s"epoch $value must be >= 1"))
+    else Left(ConvertingError(s"epoch $value must be >= 0"))
   }
 }

@@ -1,6 +1,7 @@
 package rpm4s
 
-import org.scalatest.{Assertion, Matchers}
+import org.scalatest.Assertion
+import org.scalatest.matchers.should.Matchers
 import scodec.Codec
 
 trait CustomMatchers { this: Matchers =>
