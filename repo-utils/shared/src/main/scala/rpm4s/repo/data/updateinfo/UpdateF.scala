@@ -5,6 +5,8 @@ import java.time.Instant
 import cats.Id
 import cats.implicits._
 import rpm4s.data.{CVE, _}
+
+
 case class UpdateF[F[_]](
   from: F[String],
   status: F[UpdateF.Status],
@@ -57,14 +59,20 @@ object UpdateF {
     def fromString(value: String): Option[Status] = value match {
       case "stable" => Some(Stable)
       case "final" => Some(Final)
+      case "retracted" => Some(Retracted)
+      case "testing" => Some(Testing)
       case _ => None
     }
     def toString(value: Status): String = value match {
       case Stable => "stable"
       case Final => "final"
+      case Testing => "testing"
+      case Retracted => "retracted"
     }
     case object Stable extends Status
+    case object Testing extends Status
     case object Final extends Status
+    case object Retracted extends Status
   }
 
   sealed trait Severity extends Product with Serializable
