@@ -1,9 +1,11 @@
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rpm4s.data.{And, License, Or}
 import rpm4s.data.License._
 
-class LicenseSpec extends FlatSpec with Matchers with PropertyChecks {
+class LicenseSpec extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   "License.parse" should "handle unknown licenses" in {
     License.parse("Unknown license") shouldBe Right(UnknownLicense("Unknown license"))

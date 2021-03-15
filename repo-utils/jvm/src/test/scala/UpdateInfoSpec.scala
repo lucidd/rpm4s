@@ -1,22 +1,28 @@
 import java.time.Instant
-
-import cats.effect.IO
+import cats.effect.{Blocker, IO}
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rpm4s.data._
 import rpm4s.repo.repomd.xml.updateinfo.xml2updates
 import rpm4s.repo.data.updateinfo.UpdateF
 import rpm4s.repo.data.updateinfo.UpdateF._
 import rpm4s.repo.utils.xml.xmlevents
 
+import scala.concurrent.ExecutionContext
+
 class UpdateInfoSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with Matchers
-    with PropertyChecks {
+    with ScalaCheckPropertyChecks {
 
   "repomd/updateinfo.xml" should "get parsed correctly" in {
+    implicit val contextShift = IO.contextShift(ExecutionContext.global)
+    val blocker = Blocker.liftExecutionContext(ExecutionContext.global)
     val r  = xmlevents[IO](
-      getClass.getResourceAsStream("/repomd/updateinfo.xml")
+      getClass.getResourceAsStream("/repomd/updateinfo.xml"),
+      blocker
     ).through(xml2updates)
      .compile.toVector.unsafeRunSync()
 
@@ -48,11 +54,11 @@ class UpdateInfoSpec
         packages = Set(
           PackageF[cats.Id](
             name = Name("openconnect").toOption.get,
-            epoch = None,
+            epoch = Epoch.ZERO,
             version = Version.fromString("7.08").toOption.get,
             release = Release.fromString("7.1").toOption.get,
             arch = Architecture.Src,
-            src = "src/openconnect-7.08-7.1.src.rpm",
+            src = Some("src/openconnect-7.08-7.1.src.rpm"),
             filename = "openconnect-7.08-7.1.src.rpm",
             rebootSuggested = false,
             reloginSuggested = false,
@@ -60,11 +66,11 @@ class UpdateInfoSpec
           ),
           PackageF[cats.Id](
             name = Name("openconnect").toOption.get,
-            epoch = None,
+            epoch = Epoch.ZERO,
             version = Version.fromString("7.08").toOption.get,
             release = Release.fromString("7.1").toOption.get,
             arch = Architecture.x86_64,
-            src = "x86_64/openconnect-7.08-7.1.x86_64.rpm",
+            src = Some("x86_64/openconnect-7.08-7.1.x86_64.rpm"),
             filename = "openconnect-7.08-7.1.x86_64.rpm",
             rebootSuggested = false,
             reloginSuggested = false,
@@ -102,11 +108,11 @@ class UpdateInfoSpec
         packages = Set(
           PackageF[cats.Id](
             name = Name("wireshark").toOption.get,
-            epoch = Some(Epoch.fromInt(4).toOption.get),
+            epoch = Epoch.fromInt(4).toOption.get,
             version = Version.fromString("2.2.8").toOption.get,
             release = Release.fromString("17.1").toOption.get,
             arch = Architecture.Src,
-            src = "src/wireshark-2.2.8-17.1.src.rpm",
+            src = Some("src/wireshark-2.2.8-17.1.src.rpm"),
             filename = "wireshark-2.2.8-17.1.src.rpm",
             rebootSuggested = false,
             reloginSuggested = false,

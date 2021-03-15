@@ -1,15 +1,16 @@
 import java.security.MessageDigest
-
 import cats.effect.IO
 import fs2.{Pipe, Stream}
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rpm4s.data.Checksum.Sha256
 
 class HashSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with Matchers
-    with PropertyChecks {
+    with ScalaCheckPropertyChecks {
 
   "checksumsBeforeAndAfter" should "produce the same result as doing each step manually" in {
     forAll { value: String =>

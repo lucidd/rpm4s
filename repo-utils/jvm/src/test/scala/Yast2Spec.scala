@@ -1,9 +1,10 @@
 import java.util.concurrent.Executors
-
 import cats.effect.{Blocker, IO}
 import org.http4s.Uri
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rpm4s.data.Checksum.Sha1
 import rpm4s.data.{Architecture, Name}
 import rpm4s.repo.data.Bytes
@@ -13,9 +14,9 @@ import rpm4s.repo.yast2.{Content, Yast2}
 import scala.concurrent.ExecutionContext
 
 class Yast2Spec
-    extends FlatSpec
+    extends AnyFlatSpec
     with Matchers
-    with PropertyChecks {
+    with ScalaCheckPropertyChecks {
 
   "content" should "get parsed correctly" in {
     implicit val cs = IO.contextShift(ExecutionContext.global)
