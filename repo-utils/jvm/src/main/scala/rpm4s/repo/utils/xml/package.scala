@@ -6,7 +6,7 @@ import javax.xml.stream.{XMLInputFactory, XMLStreamReader}
 import javax.xml.stream.events.{EndElement, StartElement, XMLEvent}
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.util.XMLEventAllocator
-import cats.effect.Sync
+import cats.effect.{Blocker, ContextShift, Sync}
 import com.sun.xml.internal.stream.events.XMLEventAllocatorImpl
 import fs2.{Pipe, Stream}
 
@@ -39,13 +39,13 @@ package object xml {
     xmlif.createXMLStreamReader(in)
   }
 
-  def xmlevents[F[_]: Sync](in: InputStream): Stream[F, XMLEvent] = {
+  def xmlevents[F[_]: Sync: ContextShift](in: InputStream, blocker: Blocker): Stream[F, XMLEvent] = {
     val xmlif = XMLInputFactory.newInstance()
     xmlif.setEventAllocator(new XMLEventAllocatorImpl())
-    Stream.bracket(Sync[F].delay(xmlif.createXMLStreamReader(in)))(xmlsr => Sync[F].delay(xmlsr.close()))
+    Stream.bracket(blocker.delay(xmlif.createXMLStreamReader(in)))(xmlsr => blocker.delay(xmlsr.close()))
       .flatMap { xmlsr =>
         Stream.unfoldEval[F, XMLStreamReader, XMLEvent](xmlsr) { xmlr =>
-          Sync[F].delay {
+          blocker.delay {
             if (xmlr.hasNext) {
               xmlr.next()
               val event = xmlif.getEventAllocator.allocate(xmlr)

@@ -2,7 +2,7 @@ package rpm4s.data
 
 import cats.Comparison
 import rpm4s.codecs.ConvertingError
-import rpm4s.data.Segment.{Alpha, Numeric, Separator, Tilde}
+import rpm4s.data.Segment.{Alpha, Caret, Numeric, Separator, Tilde}
 import rpm4s.utils
 import rpm4s.utils.{isAlpha, isNum}
 
@@ -16,6 +16,7 @@ sealed trait Segment {
     def str(seg: Option[Segment], acc: StringBuilder): String = seg match {
       case None => acc.toString()
       case Some(Tilde(next)) => str(next, acc.append('~'))
+      case Some(Caret(next)) => str(next, acc.append('^'))
       case Some(Alpha(value, next)) => str(next, acc.append(value))
       case Some(Separator(value, next)) => str(next, acc.append(value))
       case Some(Numeric(value, next)) => str(next, acc.append(value))
@@ -26,10 +27,10 @@ sealed trait Segment {
 
 object Segment {
 
-  val validChars: String = (('a' to 'z') ++ ('A' to 'Z') ++ ('0' to '9')).mkString + "{}%+_.~"
+  val validChars: String = (('a' to 'z') ++ ('A' to 'Z') ++ ('0' to '9')).mkString + "{}%+_.~^"
 
   def isValidSegmentChar(c: Char): Boolean =
-    utils.isAlphaNumOr(c, Separator.validChars + "~")
+    utils.isAlphaNumOr(c, Separator.validChars + "~^")
 
   implicit val ordering: Ordering[Segment] = new Ordering[Segment] {
     override def compare(x: Segment, y: Segment): Int = {
@@ -48,6 +49,13 @@ object Segment {
         segment(r1, r2)
       case (Some(Tilde(_)), _) => Comparison.LessThan
       case (_, Some(Tilde(_))) => Comparison.GreaterThan
+
+      case (Some(Caret(r1)), Some(Caret(r2))) =>
+        segment(r1, r2)
+      case (None, Some(Caret(_))) => Comparison.LessThan
+      case (Some(Caret(_)), None) => Comparison.GreaterThan
+      case (Some(_), Some(Caret(_))) => Comparison.GreaterThan
+      case (Some(Caret(_)), Some(_)) => Comparison.LessThan
 
       case (Some(Separator(_, r1)), Some(Separator(_, r2))) =>
         segment(r1, r2)
@@ -106,12 +114,16 @@ object Segment {
   def tilde(rest: String): Either[ConvertingError, Option[Tilde]] =
     segment(rest.drop(1)).map(x => Some(Tilde(x)))
 
+  def caret(rest: String): Either[ConvertingError, Option[Caret]] =
+    segment(rest.drop(1)).map(x => Some(Caret(x)))
+
   def notSep(rest: String): Either[ConvertingError, Option[NotSeparator]] = {
     rest.headOption match {
       case None => Right(None)
       case Some(c) if isAlpha(c) => alpha(rest)
       case Some(c) if isNum(c) => numeric(rest)
       case Some('~') => tilde(rest)
+      case Some('^') => caret(rest)
       case Some(c) => Left(ConvertingError(s"expected non sep segment got: '$c'"))
     }
   }
@@ -121,6 +133,7 @@ object Segment {
       case None => Right(None)
       case Some(c) if isAlpha(c) => alpha(rest)
       case Some('~') => tilde(rest)
+      case Some('^') => caret(rest)
       case Some(c) if Separator.validSeparatorChars.contains(c) => separator(rest)
       case Some(c) => Left(ConvertingError(s"expected non num segment got: '$c'"))
     }
@@ -131,6 +144,7 @@ object Segment {
       case None => Right(None)
       case Some(c) if isNum(c) => numeric(rest)
       case Some('~') => tilde(rest)
+      case Some('^') => caret(rest)
       case Some(c) if Separator.validSeparatorChars.contains(c) => separator(rest)
       case Some(c) => Left(ConvertingError(s"expected non alpha segment got: '$c'"))
     }
@@ -142,6 +156,7 @@ object Segment {
       case Some(c) if isAlpha(c) => alpha(rest)
       case Some(c) if isNum(c) => numeric(rest)
       case Some('~') => tilde(rest)
+      case Some('^') => caret(rest)
       case Some(c) if Separator.validSeparatorChars.contains(c) => separator(rest)
       case Some(c) => Left(ConvertingError(s"'$c' is not a valid version char"))
     }
@@ -164,6 +179,7 @@ object Segment {
   }
 
   case class Tilde(next: Option[Segment]) extends Segment with NotAlpha with NotNumeric with NotSeparator
+  case class Caret(next: Option[Segment]) extends Segment with NotAlpha with NotNumeric with NotSeparator
 
   /**
     * A version segment with one or more letters

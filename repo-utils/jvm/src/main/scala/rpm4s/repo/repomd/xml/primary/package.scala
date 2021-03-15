@@ -2,7 +2,7 @@ package rpm4s.repo.repomd.xml
 
 import javax.xml.namespace.QName
 import javax.xml.stream.events.{StartElement, XMLEvent}
-import cats.effect.{ConcurrentEffect, Effect}
+import cats.effect.{Blocker, ConcurrentEffect, ContextShift, Effect}
 import fs2.{Pipe, Pull, RaiseThrowable, Stream}
 import org.http4s.Uri
 import rpm4s.data.Dependency.Requires
@@ -69,7 +69,7 @@ package object primary {
   private def pkgref2xml(pkgRef: PkgRef): String = {
     val (name, epoch, version, release) = pkgRef match {
       case RpmRef(name, evr, flags) =>
-        (name.value, evr.flatMap(_.epoch).map(_.value.toString), evr.map(_.version.string), evr.flatMap(_.release).map(_.value))
+        (name.value, evr.map(_.epoch).map(_.value.toString), evr.map(_.version.string), evr.flatMap(_.release).map(_.value))
       case VirtualRef(name, None, flags) =>
         (name, None, None, None)
       case VirtualRef(name, Some(version), flags) =>
@@ -96,7 +96,7 @@ package object primary {
   )(sb: StringBuilder): StringBuilder = {
     val name = rpm.name.value
     val arch = Architecture.toRpmString(rpm.architecture)
-    val epoch = rpm.epoch.map(_.value).getOrElse(0).toString
+    val epoch = rpm.epoch.value.toString
     val version = rpm.version.string
     val release = rpm.release.value
     val ckType = checksum2type(checksum)
@@ -104,7 +104,7 @@ package object primary {
     val summery = rpm.summery.locales.values.head
     val description = rpm.description.locales.values.head
     //val fileTime = ""
-    //val buildTime = ""
+    val buildTime = rpm.buildtime.map(_.time.toEpochMilli / 1000).get
     //val packageSize = ""
     //val installedSize = ""
     //val archiveSize = ""
@@ -125,7 +125,8 @@ package object primary {
     sb.append(s"<description>${Utility.escape(description)}</description>")
     //sb.append(s"<packager>$summery</packager>")
     //sb.append(s"<url>$summery</url>")
-    //sb.append(s"""<time file="$fileTime" build="$buildTime"/>""")
+    //TODO: filetime should be set correctly at some point but not sure what even uses that
+    sb.append(s"""<time file="$buildTime" build="$buildTime"/>""")
     //sb.append(s"""<size package="$packageSize" installed="$installedSize" archive="$archiveSize"/>""")
     sb.append(s"""<location href="${Utility.escape(filePath)}"/>""")
     sb.append("<format>")
@@ -241,9 +242,9 @@ package object primary {
       Stream.emit("</metadata>")
   }
 
-  def bytes2packages[F[_]: ConcurrentEffect]: Pipe[F, Byte, PackageF.Package] =
+  def bytes2packages[F[_]: ConcurrentEffect: ContextShift](blocker: Blocker): Pipe[F, Byte, PackageF.Package] =
     _.through(fs2.io.toInputStream[F])
-      .flatMap(is => xmlevents(is))
+      .flatMap(is => xmlevents(is, blocker))
       .through(xml2packages)
 
 
@@ -276,9 +277,7 @@ package object primary {
                 case "version" => {
                   val version = Version.fromString(se.getAttributeByName(verAttr).getValue)
                   val epochString = se.getAttributeByName(epochAttr).getValue
-                  val epoch =
-                    if (epochString == "0") Either.right(None)
-                    else Epoch.fromString(epochString).map(Some(_))
+                  val epoch = Epoch.fromString(epochString)
                   val release = Release.fromString(se.getAttributeByName(relAttr).getValue)
                   (version, epoch, release) match {
                     case (Right(v), Right(e), Right(r)) =>

@@ -122,6 +122,7 @@ object HeaderTag {
   case object PostTrans extends HeaderTag[StringData]
   case object PreTransProg extends HeaderTag[StringData]
   case object PostTransProg extends HeaderTag[StringData]
+  case object PostTransFlags extends HeaderTag[Int32Data]
 
   case object ConflictFlags extends HeaderTag[Int32Data]
   case object ConflictName extends HeaderTag[StringArrayData]
@@ -138,6 +139,7 @@ object HeaderTag {
   case object PostUn extends HeaderTag[StringData]
   case object PreInProg extends HeaderTag[StringArrayData]
   case object PostInProg extends HeaderTag[StringArrayData]
+  case object PostInFlags extends HeaderTag[Int32Data]
   case object PreUnProg extends HeaderTag[StringArrayData]
   case object PostUnProg extends HeaderTag[StringArrayData]
 
@@ -190,6 +192,10 @@ object HeaderTag {
   case object FileSignatureLength extends HeaderTag[Int32Data] // single value
   case object PayloadDigest extends HeaderTag[StringArrayData]
   case object PayloadDigestAlgo extends HeaderTag[Int32Data] // single value
+  case object PayloadDigestAlt extends HeaderTag[StringArrayData]
+  case object ModularityLabel extends HeaderTag[StringData]
+  case object AutoInstalled extends HeaderTag[Int32Data]
+  case object Identity extends HeaderTag[StringData]
 }
 
 sealed trait SignatureTag extends RPMTag {

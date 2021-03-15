@@ -1,11 +1,13 @@
 import org.scalacheck.{Arbitrary, Gen, Shrink}
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rpm4s.data.Checksum
 import rpm4s.data.Checksum.{Md5, Sha1, Sha256, Sha512}
 
 
-class ChecksumSpec extends FlatSpec with Matchers with PropertyChecks {
+class ChecksumSpec extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   val hashChars: Set[Char] = (('a' to 'f') ++ ('0' to '9')).toSet
 
@@ -18,8 +20,6 @@ class ChecksumSpec extends FlatSpec with Matchers with PropertyChecks {
   )
 
   def hashBytes(n: Int): Gen[Vector[Byte]] = Gen.listOfN(n, Gen.choose[Byte](-128, 127)).map(_.toVector)
-
-  implicit val noShrink: Shrink[String] = Shrink(_ => Stream.empty)
 
   def testHash[T <: Checksum](
       byteSize: Int,
