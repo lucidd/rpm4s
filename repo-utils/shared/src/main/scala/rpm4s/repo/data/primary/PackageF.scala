@@ -1,7 +1,7 @@
 package rpm4s.repo.data.primary
 
 import cats.Id
-import cats.implicits._
+import cats.syntax.all._
 import rpm4s.data._
 
 case class PackageF[F[_]](

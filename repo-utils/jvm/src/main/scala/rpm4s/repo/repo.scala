@@ -5,13 +5,13 @@ import java.nio.file._
 import java.security.MessageDigest
 
 import cats.effect.{Blocker, ContextShift, Effect}
-import cats.implicits._
+import cats.syntax.all._
 import fs2.{Chunk, Pipe, Stream}
 import rpm4s.data.Checksum.Sha256
 import rpm4s.data._
 import rpm4s.repo.utils.compress.gzip
 import rpm4s.repo.data.updateinfo.UpdateF.Update
-import cats.implicits._
+import cats.syntax.all._
 
 
 package object repo {
