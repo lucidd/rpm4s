@@ -100,7 +100,7 @@ object Extractor {
     )
     val sigTags: Set[SignatureTag] = Set.empty
     def extract(data: Data): Result[Vector[T]] = {
-      import cats.implicits._
+      import cats.syntax.all._
       //TODO: needs more validation
       val a = for {
         names <- data(namesTag)
@@ -211,7 +211,7 @@ object Extractor {
       )
       val sigTags: Set[SignatureTag] = Set.empty
       def extract(data: Data): Result[Vector[FileEntry]] = {
-        import cats.implicits._
+        import cats.syntax.all._
         for {
           dirNames <- data(HeaderTag.DirNames)
           dirIndexes <- data(HeaderTag.DirIndexes)

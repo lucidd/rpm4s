@@ -13,7 +13,6 @@ import scodec.bits.{BitVector, ByteVector}
 import fs2.{Pure, Stream}
 import rpm4s.repo.data.primary.{PackageF, SizeInfo}
 import rpm4s.repo.repomd.xml.primary.xml2packages
-import cats.implicits._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
