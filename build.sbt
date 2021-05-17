@@ -83,8 +83,8 @@ lazy val benchmarks = project
 
 val commonSettings = Seq(
     organization := "io.lullabyte",
-    scalaVersion := "2.13.3",
-    crossScalaVersions := Seq("2.13.3"),
+    scalaVersion := "2.13.6",
+    crossScalaVersions := Seq("2.13.6"),
 )
 
 lazy val rpm4s = crossProject(JSPlatform, JVMPlatform)
