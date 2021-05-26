@@ -5,7 +5,7 @@ object Dependencies {
   val scalatestplus = "3.2.2.0"
   val scalacheck = "1.14.3"
   val http4s = "0.21.7"
-  val circe = "0.13.0"
+  val circe = "0.14.0"
   val shapeless = "2.3.3"
   val scodecCore = "1.11.4"
   val scalaXML = "1.2.0"
