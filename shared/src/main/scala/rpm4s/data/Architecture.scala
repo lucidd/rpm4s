@@ -17,6 +17,7 @@ object Architecture {
   case object ppc64le extends HardwareArch
   case object s390x extends HardwareArch
   case object aarch64 extends HardwareArch
+  case object armv7hl extends HardwareArch
 
   case object NoArch extends RequiredArch
 
@@ -36,6 +37,7 @@ object Architecture {
     case Architecture.Src => "src"
     case Architecture.NoSrc => "nosrc"
     case Architecture.aarch64 => "aarch64"
+    case Architecture.armv7hl => "armv7hl"
     case _ => ???
   }
 
@@ -51,6 +53,7 @@ object Architecture {
     case "nosrc" => Some(Architecture.NoSrc)
     case "src" => Some(Architecture.Src)
     case "aarch64" => Some(Architecture.aarch64)
+    case "armv7hl" => Some(Architecture.armv7hl)
     case _ => None
   }
 }
