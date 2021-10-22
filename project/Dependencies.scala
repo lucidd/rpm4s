@@ -7,7 +7,7 @@ object Dependencies {
   val http4s = "0.21.7"
   val circe = "0.13.0"
   val shapeless = "2.3.3"
-  val scodecCore = "1.11.4"
+  val scodecCore = "1.11.9"
   val scalaXML = "1.2.0"
   val decline = "1.0.0"
   val commonsCompress = "1.19"
