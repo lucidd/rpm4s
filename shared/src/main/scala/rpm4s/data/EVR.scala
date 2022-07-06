@@ -1,7 +1,6 @@
 package rpm4s.data
 
 import rpm4s.codecs.ConvertingError
-import cats.implicits._
 
 case class EVR(
     version: Version,

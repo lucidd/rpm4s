@@ -3,7 +3,7 @@ package rpm4s.repo.data.updateinfo
 import java.time.Instant
 
 import cats.Id
-import cats.implicits._
+import cats.syntax.all._
 import rpm4s.data.{CVE, _}
 
 
