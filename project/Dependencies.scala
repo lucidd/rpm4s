@@ -11,7 +11,7 @@ object Dependencies {
   val scalaXML = "1.2.0"
   val decline = "1.0.0"
   val commonsCompress = "1.19"
-  val betterFiles = "3.9.1"
+  val betterFiles = "3.9.2"
   val bouncyCastle = "1.62"
   val xz = "1.8"
 }
