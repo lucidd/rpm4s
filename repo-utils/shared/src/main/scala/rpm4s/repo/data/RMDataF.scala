@@ -3,7 +3,7 @@ package rpm4s.repo.data
 import java.time.Instant
 
 import cats.Id
-import cats.implicits._
+import cats.syntax.all._
 import rpm4s.data.Checksum
 
 
