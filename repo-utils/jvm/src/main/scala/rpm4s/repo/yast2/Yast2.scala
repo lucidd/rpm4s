@@ -1,7 +1,7 @@
 package rpm4s.repo.yast2
 
 import cats._
-import cats.implicits._
+import cats.syntax.all._
 import fs2.{Pipe, Pull, RaiseThrowable, Stream}
 import rpm4s.data.Checksum.{Sha1, Sha256}
 import rpm4s.data.{Architecture, Checksum, Name}
