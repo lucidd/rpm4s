@@ -5,7 +5,7 @@ import java.security.MessageDigest
 import cats.effect.{Effect, Sync}
 import fs2.{Pipe, Stream}
 import rpm4s.data.Checksum
-import cats.implicits._
+import cats.syntax.all._
 
 package object hash {
 

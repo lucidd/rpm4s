@@ -2,7 +2,7 @@ package rpm4s.cli
 
 import java.nio.file.Path
 
-import cats.implicits._
+import cats.syntax.all._
 import com.monovore.decline._
 import rpm4s.data.{Architecture, License}
 import rpm4s.data._
