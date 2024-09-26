@@ -9,7 +9,7 @@ object Dependencies {
   val shapeless = "2.3.3"
   val scodecCore = "1.11.4"
   val scalaXML = "1.2.0"
-  val decline = "1.0.0"
+  val decline = "1.4.0"
   val commonsCompress = "1.19"
   val betterFiles = "3.9.1"
   val bouncyCastle = "1.62"
